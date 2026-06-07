@@ -23,7 +23,7 @@
 - 纯 LLM 评委均分 88.8% vs 完整系统 37.2%（差 51.6pp）
 - 这个差距不是"准确率"，而是"LLM 对执行层失败全盲"的动机指标
 
-#### 2-4 min：一键验证
+#### 2-4 min：一键验证（全部零 key）
 
 ```bash
 git clone https://github.com/AppApp777/a-hackthon.git && cd a-hackthon
@@ -31,7 +31,32 @@ pip install -r agent-eval/requirements.txt
 python reproduce_claims.py
 ```
 
-预期输出：**17/17 PASS**，含 LLM-only mean ≈88.8%、full-system mean ≈37.2%。无需 API key。
+预期输出：**17/17 PASS**，含 LLM-only mean ≈88.8%、full-system mean ≈37.2%。**无需任何 API key、无需联网。** 如果只有时间敲一条命令，敲这条。
+
+想再补三条独立证据（同样零 key；本机无 `make` 时用 `python` 直跑版，命令均以仓库根为 cwd）：
+
+```powershell
+# 护城河黄金案例：同一对话 87 vs 0  —— 等价 make judge-demo
+# 必须先 cd agent-eval（judge_demo.py 只在 agent-eval/scripts/ 下；从根跑 scripts/judge_demo.py 会找不到文件）
+cd agent-eval; python scripts/judge_demo.py; cd ..   # 预期 result = PROOF_PASSED
+# 护城河精选测试
+$env:PYTHONPATH="agent-eval"; python -m pytest tests/judge_moat -q   # 预期 4 passed
+# 全套（两个目录都要给，缺一只有 1093）
+python -m pytest tests agent-eval/tests -q   # 退出码 0 即全过；看计数加 -rN
+```
+
+| 命令 | 证明什么 | 零 key？ |
+|---|---|---|
+| `python reproduce_claims.py` | 17 条头条数字对冻结产物核实（消融 51.6pp / 配对 30×10×3 / 数据规模 / 测试可收集） | 是（纯读 JSON，无网络） |
+| `cd agent-eval; python scripts/judge_demo.py` | 同对话 SHA256 相同，真执行 87 / 抹掉证据 0，按 trace 打分非按声称打分 | 是 |
+| `pytest tests/judge_moat -q` | 4 条护城河测试与 demo 共用 fixture，不静默漂移 | 是 |
+| `pytest tests agent-eval/tests -q` | 全套 1174（根 1093 + agent-eval 81）零 key、零网络全过 | 是 |
+
+> **`1174` vs `1093`**：`make test`（= `pytest tests/`）与 pytest 默认只跑根 `tests/`（1093）。要看到 1174 必须显式 `python -m pytest tests agent-eval/tests`。`addopts=-q` 会顶掉末尾汇总行——退出码 0 即全过，想看到 "1174 passed" 加 `-rN`。
+>
+> **零 key 怎么做到的**：公开仓只入库 `agent-eval/.env.example`（占位符），真 `.env` 被 gitignore，评委 clone 天然没有 .env。`reproduce_claims.py` 不读任何 key（唯一 `os.environ` 用途是给 pytest 子进程传 `PYTHONPATH`），demo 静态页的 `/api` fetch 在 `EMBEDDED_MODE=true` 下是死代码。
+>
+> **零 key 复现 ≠ 跑全新评测**：以上是回放 2026-06-07 冻结快照（零 LLM、零网络）。现场跑全新评测才需模型——三档：①本机 `claude` CLI + `$env:LLM_PROVIDER='claude_cli'`（零 API key，需已登录 CLI）②自带 API key 横评任意模型 ③加 `--no-llm-judge` 只省评委软质量层，**不省**被测 Agent 与用户模拟器（生成对话本身必须有模型）。详见 README「生成新 trace」。
 
 > **跑不起来？** 见下方"失败恢复路径"。
 
@@ -39,6 +64,7 @@ python reproduce_claims.py
 
 ```bash
 make judge-demo
+# 无 make（如 Windows）：cd agent-eval && python scripts/judge_demo.py
 ```
 
 **记忆锚点 1**：同一段对话，系统给 87 分 vs 0 分，差别只在工具是否真执行。
@@ -199,7 +225,7 @@ grep -n "hash_chain\|append_only" agent-eval/models.py | head -10
 | 问题 | 恢复方案 |
 |---|---|
 | `reproduce_claims.py` 报错 | 检查 Python 版本（需 3.10+）→ `pip install -r agent-eval/requirements.txt` |
-| `make` 不可用 | 直接运行：`PYTHONPATH=agent-eval python scripts/judge_demo.py` |
+| `make` 不可用 | 先 `cd agent-eval` 再 `python scripts/judge_demo.py`（该文件在 `agent-eval/scripts/` 下，从仓库根直接跑会找不到文件） |
 | 依赖安装失败 | [在线 Demo](http://101.42.14.246/a-hackthon/)（零安装） |
 | 网络不可用 | 阅读 [`docs/judge_walkthrough/README.md`](docs/judge_walkthrough/README.md)（静态 walkthrough） |
 

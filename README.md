@@ -141,40 +141,91 @@
 
 ## 快速开始
 
-### 离线验证（不需要 API Key）
+### 评委零 Key 验证（全部头条声明，无需任何 API Key）
 
-```bash
-# 1. 安装依赖
+> 所有头条数字都能在**不配置任何 API Key、不联网**下当场复核。命令均以**评委 clone 后的仓库根**为 cwd（即 `git clone https://github.com/AppApp777/a-hackthon.git && cd a-hackthon` 之后），不写任何机器绝对路径。本机无 `make`，下面给 `python` 直跑版；装了 `make`（Git-Bash）的评委可用括注的等价 target。
+>
+> 这一节只验证**已冻结快照里的声明**；跑全新评测（需 LLM）见下方「生成新 trace」。
+
+PowerShell（评委逐块复制；脚本本身不读 key，清不清结果一致，清 key 只为打消疑虑）：
+
+```powershell
+# 已在仓库根（git clone ... && cd a-hackthon 之后），先装依赖
 pip install -r agent-eval/requirements.txt
+$env:ANTHROPIC_API_KEY=$null; $env:OPENAI_API_KEY=$null
 
-# 2. 一键验证核心声明（消融实验、场景数、校准数据）
-bash scripts/judge_verify.sh
+# 1) 复现 17 条头条声明（消融 / 配对 / 数据规模 / 测试数量）  —— 等价: make reproduce
+python reproduce_claims.py
+#   预期：总计 17 项声明 | 17 通过 | 0 失败，退出码 0
 
-# 3. 跑契约测试 + 对抗测试
-PYTHONPATH=agent-eval python -m pytest tests/contracts tests/adversarial -q
+# 2) 护城河黄金案例（离线证明 87 vs 0）  —— 等价: make judge-demo
+#   必须先 cd agent-eval：judge_demo.py 只在 agent-eval/scripts/ 下，从仓库根直接跑 scripts/judge_demo.py 会找不到文件
+cd agent-eval; python scripts/judge_demo.py; cd ..
+#   预期：result = PROOF_PASSED，8 条断言全过，退出码 0
 
-# 4. 跑完整测试套件（1174 项）
-PYTHONPATH=agent-eval python -m pytest tests/ --tb=short
+# 3) 护城河精选测试（4 条）  —— 等价: make judge-tests
+$env:PYTHONPATH="agent-eval"; python -m pytest tests/judge_moat -q
+#   预期：4 passed
+
+# 4) 全套测试（必须同时给两个目录，缺一只有 1093）
+python -m pytest tests agent-eval/tests -q
+#   预期：退出码 0、全过（想看到 "1174 passed" 汇总行加 -rN，见下方提示）
+
+# 5) 看 Demo：相对路径打开静态文件，纯离线、零依赖
+start docs\demo\index.html
 ```
 
-### 生成新 trace（需要 API Key）
+每条命令证明了什么：
 
-```bash
-# 5. 配置模型 API Key（在 agent-eval/.env 中设置）
-#    支持: Claude / GPT / MiniMax / DeepSeek / GLM / Kimi / mimo / LongCat 等
+| 命令 | 证明 | 预期 |
+|---|---|---|
+| `python reproduce_claims.py` | 消融 full 37.2% / soft 88.8% / 差 51.6pp、配对 30×10×3 中位标准差 7.4%、数据规模（34 场景 / 139 trace / scorer 1760 行）、测试可离线收集，全部对冻结产物核实 | `17 通过 \| 0 失败`，退出码 0 |
+| `cd agent-eval; python scripts/judge_demo.py` | 同一段对话（可见对话 SHA256 逐字节相同）：工具**真执行**得 87 分；只抹掉隐藏执行证据 → 事件变 `TOOL_FABRICATED`、DB 回滚 → 被非补偿性 veto 压到 0 分。即"按 trace 证明的打分，不按 transcript 声称的打分" | `result = PROOF_PASSED`，退出码 0 |
+| `pytest tests/judge_moat -q` | 4 条护城河测试与 demo 共用 fixture，确保 demo 与测试不静默漂移 | `4 passed` |
+| `pytest tests agent-eval/tests -q` | 全套 1174（= 根 `tests/` 1093 + `agent-eval/tests/` 81）零 key、零网络全过；测试目录内无 `load_dotenv`/`requests`/`httpx`/真 `anthropic`/`openai` 调用 | 退出码 0，1174 passed |
+| 打开 `docs/demo/index.html` | 纯静态自包含（内联 CSS/JS、数字硬编码、相对路径 `<iframe src="dashboard.html">`），`file://` 即可离线打开，零 CDN / 零后台 / 零 key | 浏览器直接显示仪表盘 |
 
-# 6. 跑一个简单场景
+> **为什么这些路径不读 key**：`reproduce_claims.py` 只用标准库 `json/subprocess/sys/pathlib/statistics`（外加函数内惰性 `import re`），无 `load_dotenv`/`requests`/`getenv` 读 key；唯一 `os.environ` 用途是给 pytest 子进程传 `PYTHONPATH`。`docs/demo` 静态页里 `/api/*` 的 `fetch` 在 `EMBEDDED_MODE=true` 下被内嵌数据版函数整体覆盖，是死代码，离线打开一次请求都不会发。
+>
+> **两个目录的坑**：`make test`（= `pytest tests/`）与 pytest 默认 `testpaths=["tests"]` 都**只跑根 `tests/` = 1093**。要看到 1174 必须显式 `python -m pytest tests agent-eval/tests`。
+>
+> **看不到 "1174 passed" 汇总行？** pyproject 里 `addopts=-q` 会把末尾汇总行顶掉（点号刷屏）。退出码 0 即全过；想稳定看到计数加 `-rN`：`python -m pytest tests agent-eval/tests -rN`。
+
+说明：
+
+- 公开仓只入库 `agent-eval/.env.example`（占位符模板），真 `.env` 被 gitignore——评委 clone 的公开仓**天然没有 .env**，所以上面全部路径零 key。**绝不要把真 key 写进入库文件。**
+- 数据为 2026-06-07 冻结快照；上述校验的是"打分引擎对已固化 trace 的判别行为"，不是现场重新评测。
+
+### 生成新 trace（零 key 用本机 claude CLI，或自带 API key）
+
+> 跑一次**全新评测**会真实调用 LLM 生成对话（被测 Agent + 用户模拟器都得有模型说话），这与上一节"零 key 复现快照"是两回事。按是否有 key 分三档：
+
+**A 档 · 零 key 验证已有声明**（不碰 .env）：即上一节 `reproduce_claims.py` / `judge_demo.py`，纯读冻结 JSON，零 LLM、零网络。
+
+**B 档 · 零 key 跑全新评测**（本机已装并登录 `claude` CLI）：被测 Agent / 用户模拟器 / 评委全程不读任何 API key，靠 CLI 自身登录态生成新对话。
+
+```powershell
 cd agent-eval
-python run_outbound.py scenarios/outbound/delivery_confirm_basic.json \
-  --model LongCat-2.0-Preview --no-llm-judge
-
-# 7. 启用安全护栏
-python run_outbound.py scenarios/outbound/after_sales_complaint.json \
-  --model LongCat-2.0-Preview --harness
-
-# 8. 启动仪表盘
-python dashboard.py  # → http://localhost:8765
+$env:ANTHROPIC_API_KEY=$null; $env:OPENAI_API_KEY=$null
+$env:LLM_PROVIDER="claude_cli"   # 关键：显式指定，否则若存在 .env 可能被覆盖到需 key 的路径
+python run_outbound.py scenarios/outbound/delivery_confirm_basic.json --model haiku --no-llm-judge
+cd ..
+#   预期：完整跑完，输出评分报告 + 失败清单 + 根因诊断，并保存一条新 trace
 ```
+
+注意：`--no-llm-judge` 只关掉**评委软质量层**那一支 LLM 调用，**不关**被测 Agent 和用户模拟器（生成对话本身必须有模型）。所以 `--no-llm-judge ≠ 完全不用 LLM`。B 档需要本机已装并**登录** `claude` CLI；没装/没登录就只能走 A 档（回放快照）或 C 档（自带 key）。
+
+**C 档 · 自带 API key**（横评任意模型）：在 `agent-eval/.env` 里设 `LLM_PROVIDER=anthropic|openai|...` 及对应 KEY，`--model` 指定模型。不同 `--model` 走不同后端、读不同环境变量（详见 `agent-eval/llm.py` 的 `_MODEL_ENDPOINTS`），不是一个 key 通吃。
+
+```powershell
+cd agent-eval
+# 先从模板拷一份再填 key：cp .env.example .env，在 .env 里设 LLM_PROVIDER 与对应 KEY
+python run_outbound.py scenarios/outbound/delivery_confirm_basic.json --model LongCat-2.0-Preview --no-llm-judge
+python run_outbound.py scenarios/outbound/after_sales_complaint.json --model LongCat-2.0-Preview --harness  # 启用安全护栏
+python dashboard.py   # → http://localhost:8765
+```
+
+> **最容易踩的坑**：代码默认 provider（无 .env 时）是 `claude_cli`，但 `.env.example` 模板里写的是 `LLM_PROVIDER=anthropic`——一旦你 `cp .env.example .env`，就被推上"需 ANTHROPIC_API_KEY"的路径。要走 B 档零 key，**显式设 `$env:LLM_PROVIDER='claude_cli'`**，或确保没有 .env 覆盖该默认。另：若机器上恰好设了 `ANTHROPIC_API_KEY`，温度为 0 的评委调用会从 CLI 自动切到 anthropic API（这时反而走 key），要纯 CLI 零 key 就别设 `ANTHROPIC_API_KEY`。
 
 ## 项目结构
 
