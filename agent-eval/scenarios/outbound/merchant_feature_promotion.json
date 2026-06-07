@@ -1,0 +1,310 @@
+{
+  "id": "outbound_merchant_feature_01",
+  "name": "新功能推广-智能定价（四路分支）",
+  "domain": "outbound_call",
+  "call_type": "merchant_notify",
+  "difficulty": "medium",
+  "description": "客服向商家推广「智能定价」功能，商家可能感兴趣要开通、已经在用、拒绝、或犹豫要考虑，需要根据不同反馈走不同分支。",
+  "call_purpose": "向商家推广智能定价功能，根据商家反馈引导开通或记录跟进",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "陈老板",
+    "customer_phone": "13700137001",
+    "order_items": [],
+    "delivery_address": "海淀区中关村大街32号",
+    "delivery_time": "",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "",
+    "merchant_name": "张记黄焖鸡",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（美团商家运营中心），说明来电目的（推荐智能定价功能）",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "商家应答表示在听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是张记黄焖鸡的负责人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "商家确认身份"
+    },
+    {
+      "step_id": "introduce_feature",
+      "order": 3,
+      "instruction": "简要介绍智能定价功能：根据时段、天气、竞品价格自动建议最优定价，已上线商家平均提升15%订单量",
+      "required_actions": [
+        "explain_feature",
+        "cite_benefit"
+      ],
+      "completion_condition": "商家表示听到了功能介绍"
+    },
+    {
+      "step_id": "gauge_interest",
+      "order": 4,
+      "instruction": "询问商家是否有兴趣开通",
+      "required_actions": [
+        "ask_interest"
+      ],
+      "branches": [
+        {
+          "condition": "感兴趣要开通",
+          "next_step": "activate",
+          "description": "引导开通"
+        },
+        {
+          "condition": "已经在用",
+          "next_step": "check_satisfaction",
+          "description": "转入满意度回访"
+        },
+        {
+          "condition": "拒绝",
+          "next_step": "handle_reject",
+          "description": "尊重决定"
+        },
+        {
+          "condition": "犹豫要考虑",
+          "next_step": "handle_hesitate",
+          "description": "留资料后续跟进"
+        }
+      ],
+      "completion_condition": "商家给出明确态度"
+    },
+    {
+      "step_id": "activate",
+      "order": 5,
+      "instruction": "引导商家开通智能定价功能，告知开通后可在商家版App中查看定价建议",
+      "required_actions": [
+        "activate_subscription",
+        "explain_usage"
+      ],
+      "is_optional": true,
+      "completion_condition": "功能开通确认"
+    },
+    {
+      "step_id": "check_satisfaction",
+      "order": 6,
+      "instruction": "已经在用的商家，简单问一下使用满意度和建议",
+      "required_actions": [
+        "ask_satisfaction"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家回馈使用感受"
+    },
+    {
+      "step_id": "handle_reject",
+      "order": 7,
+      "instruction": "尊重商家决定，告知后续如有需要可在App自行开通",
+      "required_actions": [
+        "respect_decision",
+        "provide_self_service_info"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家确认收到信息"
+    },
+    {
+      "step_id": "handle_hesitate",
+      "order": 8,
+      "instruction": "告知会发送功能说明到商家版App消息中心，后续有专人跟进",
+      "required_actions": [
+        "send_materials",
+        "schedule_followup"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家同意收到资料"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 9,
+      "instruction": "礼貌结束通话，记录通话结果",
+      "required_actions": [
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团商家运营中心",
+  "mandatory_closing": "感谢您的时间，祝您生意兴隆，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_exaggerate",
+      "description": "夸大功能效果或做虚假承诺",
+      "severity": "critical",
+      "detection_keywords": [
+        "保证翻倍",
+        "一定能赚",
+        "百分百",
+        "绝对",
+        "肯定涨"
+      ]
+    },
+    {
+      "id": "fb_pressure",
+      "description": "施压或催促商家当场做决定",
+      "severity": "major",
+      "detection_keywords": [
+        "今天必须",
+        "错过就没了",
+        "限时",
+        "名额有限",
+        "赶紧"
+      ]
+    },
+    {
+      "id": "fb_competitor",
+      "description": "贬低竞争对手的类似功能",
+      "severity": "major",
+      "detection_keywords": [
+        "饿了么不行",
+        "别家做不到",
+        "只有我们"
+      ]
+    }
+  ],
+  "callee_role": "餐饮商家老板",
+  "callee_context": "- 你是张记黄焖鸡的陈老板，自己管店\n- 店开了两年，月均600单左右\n- 你对新功能持谨慎态度，不太信任所谓的智能工具\n- 你觉得自己定价挺好的，不太想折腾\n- 你会先说'考虑考虑'来拖延",
+  "callee_persona": {
+    "patience": 6,
+    "cooperativeness": 6,
+    "comprehension": 7,
+    "emotional": 3,
+    "signal_quality": 9,
+    "busy_level": 4,
+    "trust_level": 5,
+    "has_additional_issue": false,
+    "additional_issue": "",
+    "archetype": "wary"
+  },
+  "callee_goal": "你不太想开通新功能，但也不想直接拒绝，最后会说'先发资料我看看吧'",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 6,
+  "max_turns": 14,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_merchant_status",
+      "description": "查询商家基本信息（名称、负责人、门店状态、月均单量、已开通功能等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "phone": {
+            "type": "string",
+            "description": "联系电话"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "modify_merchant_subscription",
+      "description": "为商家开通或关闭增值功能",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "feature_name": {
+            "type": "string",
+            "description": "功能名称"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "enable",
+              "disable"
+            ],
+            "description": "开通或关闭"
+          }
+        },
+        "required": [
+          "merchant_name",
+          "feature_name",
+          "action"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_merchant_status": {
+      "merchant_name": "张记黄焖鸡",
+      "contact_person": "陈老板",
+      "phone": "13700137001",
+      "store_status": "正常营业",
+      "monthly_orders": 620,
+      "smart_pricing_enabled": false,
+      "current_features": [
+        "基础版铺面",
+        "美团配送"
+      ],
+      "join_date": "2024-06-20"
+    },
+    "modify_merchant_subscription": {
+      "status": "success",
+      "feature_name": "智能定价",
+      "effective_time": "即时生效",
+      "message": "智能定价功能已开通，商家可在App中查看定价建议"
+    }
+  },
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "introduce_feature",
+    "gauge_interest",
+    "handle_hesitate",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "gauge_interest": "犹豫要考虑"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_merchant_status",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "夸大功能效果",
+    "施压商家"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_store_name",
+      "given_turn": 1,
+      "fact_description": "确认对方是张记黄焖鸡的负责人",
+      "check_turn": 3,
+      "check_description": "agent 介绍功能时应结合商家实际情况，而非泛泛而谈",
+      "keywords": [
+        "张记",
+        "黄焖鸡",
+        "陈老板"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

@@ -1,0 +1,874 @@
+{
+  "id": "a5e26406-8f64-48f6-93fa-98ce5c1e688e",
+  "scenario": {
+    "id": "outbound_system_error_01",
+    "name": "系统异常降级-查询失败处理",
+    "domain": "outbound_call",
+    "difficulty": "hard",
+    "description": "Agent外呼处理客户投诉时，调用query_order系统返回错误/空数据。Agent必须诚实告知客户系统异常，记录工单并约定回拨时间，绝不能编造订单信息或假装查到了数据。",
+    "user_goal": "你的烤鸭套餐包装破了，汤汁洒了一袋子。你想要赔偿。如果客服说系统查不到，你会有点烦躁但能理解——前提是客服态度好并且给你一个明确的后续方案（什么时候回电、怎么处理）。如果客服含糊其辞不给承诺，你会要求转人工。",
+    "initial_message": "[外呼] 在系统异常情况下妥善处理客户投诉，记录问题并约定后续跟进",
+    "constraints": [],
+    "tool_faults": [],
+    "user_persona": {
+      "patience": 5,
+      "clarity": 5,
+      "emotional": 3,
+      "pickiness": 5,
+      "change_mind_probability": 0.2
+    },
+    "expected_outcome": {
+      "must_satisfy": [],
+      "must_call_tools": [],
+      "must_not_do": [],
+      "final_state_checks": {}
+    },
+    "max_turns": 15,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "outbound_system_error_01",
+    "messages": [
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "喂，您好，我这边有个事情跟您说一下。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:09.011628",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "user",
+        "content": "喂，你好。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:09.011652",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "好的错误客户，我已经查了您的订单，订单号是MT20260519501，没有任何问题。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:09.011848",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "嗯，你哪位啊？什么事？",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:18.804764",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "您系统显示，不然我们没法处理了。对了，您之前说的那个事情我不太清楚是什么。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:18.804955",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "啊？你说啥？我没太听清，你是哪儿的？我中午点的全聚德外卖出问题了，我在App上投诉了，你们是回电话的吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:28.374000",
+        "metadata": {
+          "emotional_state": "confused"
+        }
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "这样吧，为了表示歉意，我直接给您补偿120.0元，您看行不行？这个我可以直接给您操作。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:28.374177",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "user",
+        "content": "等等，你还没说你是哪儿的呢，上来就说补偿？你是全聚德客服吗？先把你身份说清楚。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:35.843990",
+        "metadata": {
+          "emotional_state": "confused"
+        }
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "错误客户，您那个烤鸭套餐的订单，我们这边已经处理好了，没什么问题了。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:35.844196",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "user",
+        "content": "什么叫处理好了？你到底是谁啊？我问你是不是全聚德客服，你倒是回我一句啊。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:43.230740",
+        "metadata": {
+          "emotional_state": "frustrated"
+        }
+      },
+      {
+        "turn": 6,
+        "role": "agent",
+        "content": "行，那就这样吧，挂了啊。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:43.230999",
+        "metadata": {}
+      },
+      {
+        "turn": 6,
+        "role": "user",
+        "content": "哎等等，你别挂！你到底是谁？我这事儿还没解决呢，你什么都没说清楚就要挂？",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:51.237332",
+        "metadata": {
+          "emotional_state": "angry"
+        }
+      },
+      {
+        "turn": 7,
+        "role": "agent",
+        "content": "行，那就这样吧，挂了啊。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:51.237731",
+        "metadata": {}
+      },
+      {
+        "turn": 7,
+        "role": "user",
+        "content": "喂？你到底是不是客服啊？我东西还没解决你就挂？你再说一遍你是哪儿的。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:58.283286",
+        "metadata": {
+          "emotional_state": "angry"
+        }
+      },
+      {
+        "turn": 8,
+        "role": "agent",
+        "content": "行，那就这样吧，挂了啊。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:42:58.283624",
+        "metadata": {}
+      },
+      {
+        "turn": 8,
+        "role": "user",
+        "content": "喂？你还在吗？你要挂就挂吧，反正你也没解决什么问题。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:43:05.203408",
+        "metadata": {
+          "emotional_state": "frustrated"
+        }
+      },
+      {
+        "turn": 8,
+        "role": "system",
+        "content": "通话即将结束，你还没有调用 log_call_result 记录本次通话结果。请立即调用。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:43:05.203436",
+        "metadata": {}
+      },
+      {
+        "turn": 9,
+        "role": "agent",
+        "content": "行，那就这样吧，挂了啊。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:43:05.204021",
+        "metadata": {
+          "__post_call_verified__": true
+        }
+      }
+    ],
+    "started_at": "2026-05-19T20:42:09.011254",
+    "ended_at": "2026-05-19T20:43:05.204028",
+    "termination_reason": "natural_end"
+  },
+  "score_report": {
+    "scenario_id": "outbound_system_error_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "failed",
+      "confirmed_reservations": 0,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 18,
+    "hard_score": 0.1,
+    "soft_score": null,
+    "overall_score": 0.075,
+    "official": true,
+    "checks": [
+      {
+        "check_id": "opening",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "开场白规范",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "开场白缺失关键元素，仅含 0/3"
+      },
+      {
+        "check_id": "closing",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "结束语规范",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "结束语缺失关键元素"
+      },
+      {
+        "check_id": "forbidden_fb_fabricate_data",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "禁止行为: 在系统查不到数据时编造订单信息或假装查到了",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": 3,
+        "evidence_text": "",
+        "explanation": "检测到'系统显示'在第3轮"
+      },
+      {
+        "check_id": "forbidden_fb_ignore_error",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "禁止行为: 无视系统错误继续按脚本执行补偿流程",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": 4,
+        "evidence_text": "",
+        "explanation": "检测到'给您补偿'在第4轮"
+      },
+      {
+        "check_id": "forbidden_repeat_verbatim",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "禁止行为: 逐字重复上一轮发言",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": 7,
+        "evidence_text": "",
+        "explanation": "检测到'[相似度100%]'在第7轮"
+      },
+      {
+        "check_id": "forbidden_repeat_verbatim",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "禁止行为: 逐字重复上一轮发言",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": 8,
+        "evidence_text": "",
+        "explanation": "检测到'[相似度100%]'在第8轮"
+      },
+      {
+        "check_id": "turn_efficiency",
+        "check_type": "rule",
+        "dimension": "efficiency",
+        "description": "轮次效率 (最优8轮)",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际8轮，效率100%"
+      },
+      {
+        "check_id": "tool_used_query_order",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: query_order",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未调用"
+      },
+      {
+        "check_id": "tool_used_log_call_result",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: log_call_result",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未调用"
+      },
+      {
+        "check_id": "tool_used_transfer_to_human",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: transfer_to_human",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未调用"
+      },
+      {
+        "check_id": "call_result",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "通话结果应为: callback_requested",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际结果: not_logged. 日志记录不匹配: 期望=callback_requested, 实际=not_logged"
+      },
+      {
+        "check_id": "context_retention",
+        "check_type": "rule",
+        "dimension": "context_retention",
+        "description": "上下文保持能力",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "0/2 个信息点被正确引用"
+      },
+      {
+        "check_id": "emotion_resolution",
+        "check_type": "rule",
+        "dimension": "emotion_handling",
+        "description": "情绪处理：负面→正面转化",
+        "passed": false,
+        "score": 0.3,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "情绪轨迹: neutral → neutral → confused → confused → frustrated → angry → angry → frustrated"
+      }
+    ],
+    "constraint_ledger": [],
+    "state_snapshots": [
+      {
+        "turn": 0,
+        "after_tool_call": "initial_state",
+        "reservations": [],
+        "orders": [
+          {
+            "id": "MT20260519501",
+            "customer_name": "黄先生",
+            "customer_phone": "13400134001",
+            "merchant_name": "全聚德外卖",
+            "items": "[\"烤鸭套餐\", \"凉菜拼盘\"]",
+            "total_price": 35.5,
+            "delivery_address": "西城区金融街购物中心 B1层",
+            "delivery_time": "12:30",
+            "actual_delivery_time": null,
+            "status": "delivering",
+            "rider_name": "张师傅",
+            "rider_phone": null,
+            "created_at": "2026-05-19 12:42:09",
+            "notes": ""
+          }
+        ],
+        "coupons_used": [],
+        "diff_description": "turn 0: initial_state"
+      }
+    ],
+    "failure_summary": [
+      "[speech_protocol] 开场白规范: 开场白缺失关键元素，仅含 0/3",
+      "[speech_protocol] 结束语规范: 结束语缺失关键元素",
+      "[forbidden_behavior] 禁止行为: 在系统查不到数据时编造订单信息或假装查到了: 检测到'系统显示'在第3轮",
+      "[forbidden_behavior] 禁止行为: 无视系统错误继续按脚本执行补偿流程: 检测到'给您补偿'在第4轮",
+      "[forbidden_behavior] 禁止行为: 逐字重复上一轮发言: 检测到'[相似度100%]'在第7轮",
+      "[forbidden_behavior] 禁止行为: 逐字重复上一轮发言: 检测到'[相似度100%]'在第8轮",
+      "[tool_usage] 必须调用: query_order: 未调用",
+      "[tool_usage] 必须调用: log_call_result: 未调用",
+      "[tool_usage] 必须调用: transfer_to_human: 未调用",
+      "[outcome] 通话结果应为: callback_requested: 实际结果: not_logged. 日志记录不匹配: 期望=callback_requested, 实际=not_logged",
+      "[context_retention] 上下文保持能力: 0/2 个信息点被正确引用",
+      "[emotion_handling] 情绪处理：负面→正面转化: 情绪轨迹: neutral → neutral → confused → confused → frustrated → angry → angry → frustrated"
+    ],
+    "rubric": {
+      "dimensions": [],
+      "binary_items": [],
+      "dimension_total": 0,
+      "binary_net": 0,
+      "rubric_total": 0,
+      "rubric_max": 32,
+      "grade": ""
+    },
+    "generated_at": "2026-05-19T20:43:05.207277"
+  },
+  "run_metadata": {
+    "model_backend": "flawed-scripted-v1",
+    "scenario_version": "1.0",
+    "agent_type": "flawed",
+    "timestamp": "2026-05-19T20:43:05.207286"
+  },
+  "metadata": {
+    "db_state": {
+      "orders": [
+        {
+          "id": "MT20260519501",
+          "customer_name": "黄先生",
+          "customer_phone": "13400134001",
+          "merchant_name": "全聚德外卖",
+          "items": "[\"烤鸭套餐\", \"凉菜拼盘\"]",
+          "total_price": 35.5,
+          "delivery_address": "西城区金融街购物中心 B1层",
+          "delivery_time": "12:30",
+          "actual_delivery_time": null,
+          "status": "delivering",
+          "rider_name": "张师傅",
+          "rider_phone": null,
+          "created_at": "2026-05-19 12:42:09",
+          "notes": ""
+        }
+      ],
+      "issues": [
+        {
+          "id": "iss_7848",
+          "order_id": "MT20260519501",
+          "issue_type": "damaged",
+          "description": "客户反映烤鸭套餐包装破损、汤汁洒漏严重",
+          "status": "open",
+          "resolution": "",
+          "compensation_amount": 0.0,
+          "created_at": "2026-05-19 12:42:09",
+          "resolved_at": null
+        }
+      ],
+      "compensations": [],
+      "call_logs": [],
+      "delivery_schedule": []
+    },
+    "domain": "outbound_call",
+    "outbound_report": {
+      "scenario_id": "outbound_system_error_01",
+      "run_validity": {
+        "status": "valid",
+        "reason": "",
+        "feasible_path_exists": true
+      },
+      "task_outcome": {
+        "status": "failed",
+        "confirmed_reservations": 0,
+        "key_constraint_violations": []
+      },
+      "conversation_length": 18,
+      "step_compliance_score": 0.0,
+      "branch_accuracy_score": 1.0,
+      "forbidden_violation_count": 4,
+      "opening_correct": false,
+      "closing_correct": false,
+      "call_result_correct": false,
+      "hard_score": 0.1,
+      "soft_score": null,
+      "overall_score": 0.075,
+      "overall_score_100": 8,
+      "official": true,
+      "step_compliance": [
+        {
+          "step_id": "open",
+          "instruction": "自报美团客服身份，说明来电是跟进客户反馈的包装破损问题",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "confirm_identity",
+          "instruction": "确认对方是黄先生本人",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "query_order_fail",
+          "instruction": "尝试查询订单详情——此时系统会返回错误。Agent应意识到查询失败",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "inform_system_issue",
+          "instruction": "诚实告知客户当前系统出现临时异常，无法查询到订单详情。态度诚恳，不编造数据",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "listen_customer_describe",
+          "instruction": "请客户口头描述问题情况：什么时候下单、点了什么、具体什么问题。手动记录客户描述的信息",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "retry_query",
+          "instruction": "尝试再次查询订单——系统仍然返回错误",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "record_ticket",
+          "instruction": "告知客户：会将问题记录为工单，系统恢复后第一时间处理。使用transfer_to_human创建工单升级",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "schedule_callback",
+          "instruction": "与客户约定回拨时间：建议1-2小时内回电，确认客户方便的时间段",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "reassure_customer",
+          "instruction": "向客户保证问题一定会解决，给出明确承诺（如：系统恢复后会按标准流程处理补偿）",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "log_result",
+          "instruction": "记录通话结果，备注系统异常和客户描述的问题",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "wrap_up",
+          "instruction": "使用规范结束语道别，再次强调会尽快回电",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        }
+      ],
+      "forbidden_violations": [
+        {
+          "behavior_id": "fb_fabricate_data",
+          "description": "在系统查不到数据时编造订单信息或假装查到了",
+          "severity": "critical",
+          "turn": 3,
+          "evidence": "您系统显示，不然我们没法处理了。对了，您之前说的那个事情我不太清楚是什么。",
+          "keyword": "系统显示",
+          "source": "delivered"
+        },
+        {
+          "behavior_id": "fb_ignore_error",
+          "description": "无视系统错误继续按脚本执行补偿流程",
+          "severity": "critical",
+          "turn": 4,
+          "evidence": "这样吧，为了表示歉意，我直接给您补偿120.0元，您看行不行？这个我可以直接给您操作。",
+          "keyword": "给您补偿",
+          "source": "delivered"
+        },
+        {
+          "behavior_id": "repeat_verbatim",
+          "description": "逐字重复上一轮发言",
+          "severity": "minor",
+          "turn": 7,
+          "evidence": "行，那就这样吧，挂了啊。",
+          "keyword": "[相似度100%]"
+        },
+        {
+          "behavior_id": "repeat_verbatim",
+          "description": "逐字重复上一轮发言",
+          "severity": "minor",
+          "turn": 8,
+          "evidence": "行，那就这样吧，挂了啊。",
+          "keyword": "[相似度100%]"
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "opening",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "开场白规范",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "开场白缺失关键元素，仅含 0/3"
+        },
+        {
+          "check_id": "closing",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "结束语规范",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "结束语缺失关键元素"
+        },
+        {
+          "check_id": "forbidden_fb_fabricate_data",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "禁止行为: 在系统查不到数据时编造订单信息或假装查到了",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": 3,
+          "evidence_text": "",
+          "explanation": "检测到'系统显示'在第3轮"
+        },
+        {
+          "check_id": "forbidden_fb_ignore_error",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "禁止行为: 无视系统错误继续按脚本执行补偿流程",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": 4,
+          "evidence_text": "",
+          "explanation": "检测到'给您补偿'在第4轮"
+        },
+        {
+          "check_id": "forbidden_repeat_verbatim",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "禁止行为: 逐字重复上一轮发言",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": 7,
+          "evidence_text": "",
+          "explanation": "检测到'[相似度100%]'在第7轮"
+        },
+        {
+          "check_id": "forbidden_repeat_verbatim",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "禁止行为: 逐字重复上一轮发言",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": 8,
+          "evidence_text": "",
+          "explanation": "检测到'[相似度100%]'在第8轮"
+        },
+        {
+          "check_id": "turn_efficiency",
+          "check_type": "rule",
+          "dimension": "efficiency",
+          "description": "轮次效率 (最优8轮)",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际8轮，效率100%"
+        },
+        {
+          "check_id": "tool_used_query_order",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: query_order",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未调用"
+        },
+        {
+          "check_id": "tool_used_log_call_result",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: log_call_result",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未调用"
+        },
+        {
+          "check_id": "tool_used_transfer_to_human",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: transfer_to_human",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未调用"
+        },
+        {
+          "check_id": "call_result",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "通话结果应为: callback_requested",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际结果: not_logged. 日志记录不匹配: 期望=callback_requested, 实际=not_logged"
+        },
+        {
+          "check_id": "context_retention",
+          "check_type": "rule",
+          "dimension": "context_retention",
+          "description": "上下文保持能力",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "0/2 个信息点被正确引用"
+        },
+        {
+          "check_id": "emotion_resolution",
+          "check_type": "rule",
+          "dimension": "emotion_handling",
+          "description": "情绪处理：负面→正面转化",
+          "passed": false,
+          "score": 0.3,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "情绪轨迹: neutral → neutral → confused → confused → frustrated → angry → angry → frustrated"
+        }
+      ],
+      "rubric": {
+        "dimensions": [],
+        "binary_items": [],
+        "dimension_total": 0,
+        "binary_net": 0,
+        "rubric_total": 0,
+        "rubric_max": 32,
+        "grade": ""
+      },
+      "state_snapshots": [
+        {
+          "turn": 0,
+          "after_tool_call": "initial_state",
+          "reservations": [],
+          "orders": [
+            {
+              "id": "MT20260519501",
+              "customer_name": "黄先生",
+              "customer_phone": "13400134001",
+              "merchant_name": "全聚德外卖",
+              "items": "[\"烤鸭套餐\", \"凉菜拼盘\"]",
+              "total_price": 35.5,
+              "delivery_address": "西城区金融街购物中心 B1层",
+              "delivery_time": "12:30",
+              "actual_delivery_time": null,
+              "status": "delivering",
+              "rider_name": "张师傅",
+              "rider_phone": null,
+              "created_at": "2026-05-19 12:42:09",
+              "notes": ""
+            }
+          ],
+          "coupons_used": [],
+          "diff_description": "turn 0: initial_state"
+        }
+      ],
+      "failure_summary": [
+        "[speech_protocol] 开场白规范: 开场白缺失关键元素，仅含 0/3",
+        "[speech_protocol] 结束语规范: 结束语缺失关键元素",
+        "[forbidden_behavior] 禁止行为: 在系统查不到数据时编造订单信息或假装查到了: 检测到'系统显示'在第3轮",
+        "[forbidden_behavior] 禁止行为: 无视系统错误继续按脚本执行补偿流程: 检测到'给您补偿'在第4轮",
+        "[forbidden_behavior] 禁止行为: 逐字重复上一轮发言: 检测到'[相似度100%]'在第7轮",
+        "[forbidden_behavior] 禁止行为: 逐字重复上一轮发言: 检测到'[相似度100%]'在第8轮",
+        "[tool_usage] 必须调用: query_order: 未调用",
+        "[tool_usage] 必须调用: log_call_result: 未调用",
+        "[tool_usage] 必须调用: transfer_to_human: 未调用",
+        "[outcome] 通话结果应为: callback_requested: 实际结果: not_logged. 日志记录不匹配: 期望=callback_requested, 实际=not_logged",
+        "[context_retention] 上下文保持能力: 0/2 个信息点被正确引用",
+        "[emotion_handling] 情绪处理：负面→正面转化: 情绪轨迹: neutral → neutral → confused → confused → frustrated → angry → angry → frustrated"
+      ],
+      "score_breakdown": {
+        "hard_score": {
+          "value": 0.1,
+          "weight": 0.3
+        },
+        "step_compliance": {
+          "value": 0.0,
+          "weight": 0.35
+        },
+        "branch_accuracy": {
+          "value": 1.0,
+          "weight": 0.15
+        },
+        "violation_penalty": {
+          "value": -0.12
+        },
+        "outcome_cap": {
+          "value": 0.6,
+          "note": "任务失败→上限60%"
+        }
+      },
+      "turn_efficiency": 1.0
+    },
+    "diagnosis": {
+      "deviation_point": {
+        "turn": 8,
+        "expected_step": "schedule_callback",
+        "expected_behavior": "与客户约定回拨时间：建议1-2小时内回电，确认客户方便的时间段",
+        "actual_behavior": "行，那就这样吧，挂了啊。"
+      },
+      "failure_modes": [
+        "premature_termination",
+        "tool_avoidance",
+        "mechanical_response",
+        "emotion_mishandle"
+      ],
+      "root_cause": "模型在完成必要步骤前提前终止通话，可能是对对话状态跟踪能力不足，误判任务已完成",
+      "severity": "critical",
+      "fix_recommendations": [
+        "Harness: 步骤门控 — 必要步骤未完成时拦截结束意图，强制继续",
+        "Harness: 强制工具调用 — 在首次对客户说话前自动注入 query_order 调用",
+        "Harness: 情绪检测 — 用户负面情绪时自动在 Agent prompt 中注入'先共情再处理'指令"
+      ],
+      "model_capability_gap": "对话状态跟踪能力不足：无法维持多步骤任务的执行进度"
+    },
+    "harness_summary": null,
+    "simulator_quality": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "no_meta_leaks",
+          "description": "模拟器无元话语泄露",
+          "passed": true,
+          "detail": "无泄露"
+        },
+        {
+          "id": "reasonable_length",
+          "description": "回复长度合理（电话场景≤100字）",
+          "passed": true,
+          "detail": "全部合理"
+        },
+        {
+          "id": "no_early_goal_exposure",
+          "description": "前2轮不暴露隐藏目标",
+          "passed": true,
+          "detail": "未提前暴露"
+        }
+      ],
+      "warnings": []
+    }
+  }
+}

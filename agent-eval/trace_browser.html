@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评测轨迹浏览器 — Agent Eval</title>
+<style>
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #1c2128;
+    --bg-card: #21262d;
+    --bg-hover: #2d333b;
+    --border: #30363d;
+    --border-bright: #484f58;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #484f58;
+    --accent-blue: #388bfd;
+    --accent-blue-light: #58a6ff;
+    --accent-green: #3fb950;
+    --accent-green-light: #56d364;
+    --accent-red: #f85149;
+    --accent-red-light: #ff7b72;
+    --accent-yellow: #d29922;
+    --accent-yellow-light: #e3b341;
+    --accent-purple: #8957e5;
+    --accent-purple-light: #bc8cff;
+    --accent-gray: #6e7681;
+    --score-high: #3fb950;
+    --score-mid: #d29922;
+    --score-low: #f85149;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ─── 顶部栏 ─── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .topbar-logo {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-blue-light);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .topbar-logo span {
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .topbar-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+  }
+
+  .scenario-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .scenario-badge .scenario-id {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .file-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .file-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue-light);
+    background: rgba(56, 139, 253, 0.08);
+  }
+
+  #file-input { display: none; }
+
+  .demo-btn {
+    padding: 5px 12px;
+    background: rgba(56, 139, 253, 0.15);
+    border: 1px solid var(--accent-blue);
+    border-radius: 6px;
+    color: var(--accent-blue-light);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .demo-btn:hover {
+    background: rgba(56, 139, 253, 0.25);
+  }
+
+  /* ─── 主布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ─── 左面板：策略图 ─── */
+  .panel-left {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+  }
+
+  .panel-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .legend-line {
+    width: 16px;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .graph-container {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+  }
+
+  #policy-svg {
+    max-width: 100%;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  }
+
+  /* 图节点样式 */
+  .node-circle {
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .node-circle:hover { filter: brightness(1.3); }
+
+  .node-label {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+    font-size: 11px;
+    fill: var(--text-primary);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .node-sublabel {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+    font-size: 9px;
+    fill: var(--text-secondary);
+    pointer-events: none;
+  }
+
+  .edge-path {
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .edge-path:hover { filter: brightness(1.5); }
+
+  /* 工具提示 */
+  .tooltip {
+    position: fixed;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text-primary);
+    pointer-events: none;
+    z-index: 1000;
+    max-width: 280px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    display: none;
+  }
+
+  .tooltip-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--accent-blue-light);
+  }
+
+  .tooltip-row {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    margin-top: 2px;
+  }
+
+  .tooltip-key {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  /* ─── 右面板：评分 ─── */
+  .panel-right {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+
+  .right-sections {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .right-sections::-webkit-scrollbar { width: 4px; }
+  .right-sections::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ─── 分数总览 ─── */
+  .score-overview {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-tertiary);
+  }
+
+  .score-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .score-main {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .score-number {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .score-unit {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .score-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  .score-formula {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .formula-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .formula-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .formula-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-card);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .formula-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .formula-value {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+    color: var(--text-primary);
+  }
+
+  .veto-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .veto-badge.active {
+    background: rgba(248, 81, 73, 0.15);
+    border: 1px solid rgba(248, 81, 73, 0.4);
+    color: var(--accent-red-light);
+  }
+
+  .veto-badge.inactive {
+    background: rgba(63, 185, 80, 0.1);
+    border: 1px solid rgba(63, 185, 80, 0.3);
+    color: var(--accent-green-light);
+  }
+
+  /* ─── ScoreAtom 列表 ─── */
+  .section {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s;
+  }
+
+  .section-header:hover { background: var(--bg-hover); }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+  }
+
+  .section-count {
+    padding: 1px 6px;
+    background: var(--bg-card);
+    border-radius: 10px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .section-chevron {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+  }
+
+  .section-chevron.collapsed { transform: rotate(-90deg); }
+
+  .section-body {
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+
+  .atom-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.12s;
+  }
+
+  .atom-item:hover {
+    background: var(--bg-hover);
+  }
+
+  .atom-item.selected {
+    background: rgba(56, 139, 253, 0.08);
+    border-left-color: var(--accent-blue);
+  }
+
+  .atom-status-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    margin-top: 1px;
+  }
+
+  .atom-status-icon.satisfied {
+    background: rgba(63, 185, 80, 0.2);
+    color: var(--accent-green);
+    border: 1px solid rgba(63, 185, 80, 0.4);
+  }
+
+  .atom-status-icon.unsatisfied {
+    background: rgba(248, 81, 73, 0.15);
+    color: var(--accent-red);
+    border: 1px solid rgba(248, 81, 73, 0.3);
+  }
+
+  .atom-content { flex: 1; min-width: 0; }
+
+  .atom-id {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .atom-meta {
+    display: flex;
+    gap: 6px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+  }
+
+  .atom-tag {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .atom-tag.dim-step { background: rgba(139, 148, 158, 0.15); color: var(--text-secondary); }
+  .atom-tag.dim-branch { background: rgba(137, 87, 229, 0.15); color: var(--accent-purple-light); }
+  .atom-tag.dim-tool { background: rgba(56, 139, 253, 0.15); color: var(--accent-blue-light); }
+  .atom-tag.dim-temporal { background: rgba(210, 153, 34, 0.15); color: var(--accent-yellow-light); }
+
+  .atom-delta {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .atom-delta.positive { color: var(--accent-green); }
+  .atom-delta.negative { color: var(--accent-red); }
+
+  .atom-reason {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* 证据面板 */
+  .evidence-panel {
+    margin: 6px 16px 8px;
+    padding: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: none;
+  }
+
+  .evidence-panel.show { display: block; }
+
+  .evidence-header {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+
+  .evidence-event {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    margin-top: 4px;
+    font-size: 10px;
+  }
+
+  .event-id-pill {
+    padding: 1px 6px;
+    background: rgba(56, 139, 253, 0.15);
+    border: 1px solid rgba(56, 139, 253, 0.3);
+    border-radius: 3px;
+    color: var(--accent-blue-light);
+    font-weight: 600;
+    font-family: "SF Mono", "Consolas", monospace;
+  }
+
+  .evidence-empty {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ─── 违规区 ─── */
+  .violation-item {
+    padding: 8px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border-left: 3px solid var(--accent-yellow);
+  }
+
+  .violation-item.illegal {
+    border-left-color: var(--accent-red);
+  }
+
+  .violation-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .violation-text {
+    font-size: 11px;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  .violation-penalty {
+    margin-top: 2px;
+    font-size: 10px;
+    color: var(--accent-yellow-light);
+  }
+
+  /* ─── 路径对比 ─── */
+  .path-comparison {
+    padding: 12px 16px;
+  }
+
+  .path-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .path-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    width: 48px;
+    flex-shrink: 0;
+    padding-top: 3px;
+  }
+
+  .path-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .path-step {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+
+  .path-step.expected {
+    background: rgba(56, 139, 253, 0.1);
+    border-color: rgba(56, 139, 253, 0.3);
+    color: var(--accent-blue-light);
+  }
+
+  .path-step.observed.hit {
+    background: rgba(63, 185, 80, 0.1);
+    border-color: rgba(63, 185, 80, 0.3);
+    color: var(--accent-green-light);
+  }
+
+  .path-step.observed.miss {
+    background: rgba(248, 81, 73, 0.08);
+    border-color: rgba(248, 81, 73, 0.3);
+    color: var(--accent-red-light);
+  }
+
+  .path-arrow {
+    color: var(--text-muted);
+    font-size: 10px;
+    padding-top: 3px;
+  }
+
+  /* ─── 空状态 ─── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: var(--text-muted);
+  }
+
+  .empty-icon { font-size: 48px; opacity: 0.3; }
+  .empty-title { font-size: 14px; color: var(--text-secondary); }
+  .empty-sub { font-size: 12px; text-align: center; max-width: 240px; line-height: 1.6; }
+
+  /* ─── 拖放覆盖层 ─── */
+  .drop-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 17, 23, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    display: none;
+  }
+
+  .drop-overlay.show { display: flex; }
+
+  .drop-box {
+    padding: 48px 64px;
+    border: 2px dashed var(--accent-blue);
+    border-radius: 12px;
+    text-align: center;
+    color: var(--accent-blue-light);
+  }
+
+  .drop-box-icon { font-size: 40px; margin-bottom: 12px; }
+  .drop-box-text { font-size: 16px; font-weight: 600; }
+  .drop-box-sub { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+
+  /* ─── 节点详情抽屉 ─── */
+  .node-detail {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    transform: translateY(100%);
+    transition: transform 0.2s ease;
+    z-index: 50;
+  }
+
+  .node-detail.show { transform: translateY(0); }
+
+  .node-detail-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .node-detail-row {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+  }
+
+  .panel-left { position: relative; }
+
+  /* 选中高亮 */
+  .highlighted-node circle {
+    stroke-width: 3 !important;
+    filter: drop-shadow(0 0 8px currentColor) !important;
+  }
+
+  /* 滚动条美化 */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+</style>
+</head>
+<body>
+
+<!-- 工具提示 -->
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-title" id="tt-title"></div>
+  <div id="tt-body"></div>
+</div>
+
+<!-- 拖放覆盖层 -->
+<div class="drop-overlay" id="drop-overlay">
+  <div class="drop-box">
+    <div class="drop-box-icon">📂</div>
+    <div class="drop-box-text">放开以加载评测报告</div>
+    <div class="drop-box-sub">支持 OutboundScoreReport JSON 格式</div>
+  </div>
+</div>
+
+<!-- 顶部栏 -->
+<div class="topbar">
+  <div class="topbar-logo">评测轨迹浏览器 <span>Agent Eval v2</span></div>
+  <div class="topbar-divider"></div>
+  <div class="scenario-badge">
+    <span>场景</span>
+    <span class="scenario-id" id="scenario-id-display">—</span>
+  </div>
+  <div class="topbar-right">
+    <label class="file-btn" for="file-input">
+      <span>📁</span>
+      <span>加载 JSON</span>
+    </label>
+    <input type="file" id="file-input" accept=".json">
+    <button class="demo-btn" id="demo-btn">演示数据</button>
+  </div>
+</div>
+
+<!-- 主布局 -->
+<div class="main">
+
+  <!-- 左面板：策略图 -->
+  <div class="panel-left">
+    <div class="panel-header">
+      <span class="panel-title">策略图 — 预期路径 vs 实际路径</span>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#3fb950"></div>已完成
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f85149"></div>缺失
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#388bfd"></div>未评测
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:#388bfd"></div>实际路径
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:#484f58;border-top:1px dashed #484f58;height:0"></div>
+          <span>预期未走</span>
+        </div>
+      </div>
+    </div>
+    <div class="graph-container" id="graph-container">
+      <div class="empty-state" id="graph-empty">
+        <div class="empty-icon">🗺</div>
+        <div class="empty-title">等待数据</div>
+        <div class="empty-sub">加载 JSON 文件或点击「演示数据」查看策略图</div>
+      </div>
+      <svg id="policy-svg" style="display:none"></svg>
+    </div>
+    <div class="node-detail" id="node-detail">
+      <div class="node-detail-title" id="nd-title"></div>
+      <div id="nd-body"></div>
+    </div>
+  </div>
+
+  <!-- 右面板：评分 -->
+  <div class="panel-right">
+    <div class="panel-header">
+      <span class="panel-title">评分明细 + 证据链</span>
+    </div>
+    <div class="right-sections" id="right-sections">
+      <div class="empty-state" id="score-empty" style="height:300px">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">暂无评分数据</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// 演示数据
+// ═══════════════════════════════════════════════════
+const DEMO_DATA = {
+  "scenario_id": "demo_delivery_confirm",
+  "overall_score": 0.58,
+  "overall_score_100": 58,
+  "score_breakdown": {
+    "hard_score": {"value": 0.65, "weight": 0.30},
+    "step_compliance": {"value": 0.80, "weight": 0.24},
+    "branch_accuracy": {"value": 0.50, "weight": 0.14},
+    "temporal_order": {"value": 0.90, "weight": 0.12},
+    "path_alignment": {"value": 0.70, "weight": 0.08},
+    "objective_score": {"value": 0.68, "note": "客观可审计分"},
+    "evidence_score": {"value": 0.72, "note": "含主观残差加成"},
+    "soft_score": {"value": 0.75, "weight": 0.12},
+    "veto_cap": {"value": 0.60, "gate_type": "cap_060"}
+  },
+  "expected_path": ["greet", "confirm_identity", "check_order", "inform_status", "ask_satisfaction", "farewell"],
+  "observed_path": ["greet", "confirm_identity", "inform_status", "farewell"],
+  "score_atoms": [
+    {"atom_id": "step_greet", "dimension": "step_compliance", "weight": 1.0, "status": "satisfied", "evidence_event_ids": ["msg_1_agent"], "score_delta": 1.0, "reason": "步骤在第1轮完成"},
+    {"atom_id": "step_confirm_identity", "dimension": "step_compliance", "weight": 1.0, "status": "satisfied", "evidence_event_ids": ["msg_2_agent"], "score_delta": 1.0, "reason": "步骤在第2轮完成"},
+    {"atom_id": "step_check_order", "dimension": "step_compliance", "weight": 1.0, "status": "unsatisfied", "evidence_event_ids": [], "score_delta": -1.0, "reason": "步骤未完成"},
+    {"atom_id": "step_inform_status", "dimension": "step_compliance", "weight": 1.0, "status": "satisfied", "evidence_event_ids": ["msg_3_agent"], "score_delta": 1.0, "reason": "步骤在第3轮完成"},
+    {"atom_id": "step_ask_satisfaction", "dimension": "step_compliance", "weight": 1.0, "status": "unsatisfied", "evidence_event_ids": [], "score_delta": -1.0, "reason": "步骤未完成"},
+    {"atom_id": "step_farewell", "dimension": "step_compliance", "weight": 1.0, "status": "satisfied", "evidence_event_ids": ["msg_4_agent"], "score_delta": 1.0, "reason": "步骤在第4轮完成"},
+    {"atom_id": "branch_confirm_identity", "dimension": "branch_accuracy", "weight": 1.5, "status": "unsatisfied", "evidence_event_ids": [], "score_delta": -1.5, "reason": "分支错误: 未观测到分支执行"},
+    {"atom_id": "tool_query_order", "dimension": "tool_usage", "weight": 1.0, "status": "unsatisfied", "evidence_event_ids": [], "score_delta": -1.0, "reason": "工具未成功调用"}
+  ],
+  "temporal_violations": [
+    {"description": "步骤 2 应在步骤 3 之前", "source": "check_order", "target": "inform_status", "penalty": 0.8}
+  ],
+  "illegal_transitions": ["逆序跳转: confirm_identity(第2步) → inform_status(第4步)"]
+};
+
+// ═══════════════════════════════════════════════════
+// 状态
+// ═══════════════════════════════════════════════════
+let currentData = null;
+let selectedAtomId = null;
+let selectedNodeId = null;
+
+// ═══════════════════════════════════════════════════
+// 工具函数
+// ═══════════════════════════════════════════════════
+function scoreColor(val) {
+  if (val >= 0.7) return '#3fb950';
+  if (val >= 0.5) return '#d29922';
+  return '#f85149';
+}
+
+function pct(val) {
+  return Math.round((val || 0) * 100);
+}
+
+function dimLabel(dim) {
+  const map = {
+    step_compliance: '步骤合规',
+    branch_accuracy: '分支准确',
+    tool_usage: '工具调用',
+    temporal_order: '时序约束',
+    hard_score: '硬规则',
+    soft_score: '软规则',
+  };
+  return map[dim] || dim;
+}
+
+function dimClass(dim) {
+  if (dim === 'step_compliance') return 'dim-step';
+  if (dim === 'branch_accuracy') return 'dim-branch';
+  if (dim.includes('tool')) return 'dim-tool';
+  return 'dim-temporal';
+}
+
+// ═══════════════════════════════════════════════════
+// 策略图渲染
+// ═══════════════════════════════════════════════════
+function buildGraph(data) {
+  const svg = document.getElementById('policy-svg');
+  const expected = data.expected_path || [];
+  const observed = new Set(data.observed_path || []);
+
+  const NODE_R = 28;
+  const H_GAP = 130;
+  const V_CENTER = 120;
+  const PADDING_X = 60;
+
+  const totalW = PADDING_X * 2 + (expected.length - 1) * H_GAP + NODE_R * 2;
+  const totalH = 240;
+
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+  svg.innerHTML = '';
+
+  // defs: arrowheads
+  const defs = createSVGEl('defs');
+  ['blue', 'gray'].forEach(color => {
+    const marker = createSVGEl('marker');
+    marker.setAttribute('id', `arrow-${color}`);
+    marker.setAttribute('markerWidth', '8');
+    marker.setAttribute('markerHeight', '8');
+    marker.setAttribute('refX', '6');
+    marker.setAttribute('refY', '3');
+    marker.setAttribute('orient', 'auto');
+    const poly = createSVGEl('polygon');
+    poly.setAttribute('points', '0 0, 6 3, 0 6');
+    poly.setAttribute('fill', color === 'blue' ? '#388bfd' : '#484f58');
+    poly.setAttribute('opacity', color === 'blue' ? '0.9' : '0.5');
+    marker.appendChild(poly);
+    defs.appendChild(marker);
+  });
+  svg.appendChild(defs);
+
+  // 坐标
+  const positions = {};
+  expected.forEach((stepId, i) => {
+    positions[stepId] = {
+      x: PADDING_X + NODE_R + i * H_GAP,
+      y: V_CENTER
+    };
+  });
+
+  // 画边
+  for (let i = 0; i < expected.length - 1; i++) {
+    const from = expected[i];
+    const to = expected[i + 1];
+    const p1 = positions[from];
+    const p2 = positions[to];
+
+    // 判断是否为实际走过的边
+    const fromObs = observed.has(from);
+    const toObs = observed.has(to);
+    const isTaken = fromObs && toObs;
+
+    const path = createSVGEl('path');
+    const x1 = p1.x + NODE_R;
+    const x2 = p2.x - NODE_R - 6;
+    const y = p1.y;
+
+    path.setAttribute('d', `M ${x1} ${y} L ${x2} ${y}`);
+    path.setAttribute('stroke', isTaken ? '#388bfd' : '#484f58');
+    path.setAttribute('stroke-width', isTaken ? '2.5' : '1.5');
+    path.setAttribute('stroke-dasharray', isTaken ? 'none' : '5,4');
+    path.setAttribute('opacity', isTaken ? '0.9' : '0.45');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('marker-end', isTaken ? 'url(#arrow-blue)' : 'url(#arrow-gray)');
+    path.classList.add('edge-path');
+
+    // 悬停提示
+    path.addEventListener('mouseenter', (e) => {
+      showTooltip(e, `${from} → ${to}`, [
+        ['状态', isTaken ? '✅ 实际走过' : '⬜ 未走'],
+        ['类型', '顺序转移']
+      ]);
+    });
+    path.addEventListener('mousemove', moveTooltip);
+    path.addEventListener('mouseleave', hideTooltip);
+
+    svg.appendChild(path);
+  }
+
+  // 缺失步骤的跳跃弧线（observed 中连续的步骤如果跳过了 expected 步骤）
+  const observedArr = data.observed_path || [];
+  for (let i = 0; i < observedArr.length - 1; i++) {
+    const from = observedArr[i];
+    const to = observedArr[i + 1];
+    const fromIdx = expected.indexOf(from);
+    const toIdx = expected.indexOf(to);
+    if (fromIdx >= 0 && toIdx >= 0 && toIdx > fromIdx + 1) {
+      // 这是一次跳跃 — 画弧线
+      const p1 = positions[from];
+      const p2 = positions[to];
+      const x1 = p1.x + NODE_R;
+      const x2 = p2.x - NODE_R - 6;
+      const mx = (x1 + x2) / 2;
+      const my = V_CENTER - 50;
+
+      const arc = createSVGEl('path');
+      arc.setAttribute('d', `M ${x1} ${p1.y} Q ${mx} ${my} ${x2} ${p2.y}`);
+      arc.setAttribute('stroke', '#d29922');
+      arc.setAttribute('stroke-width', '2');
+      arc.setAttribute('stroke-dasharray', '6,3');
+      arc.setAttribute('opacity', '0.7');
+      arc.setAttribute('fill', 'none');
+      arc.setAttribute('marker-end', 'url(#arrow-blue)');
+      arc.classList.add('edge-path');
+
+      arc.addEventListener('mouseenter', (e) => {
+        showTooltip(e, `跳跃转移`, [
+          ['从', from],
+          ['到', to],
+          ['跳过', expected.slice(fromIdx + 1, toIdx).join(', ')],
+          ['类型', '⚠️ 非法跳跃']
+        ]);
+      });
+      arc.addEventListener('mousemove', moveTooltip);
+      arc.addEventListener('mouseleave', hideTooltip);
+
+      svg.appendChild(arc);
+    }
+  }
+
+  // 画节点
+  expected.forEach((stepId, i) => {
+    const pos = positions[stepId];
+    const isObserved = observed.has(stepId);
+    const atomForStep = (data.score_atoms || []).find(a => a.atom_id === `step_${stepId}`);
+    const isSatisfied = atomForStep ? atomForStep.status === 'satisfied' : isObserved;
+
+    let fillColor, strokeColor, statusIcon;
+    if (isObserved && isSatisfied) {
+      fillColor = 'rgba(63,185,80,0.15)';
+      strokeColor = '#3fb950';
+      statusIcon = '✓';
+    } else if (isObserved && !isSatisfied) {
+      fillColor = 'rgba(210,153,34,0.15)';
+      strokeColor = '#d29922';
+      statusIcon = '~';
+    } else {
+      fillColor = 'rgba(248,81,73,0.12)';
+      strokeColor = '#f85149';
+      statusIcon = '✗';
+    }
+
+    const g = createSVGEl('g');
+    g.setAttribute('data-step-id', stepId);
+    g.style.cursor = 'pointer';
+
+    // 外圈光晕
+    const glow = createSVGEl('circle');
+    glow.setAttribute('cx', pos.x);
+    glow.setAttribute('cy', pos.y);
+    glow.setAttribute('r', NODE_R + 4);
+    glow.setAttribute('fill', strokeColor);
+    glow.setAttribute('opacity', '0.06');
+    g.appendChild(glow);
+
+    // 主圆
+    const circle = createSVGEl('circle');
+    circle.setAttribute('cx', pos.x);
+    circle.setAttribute('cy', pos.y);
+    circle.setAttribute('r', NODE_R);
+    circle.setAttribute('fill', fillColor);
+    circle.setAttribute('stroke', strokeColor);
+    circle.setAttribute('stroke-width', '2');
+    circle.classList.add('node-circle');
+    g.appendChild(circle);
+
+    // 状态图标
+    const iconText = createSVGEl('text');
+    iconText.setAttribute('x', pos.x);
+    iconText.setAttribute('y', pos.y - 7);
+    iconText.setAttribute('text-anchor', 'middle');
+    iconText.setAttribute('dominant-baseline', 'middle');
+    iconText.setAttribute('fill', strokeColor);
+    iconText.setAttribute('font-size', '14');
+    iconText.setAttribute('font-weight', '700');
+    iconText.textContent = statusIcon;
+    g.appendChild(iconText);
+
+    // 步骤名（截断）
+    const stepShort = stepId.replace(/_/g, ' ');
+    const label = createSVGEl('text');
+    label.setAttribute('x', pos.x);
+    label.setAttribute('y', pos.y + 10);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('dominant-baseline', 'middle');
+    label.setAttribute('fill', '#e6edf3');
+    label.setAttribute('font-size', '10');
+    label.setAttribute('font-weight', '600');
+    label.classList.add('node-label');
+    label.textContent = stepShort.length > 12 ? stepShort.slice(0, 11) + '…' : stepShort;
+    g.appendChild(label);
+
+    // 序号
+    const indexLabel = createSVGEl('text');
+    indexLabel.setAttribute('x', pos.x);
+    indexLabel.setAttribute('y', pos.y + 44);
+    indexLabel.setAttribute('text-anchor', 'middle');
+    indexLabel.setAttribute('fill', '#484f58');
+    indexLabel.setAttribute('font-size', '10');
+    indexLabel.classList.add('node-sublabel');
+    indexLabel.textContent = `#${i + 1}`;
+    g.appendChild(indexLabel);
+
+    // 事件交互
+    g.addEventListener('mouseenter', (e) => {
+      const rows = [
+        ['步骤ID', stepId],
+        ['状态', isObserved ? (isSatisfied ? '✅ 已完成' : '⚠️ 部分完成') : '❌ 缺失'],
+        ['权重', atomForStep ? atomForStep.weight : '—'],
+        ['分数', atomForStep ? (atomForStep.score_delta > 0 ? `+${atomForStep.score_delta}` : atomForStep.score_delta) : '—'],
+      ];
+      if (atomForStep && atomForStep.reason) rows.push(['原因', atomForStep.reason]);
+      showTooltip(e, stepId, rows);
+    });
+    g.addEventListener('mousemove', moveTooltip);
+    g.addEventListener('mouseleave', hideTooltip);
+    g.addEventListener('click', () => onNodeClick(stepId, atomForStep));
+
+    svg.appendChild(g);
+  });
+
+  return svg;
+}
+
+function createSVGEl(tag) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+}
+
+function onNodeClick(stepId, atom) {
+  selectedNodeId = stepId;
+
+  // 高亮节点
+  document.querySelectorAll('#policy-svg g[data-step-id]').forEach(g => {
+    g.querySelector('circle.node-circle').setAttribute('stroke-width', '2');
+  });
+  const g = document.querySelector(`#policy-svg g[data-step-id="${stepId}"]`);
+  if (g) {
+    g.querySelector('circle.node-circle').setAttribute('stroke-width', '3.5');
+  }
+
+  // 显示详情抽屉
+  const detail = document.getElementById('node-detail');
+  const ndTitle = document.getElementById('nd-title');
+  const ndBody = document.getElementById('nd-body');
+
+  ndTitle.textContent = `步骤详情: ${stepId}`;
+  if (atom) {
+    ndBody.innerHTML = `
+      <div class="node-detail-row">状态: <strong style="color:${atom.status==='satisfied'?'#3fb950':'#f85149'}">${atom.status === 'satisfied' ? '✅ 已完成' : '❌ 未完成'}</strong></div>
+      <div class="node-detail-row">维度: ${dimLabel(atom.dimension)} · 权重: ${atom.weight} · 分值变化: <strong style="color:${atom.score_delta>=0?'#3fb950':'#f85149'}">${atom.score_delta > 0 ? '+' : ''}${atom.score_delta}</strong></div>
+      <div class="node-detail-row">原因: ${atom.reason || '—'}</div>
+      <div class="node-detail-row">证据事件: ${atom.evidence_event_ids && atom.evidence_event_ids.length ? atom.evidence_event_ids.map(id => `<span class="event-id-pill" style="display:inline-block;margin-left:4px">${id}</span>`).join('') : '<span style="color:#484f58">无证据</span>'}</div>
+    `;
+    // 同时高亮对应 atom
+    selectAtom(atom.atom_id);
+  } else {
+    ndBody.innerHTML = `<div class="node-detail-row" style="color:#484f58">未找到对应 ScoreAtom</div>`;
+  }
+  detail.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════
+// 工具提示
+// ═══════════════════════════════════════════════════
+function showTooltip(e, title, rows) {
+  const tt = document.getElementById('tooltip');
+  document.getElementById('tt-title').textContent = title;
+  document.getElementById('tt-body').innerHTML = rows.map(([k, v]) =>
+    `<div class="tooltip-row"><span class="tooltip-key">${k}:</span><span>${v}</span></div>`
+  ).join('');
+  tt.style.display = 'block';
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  const tt = document.getElementById('tooltip');
+  let x = e.clientX + 16;
+  let y = e.clientY + 16;
+  const rect = tt.getBoundingClientRect();
+  if (x + rect.width > window.innerWidth - 8) x = e.clientX - rect.width - 8;
+  if (y + rect.height > window.innerHeight - 8) y = e.clientY - rect.height - 8;
+  tt.style.left = x + 'px';
+  tt.style.top = y + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════
+// 右面板渲染
+// ═══════════════════════════════════════════════════
+function renderRight(data) {
+  const container = document.getElementById('right-sections');
+  container.innerHTML = '';
+
+  // 1. 分数总览
+  container.appendChild(buildScoreOverview(data));
+
+  // 2. 路径对比
+  container.appendChild(buildPathComparison(data));
+
+  // 3. ScoreAtom 列表
+  container.appendChild(buildAtomSection(data));
+
+  // 4. 时序违规
+  if ((data.temporal_violations && data.temporal_violations.length) ||
+      (data.illegal_transitions && data.illegal_transitions.length)) {
+    container.appendChild(buildViolationSection(data));
+  }
+}
+
+function buildScoreOverview(data) {
+  const wrap = document.createElement('div');
+  wrap.className = 'score-overview';
+
+  const score = data.overall_score_100 || Math.round((data.overall_score || 0) * 100);
+  const bd = data.score_breakdown || {};
+  const color = scoreColor(data.overall_score || 0);
+
+  const vetoVal = bd.veto_cap && bd.veto_cap.value;
+  const overallVal = data.overall_score || 0;
+  const vetoCapped = vetoVal !== undefined && vetoVal !== null && overallVal > vetoVal;
+
+  wrap.innerHTML = `
+    <div class="score-header">
+      <div>
+        <div class="score-main">
+          <div class="score-number" style="color:${color}">${score}</div>
+          <div class="score-unit">/ 100</div>
+        </div>
+        <div class="score-label">综合评分</div>
+      </div>
+      <div style="text-align:right">
+        ${vetoVal !== undefined ? `
+          <div class="veto-badge ${vetoCapped ? 'active' : 'inactive'}">
+            ${vetoCapped ? '⚡ 否决上限生效' : '✅ 否决门控正常'}
+            ${vetoVal !== undefined ? `(${pct(vetoVal)}分封顶)` : ''}
+          </div>
+        ` : ''}
+      </div>
+    </div>
+    <div class="score-formula">
+      ${bd.hard_score ? formulaRow('硬规则得分', bd.hard_score.value, `权重 ${Math.round((bd.hard_score.weight||0)*100)}%`, '#f85149') : ''}
+      ${bd.step_compliance ? formulaRow('步骤合规', bd.step_compliance.value, `权重 ${Math.round((bd.step_compliance.weight||0)*100)}%`, '#388bfd') : ''}
+      ${bd.branch_accuracy ? formulaRow('分支准确', bd.branch_accuracy.value, `权重 ${Math.round((bd.branch_accuracy.weight||0)*100)}%`, '#8957e5') : ''}
+      ${bd.temporal_order ? formulaRow('时序约束', bd.temporal_order.value, `权重 ${Math.round((bd.temporal_order.weight||0)*100)}%`, '#d29922') : ''}
+      ${bd.path_alignment ? formulaRow('路径对齐', bd.path_alignment.value, `权重 ${Math.round((bd.path_alignment.weight||0)*100)}%`, '#3fb950') : ''}
+      ${bd.soft_score ? formulaRow('软规则', bd.soft_score.value, `权重 ${Math.round((bd.soft_score.weight||0)*100)}%`, '#e3b341') : ''}
+      <div style="margin-top:6px;border-top:1px solid #30363d;padding-top:6px">
+        ${bd.objective_score ? formulaRow(`客观分 ${bd.objective_score.note || ''}`, bd.objective_score.value, '', '#58a6ff') : ''}
+        ${bd.evidence_score ? formulaRow(`证据分 ${bd.evidence_score.note || ''}`, bd.evidence_score.value, '', '#bc8cff') : ''}
+      </div>
+    </div>
+  `;
+  return wrap;
+}
+
+function formulaRow(label, value, hint, barColor) {
+  const pctVal = pct(value);
+  return `
+    <div class="formula-row" title="${hint}">
+      <div class="formula-label">${label}</div>
+      <div class="formula-bar-wrap">
+        <div class="formula-bar" style="width:${pctVal}%;background:${barColor};opacity:0.8"></div>
+      </div>
+      <div class="formula-value" style="color:${barColor}">${pctVal}%</div>
+    </div>
+  `;
+}
+
+function buildPathComparison(data) {
+  const section = document.createElement('div');
+  section.className = 'section';
+
+  const header = document.createElement('div');
+  header.className = 'section-header';
+  header.innerHTML = `
+    <div class="section-title">
+      <span>🛤</span> 路径对比
+    </div>
+    <span class="section-chevron" id="chevron-path">▼</span>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'section-body';
+  body.id = 'section-body-path';
+
+  const observedSet = new Set(data.observed_path || []);
+  const expectedSteps = (data.expected_path || []).map(s =>
+    `<span class="path-step expected">${s}</span>`
+  ).join('<span class="path-arrow">→</span>');
+
+  const observedSteps = (data.observed_path || []).map(s =>
+    `<span class="path-step observed ${observedSet.has(s) ? 'hit' : 'miss'}">${s}</span>`
+  ).join('<span class="path-arrow">→</span>');
+
+  const missing = (data.expected_path || []).filter(s => !observedSet.has(s));
+
+  body.innerHTML = `
+    <div class="path-comparison">
+      <div class="path-row">
+        <div class="path-label">预期</div>
+        <div class="path-steps">${expectedSteps}</div>
+      </div>
+      <div class="path-row">
+        <div class="path-label">实际</div>
+        <div class="path-steps">${observedSteps}</div>
+      </div>
+      ${missing.length ? `
+        <div class="path-row">
+          <div class="path-label" style="color:#f85149">缺失</div>
+          <div class="path-steps">${missing.map(s => `<span class="path-step" style="background:rgba(248,81,73,0.1);border-color:rgba(248,81,73,0.4);color:#ff7b72">${s}</span>`).join('')}</div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+
+  setupSectionToggle(header, body, 'chevron-path');
+  section.appendChild(header);
+  section.appendChild(body);
+  return section;
+}
+
+function buildAtomSection(data) {
+  const atoms = data.score_atoms || [];
+  const section = document.createElement('div');
+  section.className = 'section';
+
+  const satisfied = atoms.filter(a => a.status === 'satisfied').length;
+
+  const header = document.createElement('div');
+  header.className = 'section-header';
+  header.innerHTML = `
+    <div class="section-title">
+      <span>⚛</span> 评分原子
+      <span class="section-count">${satisfied}/${atoms.length} 通过</span>
+    </div>
+    <span class="section-chevron" id="chevron-atoms">▼</span>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'section-body';
+  body.id = 'section-body-atoms';
+
+  atoms.forEach(atom => {
+    const item = document.createElement('div');
+    item.className = 'atom-item';
+    item.dataset.atomId = atom.atom_id;
+    item.innerHTML = `
+      <div class="atom-status-icon ${atom.status}">
+        ${atom.status === 'satisfied' ? '✓' : '✗'}
+      </div>
+      <div class="atom-content">
+        <div class="atom-id">${atom.atom_id}</div>
+        <div class="atom-meta">
+          <span class="atom-tag ${dimClass(atom.dimension)}">${dimLabel(atom.dimension)}</span>
+          <span class="atom-tag" style="background:rgba(139,148,158,0.1);color:#8b949e">权重 ${atom.weight}</span>
+        </div>
+        <div class="atom-reason">${atom.reason || ''}</div>
+      </div>
+      <div class="atom-delta ${atom.score_delta >= 0 ? 'positive' : 'negative'}">
+        ${atom.score_delta > 0 ? '+' : ''}${atom.score_delta}
+      </div>
+    `;
+
+    // 证据面板
+    const evidencePanel = document.createElement('div');
+    evidencePanel.className = 'evidence-panel';
+    evidencePanel.id = `evidence-${atom.atom_id}`;
+    evidencePanel.innerHTML = buildEvidenceHTML(atom);
+
+    item.addEventListener('click', () => {
+      selectAtom(atom.atom_id);
+      // 高亮图中对应步骤
+      const stepId = atom.atom_id.replace(/^step_/, '');
+      const g = document.querySelector(`#policy-svg g[data-step-id="${stepId}"]`);
+      if (g) {
+        document.querySelectorAll('#policy-svg g[data-step-id] circle.node-circle').forEach(c => c.setAttribute('stroke-width', '2'));
+        g.querySelector('circle.node-circle').setAttribute('stroke-width', '3.5');
+      }
+    });
+
+    body.appendChild(item);
+    body.appendChild(evidencePanel);
+  });
+
+  setupSectionToggle(header, body, 'chevron-atoms');
+  section.appendChild(header);
+  section.appendChild(body);
+  return section;
+}
+
+function buildEvidenceHTML(atom) {
+  const ids = atom.evidence_event_ids || [];
+  if (!ids.length) {
+    return `<div class="evidence-header">证据事件</div><div class="evidence-empty">无证据事件（步骤未执行或工具未调用）</div>`;
+  }
+  const events = ids.map(id => `
+    <div class="evidence-event">
+      <span class="event-id-pill">${id}</span>
+      <span style="color:#8b949e;font-size:10px">${inferEventType(id)}</span>
+    </div>
+  `).join('');
+  return `<div class="evidence-header">证据事件 (${ids.length})</div>${events}`;
+}
+
+function inferEventType(eventId) {
+  if (eventId.includes('tool')) return '工具调用记录';
+  if (eventId.includes('agent')) return 'Agent 消息';
+  if (eventId.includes('user')) return '用户消息';
+  return '事件记录';
+}
+
+function buildViolationSection(data) {
+  const violations = data.temporal_violations || [];
+  const illegal = data.illegal_transitions || [];
+  const section = document.createElement('div');
+  section.className = 'section';
+
+  const total = violations.length + illegal.length;
+  const header = document.createElement('div');
+  header.className = 'section-header';
+  header.innerHTML = `
+    <div class="section-title">
+      <span>⚠</span> 时序违规 & 非法转移
+      <span class="section-count" style="background:rgba(248,81,73,0.15);color:#ff7b72">${total} 项</span>
+    </div>
+    <span class="section-chevron" id="chevron-violations">▼</span>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'section-body';
+  body.id = 'section-body-violations';
+
+  violations.forEach(v => {
+    const item = document.createElement('div');
+    item.className = 'violation-item';
+    item.innerHTML = `
+      <div class="violation-icon">⚠️</div>
+      <div>
+        <div class="violation-text">${v.description || `${v.source} → ${v.target}`}</div>
+        ${v.penalty !== undefined ? `<div class="violation-penalty">惩罚系数: ×${v.penalty}</div>` : ''}
+      </div>
+    `;
+    body.appendChild(item);
+  });
+
+  illegal.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'violation-item illegal';
+    item.innerHTML = `
+      <div class="violation-icon">🚫</div>
+      <div>
+        <div class="violation-text">${t}</div>
+        <div class="violation-penalty" style="color:#ff7b72">非法状态转移</div>
+      </div>
+    `;
+    body.appendChild(item);
+  });
+
+  setupSectionToggle(header, body, 'chevron-violations');
+  section.appendChild(header);
+  section.appendChild(body);
+  return section;
+}
+
+function setupSectionToggle(header, body, chevronId) {
+  let collapsed = false;
+  header.addEventListener('click', () => {
+    collapsed = !collapsed;
+    const chevron = document.getElementById(chevronId);
+    if (collapsed) {
+      body.style.maxHeight = '0';
+      body.style.overflow = 'hidden';
+      if (chevron) chevron.classList.add('collapsed');
+    } else {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      setTimeout(() => { body.style.maxHeight = 'none'; }, 300);
+      if (chevron) chevron.classList.remove('collapsed');
+    }
+  });
+  body.style.maxHeight = 'none';
+}
+
+function selectAtom(atomId) {
+  // 取消旧选中
+  document.querySelectorAll('.atom-item.selected').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.evidence-panel.show').forEach(el => el.classList.remove('show'));
+
+  // 新选中
+  const item = document.querySelector(`.atom-item[data-atom-id="${atomId}"]`);
+  if (item) {
+    item.classList.add('selected');
+    const panel = document.getElementById(`evidence-${atomId}`);
+    if (panel) {
+      panel.classList.add('show');
+      // 更新 scrollHeight 让 section-body 知道新高度
+      const body = panel.closest('.section-body');
+      if (body && body.style.maxHeight !== 'none') {
+        body.style.maxHeight = body.scrollHeight + 'px';
+      }
+    }
+    // 滚动到视野
+    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  selectedAtomId = atomId;
+}
+
+// ═══════════════════════════════════════════════════
+// 加载数据
+// ═══════════════════════════════════════════════════
+function loadData(data) {
+  currentData = data;
+  selectedAtomId = null;
+  selectedNodeId = null;
+
+  // 更新场景 ID 显示
+  document.getElementById('scenario-id-display').textContent = data.scenario_id || '未知场景';
+
+  // 渲染图
+  document.getElementById('graph-empty').style.display = 'none';
+  const svg = document.getElementById('policy-svg');
+  svg.style.display = 'block';
+  buildGraph(data);
+
+  // 渲染右面板
+  document.getElementById('score-empty').style.display = 'none';
+  renderRight(data);
+
+  // 关闭节点详情
+  document.getElementById('node-detail').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════
+// 事件绑定
+// ═══════════════════════════════════════════════════
+document.getElementById('demo-btn').addEventListener('click', () => {
+  loadData(DEMO_DATA);
+});
+
+document.getElementById('file-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      loadData(data);
+    } catch (err) {
+      alert('JSON 解析失败: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// 拖放支持
+const dropOverlay = document.getElementById('drop-overlay');
+let dragCounter = 0;
+
+document.addEventListener('dragenter', (e) => {
+  e.preventDefault();
+  dragCounter++;
+  dropOverlay.classList.add('show');
+});
+
+document.addEventListener('dragleave', () => {
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    dropOverlay.classList.remove('show');
+  }
+});
+
+document.addEventListener('dragover', (e) => e.preventDefault());
+
+document.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dragCounter = 0;
+  dropOverlay.classList.remove('show');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      loadData(data);
+    } catch (err) {
+      alert('JSON 解析失败: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+// 点击空白处关闭节点详情
+document.getElementById('graph-container').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('graph-container') ||
+      e.target === document.getElementById('policy-svg')) {
+    document.getElementById('node-detail').classList.remove('show');
+    document.querySelectorAll('#policy-svg g[data-step-id] circle.node-circle').forEach(c => c.setAttribute('stroke-width', '2'));
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// 初始化：直接加载演示数据
+// ═══════════════════════════════════════════════════
+loadData(DEMO_DATA);
+</script>
+</body>
+</html>

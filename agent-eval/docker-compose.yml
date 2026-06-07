@@ -1,0 +1,26 @@
+# Agent 对话评测系统 — Docker Compose 配置
+#
+# 快速启动：
+#   1. cp .env.example .env          # 填入你的 API key（仅查看仪表盘可跳过）
+#   2. docker compose up --build     # 构建并启动
+#   3. 浏览器打开 http://localhost:8765
+#
+# 运行评测（需要 API key）：
+#   docker compose exec agent-eval python run_outbound.py scenarios/outbound/<场景>.json --model <模型>
+
+services:
+  agent-eval:
+    build: .
+    container_name: agent-eval
+    ports:
+      - "8765:8765"
+    volumes:
+      # 持久化评测轨迹，容器重建不丢数据
+      - ./traces:/app/traces
+    env_file:
+      # API key 等敏感配置从 .env 文件读取（不存在时 compose 会警告但不影响启动）
+      - path: .env
+        required: false
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

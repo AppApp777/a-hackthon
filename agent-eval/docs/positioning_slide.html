@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Outbound Policy Verification — Inspired by VitaBench</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --fg: #e6edf3;
+      --accent: #f0883e;
+      --muted: #7d8590;
+      --line: #30363d;
+      --green: #56d364;
+      --red: #f85149;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .slide {
+      max-width: 1100px;
+      width: 100%;
+      background: #161b22;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 56px 64px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .label {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 38px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 0 0 14px 0;
+    }
+    h1 .accent { color: var(--accent); }
+    .tagline {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .questions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+    .q-card {
+      background: #0d1117;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px 24px;
+    }
+    .q-card .who {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .q-card .question {
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    .q-card.them .who { color: #5ab3ff; }
+    .q-card.us .who { color: var(--accent); }
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 32px 0 28px;
+    }
+    .absorb {
+      display: grid;
+      grid-template-columns: max-content 1fr 1fr;
+      gap: 14px 28px;
+      font-size: 15px;
+      margin-bottom: 28px;
+    }
+    .absorb .col-h {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .arrow { color: var(--accent); margin: 0 6px; }
+    .additions {
+      background: #0d1117;
+      border-left: 3px solid var(--accent);
+      padding: 16px 22px;
+      border-radius: 0 8px 8px 0;
+    }
+    .additions h3 {
+      margin: 0 0 12px 0;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .additions ul { margin: 0; padding-left: 18px; line-height: 1.65; font-size: 15px; }
+    .footer-meta {
+      margin-top: 36px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <section class="slide">
+    <div class="label">Day 1 Positioning · 2026-05-20</div>
+
+    <h1>
+      Inspired by <span class="accent">VitaBench</span>:<br />
+      From General Life-Service Benchmark<br />
+      to <span class="accent">Outbound Policy Verification</span>
+    </h1>
+
+    <div class="tagline">
+      站在 LongCat 团队 ICLR 2026 工作的肩膀上，把通用 Agent 评测经验垂直化到外呼业务。
+    </div>
+
+    <div class="questions">
+      <div class="q-card them">
+        <div class="who">VitaBench 问</div>
+        <div class="question">通用 LLM Agent 能不能处理真实生活服务场景中的复杂任务？</div>
+      </div>
+      <div class="q-card us">
+        <div class="who">我们问</div>
+        <div class="question">外呼 Agent 是否执行了正确的业务策略路径？失败时根因在哪？下一步修什么？</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="absorb">
+      <div class="col-h">VitaBench 启发</div>
+      <div class="col-h">我们吸收</div>
+      <div class="col-h">外呼增强</div>
+
+      <div>Tool Graph (66 工具 / 512 边)</div>
+      <div><span class="arrow">→</span> PolicyGraph 编译器</div>
+      <div>把业务策略编译成可执行验证图</div>
+
+      <div>User Simulator (五段式)</div>
+      <div><span class="arrow">→</span> 五段式被叫方模拟器</div>
+      <div>被动接听 / 挂断 / 隐私警惕 / 情绪波动</div>
+
+      <div>Sliding-Window Rubric (κ=0.828)</div>
+      <div><span class="arrow">→</span> Soft-only 滑动窗口</div>
+      <div>分层验证，不污染 hard 88%</div>
+
+      <div>Multi-Run (Avg@4 / Pass^4)</div>
+      <div><span class="arrow">→</span> Subset 稳定性报告</div>
+      <div>关键场景 × 4 runs + violation rate</div>
+    </div>
+
+    <div class="additions">
+      <h3>+ 外呼业务专属增强</h3>
+      <ul>
+        <li><strong>EventLedger</strong> — 工具调用、用户同意、关键事件审计完整</li>
+        <li><strong>CanonicalIntentLedger</strong> — 用户疲劳式同意不改变业务红线</li>
+        <li><strong>CausalDiagnosis</strong> — 可复核 repair hypothesis，每条绑定 PolicyGraph 节点</li>
+      </ul>
+    </div>
+
+    <div class="footer-meta">
+      <span>美团 2026 黑客松 · 赛道二 · 外呼任务对话模型评测</span>
+      <span>占位版 · Day 16-18 polish 后替换</span>
+    </div>
+  </section>
+</body>
+</html>

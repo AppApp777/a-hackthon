@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 对话评测报告 — {{ scenario_name }}</title>
+<style>
+/* ── CSS Variables ── */
+:root {
+  /* Light theme (default, print-friendly) */
+  --bg: #ffffff;
+  --surface: #f8f9fb;
+  --surface2: #f0f1f5;
+  --border: #e2e4ea;
+  --text: #1a1d27;
+  --text2: #6b7280;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --green: #16a34a;
+  --red: #dc2626;
+  --yellow: #ca8a04;
+  --orange: #ea580c;
+  --cyan: #0891b2;
+  --pink: #db2777;
+  --score-bg-high: rgba(22,163,74,.08);
+  --score-bg-mid: rgba(202,138,4,.08);
+  --score-bg-low: rgba(220,38,38,.08);
+}
+
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #242736;
+  --border: #2d3148;
+  --text: #e4e4e7;
+  --text2: #a1a1aa;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #eab308;
+  --orange: #f97316;
+  --cyan: #06b6d4;
+  --pink: #ec4899;
+  --score-bg-high: rgba(34,197,94,.12);
+  --score-bg-mid: rgba(234,179,8,.12);
+  --score-bg-low: rgba(239,68,68,.12);
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+/* ── Layout ── */
+.report {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 32px 60px;
+}
+
+/* ── Header ── */
+.report-header {
+  text-align: center;
+  padding-bottom: 32px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 36px;
+}
+.report-header .logo {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.report-header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.report-header .subtitle {
+  font-size: 14px;
+  color: var(--text2);
+}
+.report-header .big-score {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.report-header .big-score .number {
+  font-size: 64px;
+  font-weight: 900;
+  line-height: 1;
+}
+.report-header .big-score .unit {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text2);
+}
+
+/* ── Theme Toggle ── */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all .15s;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--text); }
+
+/* ── Section ── */
+.section {
+  margin-bottom: 36px;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title .section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Cards Grid ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 18px 16px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.card .label {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.card .value {
+  font-size: 32px;
+  font-weight: 800;
+}
+.card .sub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 6px;
+}
+
+/* ── Score Colors ── */
+.c-high { color: var(--green); }
+.c-mid { color: var(--yellow); }
+.c-low { color: var(--red); }
+.bg-high { background: var(--score-bg-high); }
+.bg-mid { background: var(--score-bg-mid); }
+.bg-low { background: var(--score-bg-low); }
+
+/* ── Three-Layer Sections ── */
+.layer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.layer-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.layer-badge {
+  padding: 3px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.lb-evidence { background: rgba(99,102,241,.12); color: var(--accent); }
+.lb-quality { background: rgba(8,145,178,.12); color: var(--cyan); }
+.lb-safety { background: rgba(220,38,38,.12); color: var(--red); }
+.layer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.layer-item {
+  text-align: center;
+  padding: 12px 8px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.layer-item .label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+.layer-item .value { font-size: 24px; font-weight: 800; }
+.layer-item .weight { font-size: 10px; color: var(--accent2); margin-top: 2px; }
+
+/* ── SVG Radar ── */
+.radar-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 24px;
+}
+.radar-wrap svg {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* ── Step Timeline ── */
+.timeline { position: relative; }
+.tl-item {
+  display: flex;
+  gap: 14px;
+  position: relative;
+}
+.tl-rail {
+  width: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+.tl-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 1;
+  flex-shrink: 0;
+}
+.tl-dot-completed { background: var(--green); }
+.tl-dot-failed { background: var(--red); }
+.tl-dot-skipped { background: var(--orange); }
+.tl-dot-not_reached { background: var(--surface2); color: var(--text2); border: 2px solid var(--border); }
+.tl-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 16px;
+}
+.tl-conn-done { background: var(--green); }
+.tl-conn-pending { background: var(--border); }
+.tl-body {
+  flex: 1;
+  padding-bottom: 18px;
+}
+.tl-head {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.tl-detail {
+  font-size: 12px;
+  color: var(--text2);
+}
+.tl-evidence {
+  font-size: 12px;
+  color: var(--text2);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-top: 6px;
+  font-style: italic;
+}
+.tl-branch {
+  font-size: 11px;
+  color: var(--cyan);
+  margin-top: 4px;
+}
+
+/* ── Violation Cards ── */
+.violation {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.violation-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.sev-badge {
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.sev-critical { background: rgba(220,38,38,.1); color: var(--red); }
+.sev-major { background: rgba(234,88,12,.1); color: var(--orange); }
+.sev-minor { background: rgba(202,138,4,.1); color: var(--yellow); }
+
+/* ── Diagnosis ── */
+.diag-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.diag-card h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.fm-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  margin: 3px 4px 3px 0;
+  background: rgba(220,38,38,.08);
+  color: var(--red);
+  border: 1px solid rgba(220,38,38,.15);
+  font-weight: 500;
+}
+.rec-item {
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+/* ── Conversation ── */
+.msg {
+  margin-bottom: 14px;
+  display: flex;
+  gap: 12px;
+}
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+.msg-user .msg-avatar { background: var(--accent); color: #fff; }
+.msg-agent .msg-avatar { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.msg-system .msg-avatar { background: rgba(219,39,119,.1); color: var(--pink); }
+.msg-body { flex: 1; min-width: 0; }
+.msg-label {
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.msg-text {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.msg-agent .msg-text { background: var(--surface2); }
+.msg-system .msg-text {
+  background: rgba(219,39,119,.04);
+  border-color: rgba(219,39,119,.15);
+  font-size: 12px;
+  color: var(--pink);
+}
+.forbidden-hl {
+  background: rgba(220,38,38,.12);
+  border-radius: 3px;
+  padding: 0 2px;
+  color: var(--red);
+  font-weight: 600;
+}
+.tool-call {
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: 'Fira Code', Consolas, monospace;
+}
+.tool-name { color: var(--accent2); font-weight: 600; }
+.tool-result { color: var(--green); margin-top: 4px; }
+.tool-error { color: var(--red); margin-top: 4px; }
+.fault-tag {
+  background: var(--red);
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+/* ── Check Items ── */
+.check-list { margin-bottom: 20px; }
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.check-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.check-dim {
+  font-size: 10px;
+  color: var(--accent);
+  background: rgba(99,102,241,.08);
+  padding: 1px 8px;
+  border-radius: 4px;
+  margin-right: 6px;
+  font-weight: 500;
+}
+.check-type {
+  font-size: 10px;
+  color: var(--text2);
+  background: var(--surface2);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ── Rubric Bar ── */
+.rubric-dim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.rubric-label {
+  width: 140px;
+  font-size: 13px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.rubric-bar-bg {
+  flex: 1;
+  height: 22px;
+  background: var(--surface2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.rubric-bar {
+  height: 100%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  min-width: 24px;
+}
+.rubric-score {
+  width: 40px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Harness ── */
+.harness-stats {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.harness-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  min-width: 110px;
+}
+.harness-stat .label { font-size: 11px; color: var(--text2); }
+.harness-stat .value { font-size: 24px; font-weight: 800; color: var(--pink); }
+.intervention-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  align-items: flex-start;
+}
+.iv-type {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(99,102,241,.1);
+  color: var(--accent);
+}
+
+/* ── Cost ── */
+.cost-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+/* ── Footer ── */
+.report-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* ── Print ── */
+@media print {
+  body { background: #fff; }
+  .theme-toggle { display: none; }
+  .report { padding: 20px 16px; max-width: 100%; }
+  .report-header { page-break-after: avoid; }
+  .section { page-break-inside: avoid; }
+  .msg { page-break-inside: avoid; }
+  .card { border-color: #ddd; }
+  .layer { border-color: #ddd; }
+  @page { margin: 1.5cm; }
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()">&#9790; / &#9788;</button>
+
+<div class="report">
+
+  {# ═══════════════════════════════════════════════════════
+     1. REPORT HEADER
+     ═══════════════════════════════════════════════════════ #}
+  <div class="report-header">
+    <div class="logo">Agent 对话评测报告</div>
+    <h1>{{ scenario_name }}</h1>
+    <div class="subtitle">
+      评测 ID: {{ trace_id[:12] }}...
+      &nbsp;|&nbsp; 生成时间: {{ generated_at }}
+      {% if difficulty %}&nbsp;|&nbsp; 难度: {{ difficulty }}{% endif %}
+      {% if domain %}&nbsp;|&nbsp; 域: {{ domain_label }}{% endif %}
+    </div>
+    <div class="big-score">
+      {%- set score_pct = (overall_score * 100)|round|int -%}
+      {%- set score_class = 'c-high' if overall_score >= 0.7 else ('c-mid' if overall_score >= 0.4 else 'c-low') -%}
+      <span class="number {{ score_class }}">{{ score_pct }}</span>
+      <span class="unit">分</span>
+    </div>
+  </div>
+
+  {# ═══════════════════════════════════════════════════════
+     2. OVERVIEW CARDS
+     ═══════════════════════════════════════════════════════ #}
+  <div class="section">
+    <div class="section-title"><span class="section-num">1</span> 执行概览</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="label">综合得分</div>
+        <div class="value {{ score_class }}">{{ score_pct }}%</div>
+      </div>
+      <div class="card">
+        <div class="label">硬指标得分</div>
+        {%- set hs_class = 'c-high' if hard_score >= 0.7 else ('c-mid' if hard_score >= 0.4 else 'c-low') -%}
+        <div class="value {{ hs_class }}">{{ (hard_score * 100)|round|int }}%</div>
+      </div>
+      <div class="card">
+        <div class="label">软质量得分</div>
+        {% if soft_score is not none %}
+        {%- set ss_class = 'c-high' if soft_score >= 0.7 else ('c-mid' if soft_score >= 0.4 else 'c-low') -%}
+        <div class="value {{ ss_class }}">{{ (soft_score * 100)|round|int }}%</div>
+        {% else %}
+        <div class="value" style="color:var(--text2)">--</div>
+        {% endif %}
+      </div>
+      <div class="card">
+        <div class="label">对话轮数</div>
+        <div class="value" style="color:var(--accent)">{{ conversation_length }}</div>
+      </div>
+    </div>
+  </div>
+
+  {# ═══════════════════════════════════════════════════════
+     3. THREE-LAYER SCORING DETAIL
+     ═══════════════════════════════════════════════════════ #}
+  <div class="section">
+    <div class="section-title"><span class="section-num">2</span> 三层评分详情</div>
+
+    {# Evidence Layer #}
+    <div class="layer">
+      <div class="layer-header">
+        <span class="layer-badge lb-evidence">客观证据层</span>
+        <span style="color:var(--text2);font-size:12px;">确定性规则计算</span>
+      </div>
+      <div class="layer-grid">
+        <div class="layer-item">
+          <div class="label">硬指标</div>
+          {%- set v = hard_score -%}
+          <div class="value {{ 'c-high' if v >= 0.7 else ('c-mid' if v >= 0.4 else 'c-low') }}">{{ (v*100)|round|int }}%</div>
+          <div class="weight">30%</div>
+        </div>
+        {% if step_compliance_score is not none %}
+        <div class="layer-item">
+          <div class="label">步骤遵循</div>
+          {%- set v = step_compliance_score -%}
+          <div class="value {{ 'c-high' if v >= 0.7 else ('c-mid' if v >= 0.4 else 'c-low') }}">{{ (v*100)|round|int }}%</div>
+          <div class="weight">24%</div>
+        </div>
+        {% endif %}
+        {% if branch_accuracy_score is not none %}
+        <div class="layer-item">
+          <div class="label">分支准确</div>
+          {%- set v = branch_accuracy_score -%}
+          <div class="value {{ 'c-high' if v >= 0.7 else ('c-mid' if v >= 0.4 else 'c-low') }}">{{ (v*100)|round|int }}%</div>
+          <div class="weight">14%</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Quality Layer #}
+    <div class="layer">
+      <div class="layer-header">
+        <span class="layer-badge lb-quality">软质量层</span>
+        <span style="color:var(--text2);font-size:12px;">LLM 评委 &middot; 受客观分门控</span>
+      </div>
+      <div class="layer-grid">
+        <div class="layer-item">
+          <div class="label">LLM 评分</div>
+          {% if soft_score is not none %}
+          {%- set v = soft_score -%}
+          <div class="value {{ 'c-high' if v >= 0.7 else ('c-mid' if v >= 0.4 else 'c-low') }}">{{ (v*100)|round|int }}%</div>
+          {% else %}
+          <div class="value" style="color:var(--text2)">--</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# Safety Layer #}
+    <div class="layer">
+      <div class="layer-header">
+        <span class="layer-badge lb-safety">安全否决层</span>
+        <span style="color:var(--text2);font-size:12px;">非补偿性封顶</span>
+      </div>
+      <div class="layer-grid">
+        <div class="layer-item">
+          <div class="label">违规次数</div>
+          {%- set vc = forbidden_violation_count|default(0) -%}
+          <div class="value {{ 'c-low' if vc > 0 else 'c-high' }}">{{ vc }}</div>
+        </div>
+        <div class="layer-item">
+          <div class="label">开场白</div>
+          <div class="value {{ 'c-high' if opening_correct else 'c-low' }}" style="font-size:20px">{{ '&#10003;' if opening_correct else '&#10007;' }}</div>
+        </div>
+        <div class="layer-item">
+          <div class="label">结束语</div>
+          <div class="value {{ 'c-high' if closing_correct else 'c-low' }}" style="font-size:20px">{{ '&#10003;' if closing_correct else '&#10007;' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ═══════════════════════════════════════════════════════
+     4. RADAR CHART (SVG, D1-D7)
+     ═══════════════════════════════════════════════════════ #}
+  {% if rubric_dimensions|length >= 3 %}
+  <div class="section">
+    <div class="section-title"><span class="section-num">3</span> 维度雷达图</div>
+    {%- set n = rubric_dimensions|length -%}
+    {%- set cx = 200 -%}
+    {%- set cy = 200 -%}
+    {%- set R = 140 -%}
+    {%- set max_score = 5 -%}
+    {%- set pi = 3.14159265358979 -%}
+    {%- set angle_step = 2 * pi / n -%}
+    {%- set start_angle = -pi / 2 -%}
+    <div class="radar-wrap">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        {# Grid rings #}
+        {%- for level in [1, 2, 3, 4, 5] -%}
+          {%- set r = R * level / max_score -%}
+          <polygon points="
+            {%- for i in range(n) -%}
+              {%- set a = start_angle + i * angle_step -%}
+              {{ (cx + r * a|cos)|round(1) }},{{ (cy + r * a|sin)|round(1) }}{{ ' ' if not loop.last }}
+            {%- endfor -%}
+          " fill="none" stroke="var(--border)" stroke-width="{{ '1.5' if level == 5 else '0.5' }}" opacity="{{ '0.8' if level == 5 else '0.4' }}" />
+        {%- endfor -%}
+
+        {# Axis lines #}
+        {%- for i in range(n) -%}
+          {%- set a = start_angle + i * angle_step -%}
+          <line x1="{{ cx }}" y1="{{ cy }}" x2="{{ (cx + R * a|cos)|round(1) }}" y2="{{ (cy + R * a|sin)|round(1) }}" stroke="var(--border)" stroke-width="0.5" opacity="0.6" />
+        {%- endfor -%}
+
+        {# Data polygon #}
+        <polygon points="
+          {%- for dim in rubric_dimensions -%}
+            {%- set i = loop.index0 -%}
+            {%- set a = start_angle + i * angle_step -%}
+            {%- set v = [0, [dim.score, max_score]|min]|max -%}
+            {%- set dr = R * v / max_score -%}
+            {{ (cx + dr * a|cos)|round(1) }},{{ (cy + dr * a|sin)|round(1) }}{{ ' ' if not loop.last }}
+          {%- endfor -%}
+        " fill="rgba(99,102,241,0.2)" stroke="var(--accent)" stroke-width="2" />
+
+        {# Data dots #}
+        {%- for dim in rubric_dimensions -%}
+          {%- set i = loop.index0 -%}
+          {%- set a = start_angle + i * angle_step -%}
+          {%- set v = [0, [dim.score, max_score]|min]|max -%}
+          {%- set dr = R * v / max_score -%}
+          {%- set px = (cx + dr * a|cos)|round(1) -%}
+          {%- set py = (cy + dr * a|sin)|round(1) -%}
+          <circle cx="{{ px }}" cy="{{ py }}" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="2" />
+          {# Value label #}
+          {%- set lr = [dr + 14, R + 12]|min -%}
+          {%- set lx = (cx + lr * a|cos)|round(1) -%}
+          {%- set ly = (cy + lr * a|sin)|round(1) -%}
+          <text x="{{ lx }}" y="{{ ly }}" text-anchor="middle" dominant-baseline="middle" fill="var(--accent)" font-size="11" font-weight="700" font-family="'PingFang SC','Microsoft YaHei',sans-serif">{{ v|round(1) }}</text>
+        {%- endfor -%}
+
+        {# Dimension labels #}
+        {%- for dim in rubric_dimensions -%}
+          {%- set i = loop.index0 -%}
+          {%- set a = start_angle + i * angle_step -%}
+          {%- set lr = R + 34 -%}
+          {%- set lx = (cx + lr * a|cos)|round(1) -%}
+          {%- set ly = (cy + lr * a|sin)|round(1) -%}
+          {%- set cos_a = a|cos -%}
+          {%- set anchor = 'end' if cos_a < -0.1 else ('start' if cos_a > 0.1 else 'middle') -%}
+          <text x="{{ lx }}" y="{{ ly }}" text-anchor="{{ anchor }}" dominant-baseline="middle" fill="var(--text2)" font-size="11" font-family="'PingFang SC','Microsoft YaHei',sans-serif">{{ dim.dimension_id }} {{ dim.name }}</text>
+        {%- endfor -%}
+      </svg>
+    </div>
+
+    {# Rubric bar chart #}
+    {% for dim in rubric_dimensions %}
+    {%- set pct_val = dim.score / max_score * 100 -%}
+    {%- set bar_color = 'var(--green)' if dim.score >= 4 else ('var(--yellow)' if dim.score >= 3 else 'var(--red)') -%}
+    <div class="rubric-dim">
+      <div class="rubric-label">{{ dim.dimension_id }} {{ dim.name }}</div>
+      <div class="rubric-bar-bg"><div class="rubric-bar" style="width:{{ pct_val }}%;background:{{ bar_color }}">{{ dim.score }}</div></div>
+      <div class="rubric-score">{{ dim.score }}/{{ max_score }}</div>
+    </div>
+    {% endfor %}
+    {% if rubric_grade %}
+    <div style="text-align:right;font-size:14px;margin:8px 0 0;">
+      总分: <strong>{{ rubric_total }}/{{ rubric_max }}</strong> &nbsp; 等级: <strong>{{ rubric_grade }}</strong>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     5. STEP EXECUTION TIMELINE
+     ═══════════════════════════════════════════════════════ #}
+  {% if step_compliance %}
+  <div class="section">
+    <div class="section-title"><span class="section-num">4</span> 步骤执行时间线</div>
+    <div style="margin-bottom:14px;font-size:13px;color:var(--text2);">
+      步骤遵循率: <strong style="color:var(--text)">{{ (step_compliance_score * 100)|round|int }}%</strong>
+      {% if branch_accuracy_score is not none %}
+      &nbsp;|&nbsp; 分支准确率: <strong style="color:var(--text)">{{ (branch_accuracy_score * 100)|round|int }}%</strong>
+      {% endif %}
+    </div>
+    <div class="timeline">
+      {% for step in step_compliance %}
+      {%- set status_label = {'completed':'已完成','skipped':'被跳过','failed':'执行失败','not_reached':'未到达'}.get(step.status, step.status) -%}
+      {%- set status_color = {'completed':'var(--green)','skipped':'var(--orange)','failed':'var(--red)','not_reached':'var(--text2)'}.get(step.status, 'var(--text2)') -%}
+      <div class="tl-item">
+        <div class="tl-rail">
+          <div class="tl-dot tl-dot-{{ step.status }}">{{ loop.index }}</div>
+          {% if not loop.last %}<div class="tl-connector {{ 'tl-conn-done' if step.status == 'completed' else 'tl-conn-pending' }}"></div>{% endif %}
+        </div>
+        <div class="tl-body">
+          <div class="tl-head">[{{ step.step_id }}] {{ step.instruction[:80] }}</div>
+          <div class="tl-detail">
+            <span style="color:{{ status_color }}">{{ status_label }}</span>
+            {% if step.turn %} &middot; 第{{ step.turn }}轮{% endif %}
+          </div>
+          {% if step.evidence %}<div class="tl-evidence">"{{ step.evidence[:200] }}"</div>{% endif %}
+          {% if step.branch_taken %}<div class="tl-branch">分支: {{ step.branch_taken }}</div>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     6. VIOLATIONS
+     ═══════════════════════════════════════════════════════ #}
+  {% if forbidden_violations %}
+  <div class="section">
+    <div class="section-title"><span class="section-num">5</span> 违规详情</div>
+    {% for v in forbidden_violations %}
+    <div class="violation">
+      <div class="violation-head">
+        <strong>{{ v.description }}</strong>
+        <span class="sev-badge sev-{{ v.severity }}">{{ v.severity }}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);">第{{ v.turn }}轮 &middot; 关键词: <span style="color:var(--red)">{{ v.keyword }}</span></div>
+      {% if v.evidence %}<div style="font-size:12px;color:var(--text2);margin-top:4px;font-style:italic;">{{ v.evidence }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     7. DIAGNOSIS & RECOMMENDATIONS
+     ═══════════════════════════════════════════════════════ #}
+  {% if diagnosis %}
+  <div class="section">
+    <div class="section-title"><span class="section-num">{{ 6 if forbidden_violations else 5 }}</span> 诊断与建议</div>
+
+    {# Severity #}
+    <div class="diag-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h4>严重度</h4>
+        <span class="sev-badge sev-{{ diagnosis.severity }}">{{ diagnosis.severity }}</span>
+      </div>
+      {% if diagnosis.deviation_point %}
+      {%- set dp = diagnosis.deviation_point -%}
+      <div style="margin-bottom:12px;">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">偏离点: 第{{ dp.turn }}轮</div>
+        <div style="font-size:13px;margin-bottom:4px;">预期: <span style="color:var(--green)">[{{ dp.expected_step }}] {{ dp.expected_behavior }}</span></div>
+        <div style="font-size:13px;">实际: <span style="color:var(--red)">{{ dp.actual_behavior }}</span></div>
+      </div>
+      {% endif %}
+    </div>
+
+    {# Failure Modes #}
+    {% if diagnosis.failure_modes %}
+    <div class="diag-card">
+      <h4>失败模式</h4>
+      <div style="margin-top:8px;">
+        {%- set mode_labels = {
+          'premature_termination': '过早终止',
+          'step_skipping': '步骤跳过',
+          'instruction_misread': '指令误读',
+          'context_loss': '上下文丢失',
+          'template_leakage': '模板泄露',
+          'tool_avoidance': '工具回避',
+          'emotion_mishandle': '情绪处理失当',
+          'branch_error': '分支错误',
+          'overcommit': '越权承诺',
+          'mechanical_response': '机械式回复'
+        } -%}
+        {% for m in diagnosis.failure_modes %}
+        <span class="fm-tag">{{ mode_labels.get(m, m) }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Root Cause #}
+    {% if diagnosis.root_cause %}
+    <div class="diag-card">
+      <h4>根因分析</h4>
+      <p style="margin-top:8px;font-size:14px;line-height:1.7;">{{ diagnosis.root_cause }}</p>
+    </div>
+    {% endif %}
+
+    {# Capability Gap #}
+    {% if diagnosis.model_capability_gap %}
+    <div class="diag-card">
+      <h4>模型能力缺口</h4>
+      <p style="margin-top:8px;font-size:14px;line-height:1.7;color:var(--orange);">{{ diagnosis.model_capability_gap }}</p>
+    </div>
+    {% endif %}
+
+    {# Recommendations #}
+    {% if diagnosis.fix_recommendations %}
+    <div style="margin-top:16px;">
+      <h4 style="font-size:14px;margin-bottom:10px;">修复建议</h4>
+      {% for rec in diagnosis.fix_recommendations %}
+      <div class="rec-item">{{ rec }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     8. CONVERSATION REPLAY
+     ═══════════════════════════════════════════════════════ #}
+  <div class="section">
+    {%- set conv_num = 7 if diagnosis and forbidden_violations else (6 if diagnosis or forbidden_violations else 5) -%}
+    <div class="section-title"><span class="section-num">{{ conv_num }}</span> 对话全文回放</div>
+    {% for m in messages %}
+    {%- set is_user = (m.role == 'user') -%}
+    {%- set is_system = (m.role == 'system') -%}
+    {%- set cls = 'system' if is_system else ('user' if is_user else 'agent') -%}
+    {%- set avatar = '&#9881;' if is_system else ('&#128100;' if is_user else '&#129302;') -%}
+    {%- set role_label = '系统提醒' if is_system else ('被叫方' if is_user and is_outbound else ('用户' if is_user else 'Agent')) -%}
+    <div class="msg msg-{{ cls }}">
+      <div class="msg-avatar">{{ avatar }}</div>
+      <div class="msg-body">
+        <div class="msg-label">{{ role_label }} &middot; 第{{ m.turn }}轮</div>
+        <div class="msg-text">{{ m.content|e }}</div>
+        {% if m.tool_calls %}
+        {% for tc in m.tool_calls %}
+        <div class="tool-call">
+          <span class="tool-name">{{ tc.tool_name }}</span>({{ tc.arguments|tojson|truncate(120, True) }})
+          {% if tc.fault_injected %}<span class="fault-tag">故障注入</span>{% endif %}
+          {% if tc.error %}
+          <div class="tool-error">&#10007; {{ tc.error }}</div>
+          {% else %}
+          <div class="tool-result">&#10003; {{ tc.result|tojson|truncate(200, True) }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# ═══════════════════════════════════════════════════════
+     9. HARNESS INTERVENTIONS
+     ═══════════════════════════════════════════════════════ #}
+  {% if harness_summary %}
+  <div class="section">
+    <div class="section-title"><span class="section-num">{{ conv_num + 1 }}</span> Harness 干预记录</div>
+    <div class="harness-stats">
+      <div class="harness-stat"><div class="label">总干预</div><div class="value">{{ harness_summary.total_interventions }}</div></div>
+      <div class="harness-stat"><div class="label">拦截重生成</div><div class="value">{{ harness_summary.blocked_outputs }}</div></div>
+      <div class="harness-stat"><div class="label">注入工具</div><div class="value">{{ harness_summary.injected_tools }}</div></div>
+      <div class="harness-stat"><div class="label">步骤提醒</div><div class="value">{{ harness_summary.injected_reminders|default(0) }}</div></div>
+      <div class="harness-stat"><div class="label">禁止词清洗</div><div class="value">{{ harness_summary.sanitized_outputs|default(0) }}</div></div>
+    </div>
+    {% if harness_summary.interventions %}
+    <h4 style="font-size:14px;margin-bottom:10px;">干预时间线</h4>
+    {% for iv in harness_summary.interventions %}
+    <div class="intervention-item">
+      <span class="iv-type">{{ iv.type }}</span>
+      <div>
+        <strong>第{{ iv.turn }}轮</strong>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px;">{{ iv.detail }}</div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     10. COST SUMMARY
+     ═══════════════════════════════════════════════════════ #}
+  {% if cost_summary and cost_summary.total_calls %}
+  <div class="section">
+    <div class="section-title"><span class="section-num">{{ (conv_num + 2) if harness_summary else (conv_num + 1) }}</span> 成本摘要</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="label">LLM 调用次数</div>
+        <div class="value" style="color:var(--accent)">{{ cost_summary.total_calls }}</div>
+      </div>
+      <div class="card">
+        <div class="label">总 Token 数</div>
+        <div class="value" style="color:var(--cyan);font-size:22px;">{{ (cost_summary.total_tokens / 1000)|round(1) }}K</div>
+        <div class="sub">{{ cost_summary.total_input_tokens|default(0) }} 入 / {{ cost_summary.total_output_tokens|default(0) }} 出</div>
+      </div>
+      <div class="card">
+        <div class="label">估算费用</div>
+        {%- set cost_usd = cost_summary.estimated_cost_usd|default(0) -%}
+        <div class="value" style="color:var(--cyan);font-size:22px;">${{ '%.4f'|format(cost_usd) if cost_usd < 0.01 else '%.2f'|format(cost_usd) }}</div>
+      </div>
+    </div>
+    {% if cost_summary.by_purpose %}
+    <h4 style="font-size:14px;margin:16px 0 10px;">按用途分布</h4>
+    <div class="cost-grid">
+      {%- set purpose_labels = {'user_sim':'用户模拟', 'judge':'LLM评委', 'scorer':'评分器', 'diagnosis':'诊断', '':'未标注'} -%}
+      {% for purpose, data in cost_summary.by_purpose.items() %}
+      <div class="card">
+        <div class="label">{{ purpose_labels.get(purpose, purpose) }}</div>
+        <div class="value" style="font-size:22px;color:var(--accent2)">{{ data.calls }} 次</div>
+        <div class="sub">{{ (data.total_tokens / 1000)|round(1) }}K tokens</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     11. CHECK ITEMS
+     ═══════════════════════════════════════════════════════ #}
+  {% if checks %}
+  <div class="section">
+    <div class="section-title"><span class="section-num">&#10004;</span> 全部检查项 ({{ checks|length }})</div>
+    <div class="check-list">
+      {% for c in checks %}
+      <div class="check-item">
+        <span class="check-icon">{{ '&#9989;' if c.passed else '&#10060;' }}</span>
+        <div>
+          <span class="check-type">{{ '规则' if c.check_type == 'rule' else 'LLM' }}</span>
+          <span class="check-dim">{{ c.dimension }}</span>
+          <strong>{{ c.description }}</strong>: {{ c.score|round(1) }}
+          <div style="color:var(--text2);margin-top:2px;font-size:12px;">{{ c.explanation }}</div>
+          {% if c.evidence_turn %}<div style="color:var(--accent);font-size:11px;">证据: 第{{ c.evidence_turn }}轮</div>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     12. FAILURE SUMMARY
+     ═══════════════════════════════════════════════════════ #}
+  {% if failure_summary %}
+  <div class="section">
+    <div class="section-title" style="color:var(--red);"><span class="section-num" style="background:var(--red)">!</span> 失败清单</div>
+    {% for f in failure_summary %}
+    <div style="padding:8px 14px;background:rgba(220,38,38,.04);border:1px solid rgba(220,38,38,.1);border-radius:6px;margin-bottom:6px;font-size:13px;">&#10007; {{ f }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# ═══════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════ #}
+  <div class="report-footer">
+    由 Agent 对话评测引擎生成 &middot; v{{ version }} &middot; {{ generated_at }}
+  </div>
+</div>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  html.setAttribute('data-theme', current === 'dark' ? '' : 'dark');
+}
+</script>
+</body>
+</html>

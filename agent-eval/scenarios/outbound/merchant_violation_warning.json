@@ -1,0 +1,380 @@
+{
+  "id": "outbound_merchant_violation_01",
+  "name": "商户违规警告-出餐超时（三路分支·抵触型）",
+  "domain": "outbound_call",
+  "call_type": "merchant_notify",
+  "difficulty": "hard",
+  "description": "商户因出餐超时率过高收到平台警告，客服致电告知违规情况及整改要求。商家可能认错接受、提出申诉、或否认发火。",
+  "call_purpose": "告知商户出餐超时率违规，说明处罚措施和整改要求，提供申诉路径",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "赵老板",
+    "customer_phone": "13600136001",
+    "order_items": [],
+    "delivery_address": "丰台区方庄芳古园一区18号",
+    "delivery_time": "",
+    "issue_type": "violation",
+    "issue_detail": "近30天出餐超时率38.5%，超过平台红线（20%），已触发二级警告",
+    "rider_name": "",
+    "merchant_name": "老赵烤鱼·方庄店",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（美团商家品控中心），说明来电目的（关于门店出餐时效的沟通）",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "商家应答表示在听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是老赵烤鱼·方庄店的赵老板",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "商家确认身份"
+    },
+    {
+      "step_id": "state_violation",
+      "order": 3,
+      "instruction": "告知违规事实：近30天出餐超时率38.5%，超过平台红线20%，已触发二级警告",
+      "required_actions": [
+        "state_facts",
+        "cite_data"
+      ],
+      "completion_condition": "商家听到了违规事实"
+    },
+    {
+      "step_id": "explain_consequence",
+      "order": 4,
+      "instruction": "说明当前处罚措施：搜索排名降权7天。如不整改，下一步将暂停接单功能",
+      "required_actions": [
+        "explain_current_penalty",
+        "warn_escalation"
+      ],
+      "completion_condition": "商家听到了处罚措施"
+    },
+    {
+      "step_id": "gauge_response",
+      "order": 5,
+      "instruction": "听取商家反馈",
+      "required_actions": [
+        "listen_response"
+      ],
+      "branches": [
+        {
+          "condition": "商家认错接受",
+          "next_step": "provide_improvement",
+          "description": "引导整改"
+        },
+        {
+          "condition": "商家提出申诉",
+          "next_step": "handle_appeal",
+          "description": "告知申诉路径"
+        },
+        {
+          "condition": "商家否认发火",
+          "next_step": "de_escalate",
+          "description": "安抚情绪后告知申诉路径"
+        }
+      ],
+      "completion_condition": "商家给出明确反馈"
+    },
+    {
+      "step_id": "provide_improvement",
+      "order": 6,
+      "instruction": "提供整改建议：优化备餐流程、调整接单上限、高峰期临时关闭新单",
+      "required_actions": [
+        "suggest_improvements"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家表示会改进"
+    },
+    {
+      "step_id": "handle_appeal",
+      "order": 7,
+      "instruction": "告知申诉路径：在商家版App→我的→申诉中心提交，附上出餐记录截图，5个工作日内回复",
+      "required_actions": [
+        "explain_appeal_path",
+        "state_deadline"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家理解申诉流程"
+    },
+    {
+      "step_id": "de_escalate",
+      "order": 8,
+      "instruction": "安抚商家情绪，表示理解商家的困难，同时仍需告知申诉路径和时限",
+      "required_actions": [
+        "empathize",
+        "explain_appeal_path",
+        "state_deadline"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家情绪缓和，了解申诉路径"
+    },
+    {
+      "step_id": "confirm_appeal_info",
+      "order": 9,
+      "instruction": "无论走哪个分支，确认商家知道申诉路径和5个工作日时限",
+      "required_actions": [
+        "confirm_appeal_awareness"
+      ],
+      "completion_condition": "商家确认知道申诉路径"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 10,
+      "instruction": "告知后续会通过App推送正式通知，创建工单记录本次沟通，礼貌结束通话",
+      "required_actions": [
+        "create_ticket",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团商家品控中心",
+  "mandatory_closing": "感谢您的理解与配合，我们会持续关注门店改善情况，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_threaten_close",
+      "description": "威胁直接关店",
+      "severity": "critical",
+      "detection_keywords": [
+        "直接关店",
+        "关掉你的店",
+        "封你的店",
+        "永久关闭"
+      ]
+    },
+    {
+      "id": "fb_promise_exempt",
+      "description": "承诺免除处罚",
+      "severity": "critical",
+      "detection_keywords": [
+        "免除处罚",
+        "取消处罚",
+        "不罚了",
+        "帮你撤销",
+        "给你免了"
+      ]
+    },
+    {
+      "id": "fb_insult",
+      "description": "使用侮辱性或嘲讽性语言",
+      "severity": "critical",
+      "detection_keywords": [
+        "活该",
+        "你自己的问题",
+        "怪谁",
+        "不想干就别干"
+      ]
+    },
+    {
+      "id": "fb_argue_back",
+      "description": "与商家争吵或反驳商家的情绪表达",
+      "severity": "major",
+      "detection_keywords": [
+        "你别激动",
+        "你冷静点",
+        "你这态度",
+        "你讲不讲理"
+      ]
+    }
+  ],
+  "canonical_intent": [
+    {
+      "id": "R1_appeal_path",
+      "content": "必须告知申诉路径和时限，无论商家态度如何",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "申诉",
+        "工作日",
+        "路径",
+        "申诉中心"
+      ]
+    }
+  ],
+  "callee_role": "餐饮商家老板",
+  "callee_context": "- 你是老赵烤鱼·方庄店的赵老板，亲自管厨房\n- 最近店里两个厨师离职，人手严重不足，出餐确实慢了\n- 你觉得平台不体谅商家的难处，来了就罚\n- 你脾气比较急，听到'处罚'二字容易上火\n- 你会先否认'哪有那么多超时'，然后抱怨人手不够\n- 最终你会接受事实但要求申诉",
+  "callee_persona": {
+    "patience": 4,
+    "cooperativeness": 3,
+    "comprehension": 7,
+    "emotional": 7,
+    "signal_quality": 9,
+    "busy_level": 5,
+    "trust_level": 4,
+    "has_additional_issue": true,
+    "additional_issue": "你觉得平台派单太密集也是超时原因之一，想反映这个问题",
+    "archetype": "impatient"
+  },
+  "callee_goal": "你想搞清楚到底怎么处罚的、能不能申诉、怎么申诉。你一开始会否认和发火，但如果客服态度好、解释清楚，你会接受并走申诉流程",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 8,
+  "max_turns": 18,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_merchant_status",
+      "description": "查询商家基本信息（名称、负责人、门店状态等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "phone": {
+            "type": "string",
+            "description": "联系电话"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "query_merchant_violations",
+      "description": "查询商家违规记录（违规类型、数据、警告等级、历史处罚）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "time_range": {
+            "type": "string",
+            "description": "查询时间范围，如'近30天'"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "create_merchant_ticket",
+      "description": "为商家创建工单（申诉、投诉、问题跟进等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "ticket_type": {
+            "type": "string",
+            "description": "工单类型"
+          },
+          "description": {
+            "type": "string",
+            "description": "工单描述"
+          }
+        },
+        "required": [
+          "merchant_name",
+          "ticket_type"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_merchant_status": {
+      "merchant_name": "老赵烤鱼·方庄店",
+      "contact_person": "赵老板",
+      "phone": "13600136001",
+      "store_status": "正常营业（降权中）",
+      "monthly_orders": 450,
+      "warning_level": "二级警告",
+      "join_date": "2023-11-08"
+    },
+    "query_merchant_violations": {
+      "merchant_name": "老赵烤鱼·方庄店",
+      "time_range": "近30天",
+      "overtime_rate": "38.5%",
+      "platform_threshold": "20%",
+      "total_orders": 450,
+      "overtime_orders": 173,
+      "warning_level": "二级",
+      "current_penalty": "搜索排名降权7天",
+      "next_penalty": "暂停接单功能",
+      "appeal_deadline": "收到通知后5个工作日内"
+    },
+    "create_merchant_ticket": {
+      "ticket_id": "TK20260521001",
+      "status": "已创建",
+      "type": "违规沟通记录",
+      "expected_response_time": "5个工作日"
+    }
+  },
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "state_violation",
+    "explain_consequence",
+    "gauge_response",
+    "de_escalate",
+    "confirm_appeal_info",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "gauge_response": "商家否认发火"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_merchant_status",
+    "query_merchant_violations",
+    "create_merchant_ticket",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "威胁关店",
+    "承诺免除处罚",
+    "与商家争吵"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_violation_data",
+      "given_turn": 1,
+      "fact_description": "系统数据显示出餐超时率38.5%",
+      "check_turn": 4,
+      "check_description": "agent 在后续沟通中应持续引用准确数据，不能被商家否认后改口",
+      "keywords": [
+        "38.5%",
+        "超时率",
+        "二级"
+      ]
+    },
+    {
+      "fact_id": "cp_staffing_issue",
+      "given_turn": 4,
+      "fact_description": "商家提到两个厨师离职导致人手不足",
+      "check_turn": 6,
+      "check_description": "agent 在提建议时应考虑商家实际困难（人手不足），不要只泛泛说'加快出餐'",
+      "keywords": [
+        "人手",
+        "厨师",
+        "理解"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

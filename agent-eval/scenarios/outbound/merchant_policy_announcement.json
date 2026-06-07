@@ -1,0 +1,240 @@
+{
+  "id": "outbound_merchant_policy_01",
+  "name": "平台政策变更告知-商家配合型",
+  "domain": "outbound_call",
+  "call_type": "merchant_notify",
+  "difficulty": "easy",
+  "description": "客服致电餐饮商家，告知下月起配送费结算规则变更。商家配合度高，简单确认收到。",
+  "call_purpose": "告知商家下月起配送费结算规则变更（从固定费率改为阶梯费率），确认商家理解新旧规则差异",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "王经理",
+    "customer_phone": "13900139001",
+    "order_items": [],
+    "delivery_address": "朝阳区望京SOHO T2 B1层",
+    "delivery_time": "",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "",
+    "merchant_name": "鼎泰丰·国贸店",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（美团商家服务中心），说明来电目的（通知配送费结算规则调整）",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "商家应答表示在听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是鼎泰丰·国贸店的王经理本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "商家确认身份"
+    },
+    {
+      "step_id": "announce_policy",
+      "order": 3,
+      "instruction": "告知政策变更内容：下月1号起配送费结算从固定费率（每单4.5元）改为阶梯费率（月单量≤500单按4.5元，501-1000单按4.0元，1000单以上按3.5元），必须说明新旧规则差异和生效日期",
+      "required_actions": [
+        "explain_old_rule",
+        "explain_new_rule",
+        "state_effective_date"
+      ],
+      "completion_condition": "商家表示听到了政策内容"
+    },
+    {
+      "step_id": "confirm_understanding",
+      "order": 4,
+      "instruction": "确认商家理解新规则，询问是否有疑问",
+      "required_actions": [
+        "check_understanding",
+        "ask_questions"
+      ],
+      "branches": [
+        {
+          "condition": "商家理解无疑问",
+          "next_step": "wrap_up",
+          "description": "直接结束"
+        },
+        {
+          "condition": "商家有疑问",
+          "next_step": "answer_questions",
+          "description": "解答疑问"
+        }
+      ],
+      "completion_condition": "商家明确回复是否理解"
+    },
+    {
+      "step_id": "answer_questions",
+      "order": 5,
+      "instruction": "解答商家关于新政策的疑问",
+      "required_actions": [
+        "answer_policy_questions"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家疑问得到解答"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 6,
+      "instruction": "告知后续会通过商家版App推送正式通知，礼貌结束通话并记录结果",
+      "required_actions": [
+        "mention_app_notification",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团商家服务中心",
+  "mandatory_closing": "感谢您的配合，祝您生意兴隆，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_threaten",
+      "description": "威胁商家不接受就关店或降权",
+      "severity": "critical",
+      "detection_keywords": [
+        "关店",
+        "降权",
+        "下架",
+        "封号",
+        "处罚"
+      ]
+    },
+    {
+      "id": "fb_wrong_date",
+      "description": "告知错误的生效日期或费率数字",
+      "severity": "major",
+      "detection_keywords": [
+        "本月生效",
+        "立即生效",
+        "今天开始"
+      ]
+    },
+    {
+      "id": "fb_skip_difference",
+      "description": "未告知新旧规则差异就跳到下一步",
+      "severity": "major",
+      "detection_keywords": [
+        "具体的您自己看通知",
+        "回头看App"
+      ]
+    }
+  ],
+  "canonical_intent": [
+    {
+      "id": "R1_full_disclosure",
+      "content": "必须完整告知新旧规则差异，包括旧费率、新费率和生效日期",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "变更",
+        "新规则",
+        "生效日期",
+        "阶梯费率",
+        "下月"
+      ]
+    }
+  ],
+  "callee_role": "餐饮商家负责人",
+  "callee_context": "- 你是鼎泰丰·国贸店的王经理，负责门店日常运营\n- 你每月大约有800单外卖\n- 你之前一直按固定4.5元/单结算配送费\n- 你对平台政策关注度一般，但配合度很高\n- 你希望电话简短，确认收到就行",
+  "callee_persona": {
+    "patience": 8,
+    "cooperativeness": 9,
+    "comprehension": 8,
+    "emotional": 2,
+    "signal_quality": 9,
+    "busy_level": 3,
+    "trust_level": 8,
+    "has_additional_issue": false,
+    "additional_issue": "",
+    "archetype": "cooperative"
+  },
+  "callee_goal": "你就想快速了解政策变化对自己有什么影响，确认收到就行，不想多聊",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 5,
+  "max_turns": 10,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_merchant_status",
+      "description": "查询商家基本信息（名称、负责人、门店状态、月均单量等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "phone": {
+            "type": "string",
+            "description": "联系电话"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_merchant_status": {
+      "merchant_name": "鼎泰丰·国贸店",
+      "contact_person": "王经理",
+      "phone": "13900139001",
+      "store_status": "正常营业",
+      "monthly_orders": 820,
+      "current_delivery_fee_rate": "固定4.5元/单",
+      "join_date": "2024-03-15"
+    }
+  },
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "announce_policy",
+    "confirm_understanding",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "confirm_understanding": "商家理解无疑问"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_merchant_status",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "威胁商家",
+    "跳过新旧差异说明"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_merchant_name",
+      "given_turn": 1,
+      "fact_description": "商家确认自己是鼎泰丰·国贸店的王经理",
+      "check_turn": 3,
+      "check_description": "agent 告知政策时应正确使用商家名称或负责人称呼",
+      "keywords": [
+        "王经理",
+        "鼎泰丰"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

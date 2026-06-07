@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-06-02T13:52:56",
+  "model": "gpt-5-5-pro",
+  "traces_scored": 32,
+  "total_traces": 32,
+  "na_counts": {
+    "D1": 0,
+    "D2": 0,
+    "D3": 0,
+    "D4": 8,
+    "D5": 0,
+    "D6": 0
+  },
+  "per_dimension": {
+    "D1": {
+      "n": 32,
+      "exact_agreement": 0.3125,
+      "within_1_agreement": 0.6875,
+      "mean_diff_oracle_minus_system": -0.719,
+      "mae": 1.031,
+      "weighted_kappa": 0.036,
+      "pearson_r": 0.055
+    },
+    "D2": {
+      "n": 32,
+      "exact_agreement": 0.21875,
+      "within_1_agreement": 0.6875,
+      "mean_diff_oracle_minus_system": -0.125,
+      "mae": 1.125,
+      "weighted_kappa": -0.091,
+      "pearson_r": -0.039
+    },
+    "D3": {
+      "n": 32,
+      "exact_agreement": 0.25,
+      "within_1_agreement": 0.5625,
+      "mean_diff_oracle_minus_system": -0.938,
+      "mae": 1.25,
+      "weighted_kappa": -0.039,
+      "pearson_r": -0.108
+    },
+    "D4": {
+      "n": 24,
+      "exact_agreement": 0.2916666666666667,
+      "within_1_agreement": 0.7083333333333334,
+      "mean_diff_oracle_minus_system": -0.375,
+      "mae": 1.042,
+      "weighted_kappa": -0.124,
+      "pearson_r": -0.188
+    },
+    "D5": {
+      "n": 32,
+      "exact_agreement": 0.34375,
+      "within_1_agreement": 0.71875,
+      "mean_diff_oracle_minus_system": -0.531,
+      "mae": 0.969,
+      "weighted_kappa": 0.095,
+      "pearson_r": 0.125
+    },
+    "D6": {
+      "n": 32,
+      "exact_agreement": 0.25,
+      "within_1_agreement": 0.625,
+      "mean_diff_oracle_minus_system": -0.094,
+      "mae": 1.156,
+      "weighted_kappa": -0.096,
+      "pearson_r": -0.132
+    }
+  },
+  "overall": {
+    "n": 184,
+    "exact_agreement": 0.27717391304347827,
+    "within_1_agreement": 0.6630434782608695,
+    "mean_diff_oracle_minus_system": -0.467,
+    "mae": 1.098,
+    "weighted_kappa": -0.031,
+    "pearson_r": -0.041
+  },
+  "layered_calibration": {
+    "deterministic_layer": {
+      "weight": 0.88,
+      "reproducibility": 1.0,
+      "traces_tested": 111,
+      "consistency_rate": 0.973,
+      "description": "Tool calls, DB state, branch compliance, temporal constraints — all rule-based, zero LLM dependency"
+    },
+    "soft_quality_layer": {
+      "weight": 0.12,
+      "oracle_within_1": 0.663,
+      "oracle_pearson_r": -0.041,
+      "oracle_weighted_kappa": -0.031,
+      "traces_tested": 32,
+      "description": "LLM PoLL judges (Opus+Sonnet), gated by deterministic layer"
+    },
+    "summary": "88% of score is deterministic and perfectly reproducible. 12% uses LLM judges with known calibration limitations."
+  }
+}

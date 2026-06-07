@@ -1,0 +1,26 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.12
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: contract-tests
+        name: contract tests
+        entry: bash -c 'if ls tests/contracts/*.py >/dev/null 2>&1; then pytest -q tests/contracts --maxfail=1; fi'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

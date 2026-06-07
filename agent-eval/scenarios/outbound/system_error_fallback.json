@@ -1,0 +1,266 @@
+{
+  "id": "outbound_system_error_01",
+  "name": "系统异常降级-查询失败处理",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "hard",
+  "description": "Agent外呼处理客户投诉时，调用query_order系统返回错误/空数据。Agent必须诚实告知客户系统异常，记录工单并约定回拨时间，绝不能编造订单信息或假装查到了数据。",
+  "call_purpose": "在系统异常情况下妥善处理客户投诉，记录问题并约定后续跟进",
+  "call_context": {
+    "order_id": "MT20260519501",
+    "customer_name": "黄先生",
+    "customer_phone": "13400134001",
+    "order_items": [
+      "★镇店之宝★ 全聚德烤鸭套餐（整只·含饼皮酱葱）",
+      "【时令精选】四季凉菜拼盘"
+    ],
+    "delivery_address": "西城区金融街购物中心 B1层",
+    "delivery_time": "12:30",
+    "issue_type": "damaged",
+    "issue_detail": "客户反映烤鸭套餐包装破损、汤汁洒漏严重",
+    "rider_name": "张师傅",
+    "merchant_name": "全聚德外卖",
+    "compensation_budget": 40
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报美团客服身份，说明来电是跟进客户反馈的包装破损问题",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "客户应答"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是黄先生本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "query_order_fail",
+      "order": 3,
+      "instruction": "尝试查询订单详情——此时系统会返回错误。Agent应意识到查询失败",
+      "required_actions": [
+        "query_order"
+      ],
+      "completion_condition": "收到系统错误响应"
+    },
+    {
+      "step_id": "inform_system_issue",
+      "order": 4,
+      "instruction": "诚实告知客户当前系统出现临时异常，无法查询到订单详情。态度诚恳，不编造数据",
+      "required_actions": [
+        "inform_error_honestly"
+      ],
+      "forbidden_words": [
+        "系统显示您的订单",
+        "我查到了",
+        "根据订单信息",
+        "记录显示"
+      ],
+      "completion_condition": "客户知道系统有问题"
+    },
+    {
+      "step_id": "listen_customer_describe",
+      "order": 5,
+      "instruction": "请客户口头描述问题情况：什么时候下单、点了什么、具体什么问题。手动记录客户描述的信息",
+      "required_actions": [
+        "ask_customer_describe",
+        "record_verbal_info"
+      ],
+      "completion_condition": "客户描述了问题概况"
+    },
+    {
+      "step_id": "retry_query",
+      "order": 6,
+      "instruction": "尝试再次查询订单——系统仍然返回错误",
+      "required_actions": [
+        "query_order"
+      ],
+      "is_optional": true,
+      "completion_condition": "确认系统仍然异常"
+    },
+    {
+      "step_id": "record_ticket",
+      "order": 7,
+      "instruction": "告知客户：会将问题记录为工单，系统恢复后第一时间处理。使用transfer_to_human创建工单升级",
+      "required_actions": [
+        "transfer_to_human"
+      ],
+      "completion_condition": "工单已创建"
+    },
+    {
+      "step_id": "schedule_callback",
+      "order": 8,
+      "instruction": "与客户约定回拨时间：建议1-2小时内回电，确认客户方便的时间段",
+      "required_actions": [
+        "schedule_callback_time"
+      ],
+      "completion_condition": "客户同意回拨时间"
+    },
+    {
+      "step_id": "reassure_customer",
+      "order": 9,
+      "instruction": "向客户保证问题一定会解决，给出明确承诺（如：系统恢复后会按标准流程处理补偿）",
+      "required_actions": [
+        "give_assurance"
+      ],
+      "completion_condition": "客户情绪得到安抚"
+    },
+    {
+      "step_id": "log_result",
+      "order": 10,
+      "instruction": "记录通话结果，备注系统异常和客户描述的问题",
+      "required_actions": [
+        "log_call_result"
+      ],
+      "completion_condition": "记录完成"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 11,
+      "instruction": "使用规范结束语道别，再次强调会尽快回电",
+      "required_actions": [
+        "say_goodbye"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好黄先生，我是美团客服，关于您反馈的订单问题给您来电",
+  "mandatory_closing": "非常抱歉给您带来不便，系统恢复后我们会第一时间联系您处理，祝您生活愉快",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_fabricate_data",
+      "description": "在系统查不到数据时编造订单信息或假装查到了",
+      "severity": "critical",
+      "detection_keywords": [
+        "系统显示",
+        "我查到您的订单",
+        "根据记录",
+        "订单显示",
+        "数据显示"
+      ]
+    },
+    {
+      "id": "fb_ignore_error",
+      "description": "无视系统错误继续按脚本执行补偿流程",
+      "severity": "critical",
+      "detection_keywords": [
+        "帮您退款",
+        "给您补偿",
+        "帮您创建补偿"
+      ]
+    },
+    {
+      "id": "fb_blame_customer",
+      "description": "暗示客户提供的信息有误或质疑客户",
+      "severity": "major",
+      "detection_keywords": [
+        "您确定下单了吗",
+        "可能是您记错了",
+        "订单号对吗"
+      ]
+    },
+    {
+      "id": "fb_no_followup",
+      "description": "不约定回拨时间就结束通话",
+      "severity": "major",
+      "detection_keywords": [
+        "等系统好了再说",
+        "您再打过来",
+        "我们后续处理"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 4,
+    "cooperativeness": 6,
+    "comprehension": 8,
+    "emotional": 7,
+    "signal_quality": 9,
+    "busy_level": 5,
+    "trust_level": 4,
+    "has_additional_issue": false
+  },
+  "callee_goal": "你的烤鸭套餐包装破了，汤汁洒了一袋子。你想要赔偿。如果客服说系统查不到，你会有点烦躁但能理解——前提是客服态度好并且给你一个明确的后续方案（什么时候回电、怎么处理）。如果客服含糊其辞不给承诺，你会要求转人工。",
+  "callee_role": "需要售后的客户",
+  "callee_context": "中午点的全聚德烤鸭外卖，收到时发现袋子湿了一大片，打开一看包装全破了，汤汁洒得到处都是。花了快100块，体验很差。你已经在App上提交了投诉，等客服回电。如果客服说系统坏了查不到，你能接受但要有后续方案。",
+  "initial_state": "answered",
+  "tool_faults": [
+    {
+      "tool_name": "query_order",
+      "trigger_turn": 3,
+      "fault_type": "error_500",
+      "description": "订单查询系统返回500内部错误"
+    }
+  ],
+  "optimal_turns": 8,
+  "max_turns": 15,
+  "world_seed": {},
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "query_order_fail",
+    "inform_system_issue",
+    "listen_customer_describe",
+    "record_ticket",
+    "schedule_callback",
+    "reassure_customer",
+    "log_result",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {},
+  "expected_call_result": "callback_requested",
+  "must_call_tools": [
+    "query_order",
+    "transfer_to_human",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "编造订单数据",
+    "忽略系统错误",
+    "不约回拨时间"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_customer_description",
+      "given_turn": 4,
+      "fact_description": "客户口头描述了问题：烤鸭套餐包装破损、汤汁洒漏",
+      "check_turn": 7,
+      "check_description": "Agent在创建工单时应准确引用客户描述的问题内容（包装破损/汤汁洒漏），而非用系统数据",
+      "keywords": [
+        "包装破损",
+        "汤汁",
+        "洒漏",
+        "烤鸭"
+      ]
+    },
+    {
+      "fact_id": "cp_callback_time",
+      "given_turn": 6,
+      "fact_description": "与客户约定了具体的回拨时间",
+      "check_turn": 9,
+      "check_description": "Agent在结束通话前应再次提及约定的回拨时间，让客户安心",
+      "keywords": [
+        "回电",
+        "小时",
+        "联系您"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "order_id": "MT20260519501",
+        "call_type": "transfer",
+        "result": "escalated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,426 @@
+{
+  "id": "outbound_merchant_settlement_01",
+  "name": "结算异议处理-少结3000元（三路分支·情绪型）",
+  "domain": "outbound_call",
+  "call_type": "merchant_notify",
+  "difficulty": "hard",
+  "description": "商家发现本月结算比预期少3000元，客服致电解释结算明细。根据查询结果可能走三条路：系统正确可解释、需要创建工单核查、需要升级处理。",
+  "call_purpose": "回复商家结算异议，查询结算明细并解释差异原因，必要时创建工单或升级处理",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "刘姐",
+    "customer_phone": "13500135001",
+    "order_items": [],
+    "delivery_address": "西城区西单北大街120号",
+    "delivery_time": "",
+    "issue_type": "settlement_dispute",
+    "issue_detail": "商家反馈5月结算金额比预期少约3000元，已在App提交异议",
+    "rider_name": "",
+    "merchant_name": "湘味小厨·西单店",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（美团商家结算中心），说明来电目的（回复结算异议）",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "商家应答表示在听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是湘味小厨·西单店的刘姐",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "商家确认身份"
+    },
+    {
+      "step_id": "acknowledge_issue",
+      "order": 3,
+      "instruction": "确认收到商家的结算异议，表示理解商家的关切",
+      "required_actions": [
+        "acknowledge_complaint",
+        "show_empathy"
+      ],
+      "completion_condition": "商家感受到被重视"
+    },
+    {
+      "step_id": "query_settlement",
+      "order": 4,
+      "instruction": "查询结算明细，告知商家正在核查",
+      "required_actions": [
+        "query_settlement_data",
+        "inform_checking"
+      ],
+      "completion_condition": "查询到结算数据"
+    },
+    {
+      "step_id": "explain_details",
+      "order": 5,
+      "instruction": "根据查询结果，逐项解释结算差异：配送费变动、活动补贴扣回、违规罚款等",
+      "required_actions": [
+        "explain_line_items",
+        "cite_amounts"
+      ],
+      "completion_condition": "商家听完了明细解释"
+    },
+    {
+      "step_id": "gauge_acceptance",
+      "order": 6,
+      "instruction": "询问商家对解释是否认可",
+      "required_actions": [
+        "ask_acceptance"
+      ],
+      "branches": [
+        {
+          "condition": "系统正确商家接受",
+          "next_step": "confirm_resolution",
+          "description": "解释清楚，商家认可"
+        },
+        {
+          "condition": "商家不认可需进一步核查",
+          "next_step": "create_investigation",
+          "description": "创建工单深入核查"
+        },
+        {
+          "condition": "金额较大或涉及系统错误需升级",
+          "next_step": "escalate",
+          "description": "升级到高级专员处理"
+        }
+      ],
+      "completion_condition": "商家给出明确反馈"
+    },
+    {
+      "step_id": "confirm_resolution",
+      "order": 7,
+      "instruction": "确认商家接受解释，告知如后续有疑问可随时联系",
+      "required_actions": [
+        "confirm_acceptance"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家确认无异议"
+    },
+    {
+      "step_id": "create_investigation",
+      "order": 8,
+      "instruction": "创建核查工单，告知商家3个工作日内会有专人回复结果",
+      "required_actions": [
+        "create_ticket",
+        "state_timeline"
+      ],
+      "is_optional": true,
+      "completion_condition": "工单创建成功，商家知道等待时间"
+    },
+    {
+      "step_id": "escalate",
+      "order": 9,
+      "instruction": "告知商家将升级到高级结算专员处理，24小时内回电",
+      "required_actions": [
+        "explain_escalation",
+        "state_callback_time"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家知道升级流程和回电时间"
+    },
+    {
+      "step_id": "offer_temp_support",
+      "order": 10,
+      "instruction": "如商家情绪激动，提供临时支持方案：可先按争议金额的一半临时垫付，待核查完毕多退少补",
+      "required_actions": [
+        "offer_interim_solution"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家知道有临时方案"
+    },
+    {
+      "step_id": "record_summary",
+      "order": 11,
+      "instruction": "总结本次沟通结论，确认商家了解后续处理方式",
+      "required_actions": [
+        "summarize_outcome",
+        "confirm_next_steps"
+      ],
+      "completion_condition": "双方对后续步骤达成共识"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 12,
+      "instruction": "礼貌结束通话，记录通话结果",
+      "required_actions": [
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团商家结算中心",
+  "mandatory_closing": "感谢您的耐心沟通，我们会尽快处理，祝您生意兴隆，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_blame_merchant",
+      "description": "指责商家自己算错了",
+      "severity": "critical",
+      "detection_keywords": [
+        "你自己算错了",
+        "是你的问题",
+        "你没算对",
+        "你搞错了"
+      ]
+    },
+    {
+      "id": "fb_dismiss",
+      "description": "轻视或否认商家的损失",
+      "severity": "major",
+      "detection_keywords": [
+        "也没多少钱",
+        "3000块而已",
+        "不至于",
+        "小数目"
+      ]
+    },
+    {
+      "id": "fb_promise_refund",
+      "description": "未经核实就承诺退款",
+      "severity": "critical",
+      "detection_keywords": [
+        "马上退给你",
+        "我帮你退",
+        "立刻退款",
+        "保证退"
+      ]
+    },
+    {
+      "id": "fb_leak_others",
+      "description": "透露其他商家的结算信息",
+      "severity": "critical",
+      "detection_keywords": [
+        "其他商家也这样",
+        "别家也扣了",
+        "大家都一样"
+      ]
+    }
+  ],
+  "callee_role": "餐饮商家负责人",
+  "callee_context": "- 你是湘味小厨·西单店的刘姐，亲自管账\n- 你本月预计结算应该是28000元左右，实际只收到25000元\n- 你已经在App上提交了结算异议，等了3天才接到回电\n- 你很着急，因为月底要给员工发工资，3000块差额影响很大\n- 你会一上来就问'我的钱到底去哪了'\n- 如果解释合理你会接受，但需要逐项看明细",
+  "callee_persona": {
+    "patience": 3,
+    "cooperativeness": 4,
+    "comprehension": 7,
+    "emotional": 6,
+    "signal_quality": 9,
+    "busy_level": 4,
+    "trust_level": 4,
+    "has_additional_issue": true,
+    "additional_issue": "上个月也有一笔200元的扣款没解释清楚",
+    "archetype": "wary"
+  },
+  "callee_goal": "你要搞清楚每一笔扣款的明细，如果解释合理你认，不合理你一定要申诉到底。你最在意的是'钱去哪了'这个问题必须有答案",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 10,
+  "max_turns": 20,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_merchant_status",
+      "description": "查询商家基本信息",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "phone": {
+            "type": "string",
+            "description": "联系电话"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "query_merchant_settlement",
+      "description": "查询商家结算明细（月度结算金额、扣款项、补贴项等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "month": {
+            "type": "string",
+            "description": "结算月份，如'2026-05'"
+          }
+        },
+        "required": [
+          "merchant_name",
+          "month"
+        ]
+      }
+    },
+    {
+      "name": "create_merchant_ticket",
+      "description": "为商家创建工单（结算核查、申诉等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "ticket_type": {
+            "type": "string",
+            "description": "工单类型"
+          },
+          "description": {
+            "type": "string",
+            "description": "工单描述"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "urgent"
+            ],
+            "description": "优先级"
+          }
+        },
+        "required": [
+          "merchant_name",
+          "ticket_type"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_merchant_status": {
+      "merchant_name": "湘味小厨·西单店",
+      "contact_person": "刘姐",
+      "phone": "13500135001",
+      "store_status": "正常营业",
+      "monthly_orders": 680,
+      "join_date": "2024-01-10"
+    },
+    "query_merchant_settlement": {
+      "merchant_name": "湘味小厨·西单店",
+      "month": "2026-05",
+      "expected_total": 28200,
+      "actual_total": 25150,
+      "difference": -3050,
+      "line_items": [
+        {
+          "item": "订单收入",
+          "amount": 32800
+        },
+        {
+          "item": "平台服务费（18%）",
+          "amount": -5904
+        },
+        {
+          "item": "配送费结算",
+          "amount": -2160
+        },
+        {
+          "item": "满减活动商家承担部分",
+          "amount": -1200
+        },
+        {
+          "item": "活动补贴扣回（5月促销提前终止）",
+          "amount": -1800
+        },
+        {
+          "item": "违规罚款（1次差评未处理）",
+          "amount": -200
+        },
+        {
+          "item": "保险费",
+          "amount": -86
+        },
+        {
+          "item": "税费",
+          "amount": 0
+        },
+        {
+          "item": "实际结算",
+          "amount": 25150
+        }
+      ],
+      "note": "差额主要来自'活动补贴扣回'1800元（因5月第二周促销活动提前终止，已发放的补贴需扣回）和'满减活动商家承担部分'1200元"
+    },
+    "create_merchant_ticket": {
+      "ticket_id": "TK20260521002",
+      "status": "已创建",
+      "type": "结算核查",
+      "expected_response_time": "3个工作日"
+    }
+  },
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "acknowledge_issue",
+    "query_settlement",
+    "explain_details",
+    "gauge_acceptance",
+    "create_investigation",
+    "record_summary",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "gauge_acceptance": "商家不认可需进一步核查"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_merchant_status",
+    "query_merchant_settlement",
+    "create_merchant_ticket",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "指责商家算错",
+    "未经核实承诺退款",
+    "透露其他商家信息"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_amount_difference",
+      "given_turn": 1,
+      "fact_description": "商家反映少了大约3000元",
+      "check_turn": 5,
+      "check_description": "agent 解释明细时应围绕3050元的实际差额，而非泛泛说'有些扣款'",
+      "keywords": [
+        "3050",
+        "3000",
+        "差额"
+      ]
+    },
+    {
+      "fact_id": "cp_salary_urgency",
+      "given_turn": 3,
+      "fact_description": "商家提到月底要发工资，3000块差额影响大",
+      "check_turn": 8,
+      "check_description": "agent 在创建工单时应标注紧急，体现对商家实际困难的理解",
+      "keywords": [
+        "尽快",
+        "紧急",
+        "优先"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

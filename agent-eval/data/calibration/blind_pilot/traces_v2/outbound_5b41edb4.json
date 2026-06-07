@@ -1,0 +1,1633 @@
+{
+  "id": "5b41edb4-e2be-418f-9809-6f74498a39d9",
+  "scenario": {
+    "id": "outbound_rider_fmt_01",
+    "name": "飞毛腿骑手合同通知-配合型",
+    "domain": "outbound_call",
+    "difficulty": "medium",
+    "description": "站长致电骑手，通知飞毛腿合同已生效，提醒完成配送任务要求。骑手整体配合但有疑问。",
+    "user_goal": "你想了解飞毛腿的具体要求，今天可以配送但后天可能有私事，想知道能不能灵活安排。如果站长态度好你会配合，如果太强硬你会犹豫。",
+    "initial_message": "[外呼] 通知飞毛腿骑手今天合同已签署生效，提醒午晚高峰上线及每日最低单量要求",
+    "constraints": [],
+    "tool_faults": [],
+    "user_persona": {
+      "patience": 5,
+      "clarity": 5,
+      "emotional": 3,
+      "pickiness": 5,
+      "change_mind_probability": 0.2
+    },
+    "expected_outcome": {
+      "must_satisfy": [],
+      "must_call_tools": [],
+      "must_not_do": [],
+      "final_state_checks": {}
+    },
+    "max_turns": 15,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "outbound_rider_fmt_01",
+    "messages": [
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "你好，请问是王磊吗？我是站长。看到你今天报名了飞毛腿，恭喜！\n\n午餐和晚餐高峰期记得上线哦。单日合同每天至少完成8单，多日合同每天至少完成5单。\n\n你今天方便开始配送吗？",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:15.391806",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "user",
+        "content": "喂，你好。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:15.391841",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "哎王磊，你好！我是站长。\n\n你的飞毛腿合同今天已经生效了，今天能出来跑单吗？",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:21.990736",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "哦好的，那我今天出来跑单。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:27.547976",
+        "metadata": {
+          "emotional_state": "neutral",
+          "compliance_pressure_level": 0,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "好的太好了！\n\n提醒你一下，单日飞毛腿合同需要连续完成3天配送，今天至少要跑8单，注意安全哈！",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:34.986729",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "嗯，我试试今天跑够8单吧。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:41.799810",
+        "metadata": {
+          "emotional_state": "neutral",
+          "compliance_pressure_level": 0,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "太好了！高峰期流量大，单子好接。\n\n骑车注意安全，有问题随时联系我！加油！",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:49.323579",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "user",
+        "content": "好的，那我挂了哈。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:53.263923",
+        "metadata": {
+          "emotional_state": "neutral",
+          "compliance_pressure_level": 0,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 4,
+        "role": "system",
+        "content": "通话即将结束，你还没有调用 log_call_result 记录本次通话结果。请立即调用。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T13:33:53.263960",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "通话已结束，结果已记录。\n\n本次外呼小结：\n- **骑手**：王磊\n- **结果**：确认可以今天配送 ✅\n- **要点**：飞毛腿单日合同已生效，骑手知悉需完成8单，态度积极\n- **记录**：log_call_result 已成功落库（log_id: log_5397）",
+        "tool_calls": [
+          {
+            "id": "3a262dfd",
+            "tool_name": "log_call_result",
+            "arguments": {
+              "order_id": "rider_wanglei_20260606",
+              "result": "confirmed",
+              "customer_response": "骑手王磊确认今天可以出来跑单，表示会尽量完成8单",
+              "notes": "飞毛腿单日合同已生效，骑手态度积极，已提醒高峰期上线及安全注意事项"
+            },
+            "result": {
+              "log_id": "log_9832",
+              "recorded": true
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-06-06T13:34:08.193043",
+        "metadata": {
+          "__post_call_verified__": true
+        }
+      }
+    ],
+    "started_at": "2026-06-06T13:33:06.593499",
+    "ended_at": "2026-06-06T13:34:08.193066",
+    "termination_reason": "natural_end"
+  },
+  "score_report": {
+    "scenario_id": "outbound_rider_fmt_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "failed",
+      "confirmed_reservations": 0,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 10,
+    "hard_score": 0.789,
+    "soft_score": 0.273,
+    "overall_score": 0.402,
+    "official": false,
+    "checks": [
+      {
+        "check_id": "opening",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "开场白规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "开场白包含 3/3 个必要元素"
+      },
+      {
+        "check_id": "closing",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "结束语规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "无强制结束语要求"
+      },
+      {
+        "check_id": "no_forbidden",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "无禁止行为违规",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未检测到禁止话术或重复"
+      },
+      {
+        "check_id": "response_length",
+        "check_type": "rule",
+        "dimension": "constraint",
+        "description": "回复长度≤30字",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "4/4轮超限(违规率100%)，最严重第1轮(85字)"
+      },
+      {
+        "check_id": "turn_efficiency",
+        "check_type": "rule",
+        "dimension": "efficiency",
+        "description": "轮次效率 (最优5轮)",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际4轮，效率100%"
+      },
+      {
+        "check_id": "tool_used_log_call_result",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: log_call_result",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "call_result",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "通话结果应为: confirmed",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行"
+      },
+      {
+        "check_id": "db_state_match",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "DB终态验证",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DB状态完全匹配 1/1"
+      },
+      {
+        "check_id": "knowledge_accuracy",
+        "check_type": "rule",
+        "dimension": "knowledge_accuracy",
+        "description": "知识准确性",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "1/5 个知识点准确传达，2 个矛盾，2 个未提及"
+      },
+      {
+        "check_id": "ai_rejection",
+        "check_type": "rule",
+        "dimension": "compliance",
+        "description": "客户因 AI 身份拒绝沟通",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "客户未因 AI 身份拒绝沟通"
+      },
+      {
+        "check_id": "step_compliance_overall",
+        "check_type": "structural",
+        "dimension": "instruction_following",
+        "description": "必要步骤完成率",
+        "passed": false,
+        "score": 0.2,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: step_score=0.20"
+      },
+      {
+        "check_id": "branch_accuracy_overall",
+        "check_type": "structural",
+        "dimension": "branching",
+        "description": "分支判断准确率",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: branch_score=0.00"
+      },
+      {
+        "check_id": "temporal_order",
+        "check_type": "structural",
+        "dimension": "temporal_order",
+        "description": "时序约束合规",
+        "passed": false,
+        "score": 0.667,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "时序违反: 1 处"
+      },
+      {
+        "check_id": "path_alignment",
+        "check_type": "structural",
+        "dimension": "path_alignment",
+        "description": "执行路径对齐度",
+        "passed": false,
+        "score": 0.24,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DP对齐分=0.24, 代价=9.5"
+      },
+      {
+        "check_id": "rubric_D1",
+        "check_type": "llm",
+        "dimension": "D1",
+        "description": "指令步骤遵循",
+        "passed": false,
+        "score": 0.2,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "~if_1 ✗if_2 ~if_3 ✗if_4 ✗if_5"
+      },
+      {
+        "check_id": "rubric_D2",
+        "check_type": "llm",
+        "dimension": "D2",
+        "description": "信息确认完整性",
+        "passed": false,
+        "score": 0.2,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "✗ic_1 ~ic_2 ~ic_3 ✗ic_4 ✗ic_5"
+      },
+      {
+        "check_id": "rubric_D3",
+        "check_type": "llm",
+        "dimension": "D3",
+        "description": "话术规范性",
+        "passed": false,
+        "score": 0.4,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "~sp_1 ~sp_2 ~sp_3 —sp_4 ✗sp_5"
+      },
+      {
+        "check_id": "rubric_D4",
+        "check_type": "llm",
+        "dimension": "D4",
+        "description": "异常处理能力",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "—eh_1 —eh_2 —eh_3 ✗eh_4 —eh_5 [undertested: 1/5]"
+      },
+      {
+        "check_id": "rubric_D5",
+        "check_type": "llm",
+        "dimension": "D5",
+        "description": "沟通效率",
+        "passed": false,
+        "score": 0.4,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "✗ce_1 ~ce_2 ✗ce_3 ~ce_4 ~ce_5"
+      },
+      {
+        "check_id": "rubric_D6",
+        "check_type": "llm",
+        "dimension": "D6",
+        "description": "操作安全性",
+        "passed": false,
+        "score": 0.4,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "~os_1 ~os_2 —os_3 ~os_4 —os_5 —os_6 ~os_7 ✗os_8"
+      }
+    ],
+    "constraint_ledger": [],
+    "state_snapshots": [
+      {
+        "turn": 0,
+        "after_tool_call": "initial_state",
+        "reservations": [],
+        "orders": [],
+        "coupons_used": [],
+        "diff_description": "turn 0: initial_state"
+      }
+    ],
+    "failure_summary": [
+      "[constraint] 回复长度≤30字: 4/4轮超限(违规率100%)，最严重第1轮(85字)",
+      "[outcome] 通话结果应为: confirmed: 实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行",
+      "[knowledge_accuracy] 知识准确性: 1/5 个知识点准确传达，2 个矛盾，2 个未提及",
+      "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.20",
+      "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+      "[temporal_order] 时序约束合规: 时序违反: 1 处",
+      "[path_alignment] 执行路径对齐度: DP对齐分=0.24, 代价=9.5",
+      "[D1] 指令步骤遵循: ~if_1 ✗if_2 ~if_3 ✗if_4 ✗if_5",
+      "[D2] 信息确认完整性: ✗ic_1 ~ic_2 ~ic_3 ✗ic_4 ✗ic_5",
+      "[D3] 话术规范性: ~sp_1 ~sp_2 ~sp_3 —sp_4 ✗sp_5",
+      "[D4] 异常处理能力: —eh_1 —eh_2 —eh_3 ✗eh_4 —eh_5 [undertested: 1/5]",
+      "[D5] 沟通效率: ✗ce_1 ~ce_2 ✗ce_3 ~ce_4 ~ce_5",
+      "[D6] 操作安全性: ~os_1 ~os_2 —os_3 ~os_4 —os_5 —os_6 ~os_7 ✗os_8"
+    ],
+    "rubric": {
+      "dimensions": [
+        {
+          "dimension_id": "D1",
+          "name": "指令步骤遵循",
+          "score": 1,
+          "explanation": "~if_1 ✗if_2 ~if_3 ✗if_4 ✗if_5",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D2",
+          "name": "信息确认完整性",
+          "score": 1,
+          "explanation": "✗ic_1 ~ic_2 ~ic_3 ✗ic_4 ✗ic_5",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D3",
+          "name": "话术规范性",
+          "score": 2,
+          "explanation": "~sp_1 ~sp_2 ~sp_3 —sp_4 ✗sp_5",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D4",
+          "name": "异常处理能力",
+          "score": 0,
+          "explanation": "—eh_1 —eh_2 —eh_3 ✗eh_4 —eh_5 [undertested: 1/5]",
+          "evidence_turns": [],
+          "undertested": true
+        },
+        {
+          "dimension_id": "D5",
+          "name": "沟通效率",
+          "score": 2,
+          "explanation": "✗ce_1 ~ce_2 ✗ce_3 ~ce_4 ~ce_5",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D6",
+          "name": "操作安全性",
+          "score": 2,
+          "explanation": "~os_1 ~os_2 —os_3 ~os_4 —os_5 —os_6 ~os_7 ✗os_8",
+          "evidence_turns": [],
+          "undertested": true
+        }
+      ],
+      "binary_items": [
+        {
+          "item_id": "confirm_identity",
+          "description": "确认对方身份",
+          "triggered": true,
+          "value": 1,
+          "explanation": "Agent在第1轮开场就用'请问是王磊吗？'确认对方姓名身份，用户在第2轮以'哎王磊，你好'被Agent再次称呼后继续对话（隐含确认），完成了通过姓名核实客户本人的动作。"
+        },
+        {
+          "item_id": "state_purpose",
+          "description": "说明来电目的",
+          "triggered": true,
+          "value": 1,
+          "explanation": "Agent 在第1轮就清楚说明了来电目的——告知骑手报名的飞毛腿合同相关事项，并提醒高峰期上线、单日/多日合同的最低单量要求；第2轮进一步明确飞毛腿合同已生效、询问今天是否能跑单。来电目的（飞毛腿合同生效通知 + 配送任务要求提醒）在前2轮内已清楚传达。"
+        },
+        {
+          "item_id": "unauthorized_promise",
+          "description": "越权承诺",
+          "triggered": false,
+          "value": 0,
+          "explanation": "Agent全程仅进行任务提醒和鼓励，未涉及任何退款、补偿、奖励等承诺，不存在越权行为。"
+        },
+        {
+          "item_id": "info_leak",
+          "description": "信息泄露",
+          "triggered": false,
+          "value": 0,
+          "explanation": "Agent仅告知骑手本人合同生效、配送要求（单量、连续天数）等与该骑手自身相关的信息，未泄露其他客户信息、内部系统细节或第三方个人电话等敏感信息。"
+        },
+        {
+          "item_id": "robot_detected",
+          "description": "客户因AI身份拒绝沟通",
+          "triggered": false,
+          "value": 0,
+          "explanation": "客户全程配合，回应「哦好的，那我今天出来跑单」「嗯，我试试今天跑够8单吧」「好的，那我挂了哈」，未识别 Agent 为 AI，也未表达拒绝沟通、要求转人工或不信任。"
+        }
+      ],
+      "dimension_total": 6,
+      "binary_net": 2,
+      "rubric_total": 8,
+      "rubric_max": 22,
+      "grade": "严重不合格"
+    },
+    "generated_at": "2026-06-06T13:40:18.505163"
+  },
+  "run_metadata": {
+    "model_backend": "claude-sonnet-4-6",
+    "scenario_version": "1.0",
+    "agent_type": "baseline",
+    "timestamp": "2026-06-06T13:40:18.505288",
+    "run_id": "bfa3300c-0d01-4409-85c4-7504ef650506",
+    "evaluator_version": "1.0.0",
+    "judge_model_id": "claude-opus-4-7",
+    "judge_model_secondary_id": "claude-sonnet-4-6",
+    "simulator_model_id": "LongCat-2.0-Preview",
+    "seed": null,
+    "self_consistency_n": 1,
+    "use_llm_judge": true,
+    "started_at": "2026-06-06T13:33:06.593637",
+    "finished_at": "2026-06-06T13:40:18.505178",
+    "duration_seconds": 431.911541,
+    "cost_summary": {
+      "total_calls": 34,
+      "total_input_tokens": 2792,
+      "total_output_tokens": 137,
+      "total_tokens": 2929,
+      "estimated_cost_usd": 0.001602,
+      "by_purpose": {
+        "unknown": {
+          "calls": 34,
+          "input_tokens": 2792,
+          "output_tokens": 137,
+          "total_tokens": 2929
+        }
+      },
+      "by_model": {
+        "claude-sonnet-4-6": {
+          "calls": 11,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "LongCat-2.0-Preview": {
+          "calls": 3,
+          "input_tokens": 2792,
+          "output_tokens": 137,
+          "total_tokens": 2929
+        },
+        "claude-opus-4-7": {
+          "calls": 20,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      }
+    }
+  },
+  "metadata": {
+    "db_state": {
+      "orders": [],
+      "issues": [],
+      "compensations": [],
+      "call_logs": [
+        {
+          "id": "log_9832",
+          "order_id": "rider_wanglei_20260606",
+          "call_type": "outbound",
+          "result": "confirmed",
+          "customer_response": "骑手王磊确认今天可以出来跑单，表示会尽量完成8单",
+          "notes": "飞毛腿单日合同已生效，骑手态度积极，已提醒高峰期上线及安全注意事项",
+          "started_at": "2026-06-06 05:29:08",
+          "ended_at": "2026-06-06 05:34:08"
+        }
+      ],
+      "delivery_schedule": []
+    },
+    "domain": "outbound_call",
+    "outbound_report": {
+      "scenario_id": "outbound_rider_fmt_01",
+      "run_validity": {
+        "status": "valid",
+        "reason": "",
+        "feasible_path_exists": true
+      },
+      "task_outcome": {
+        "status": "failed",
+        "confirmed_reservations": 0,
+        "key_constraint_violations": []
+      },
+      "conversation_length": 10,
+      "step_compliance_score": 0.2,
+      "branch_accuracy_score": 0.0,
+      "forbidden_violation_count": 0,
+      "opening_correct": true,
+      "closing_correct": true,
+      "call_result_correct": false,
+      "hard_score": 0.789,
+      "soft_score": 0.273,
+      "objective_score": 0.384,
+      "evidence_score": 0.402,
+      "veto_cap": 0.6,
+      "gate_type": "cap_060",
+      "overall_score": 0.402,
+      "overall_score_100": 40,
+      "scoring_mode": "full",
+      "official": false,
+      "step_compliance": [
+        {
+          "step_id": "open_notify",
+          "instruction": "自报身份（站长），确认对方是王磊，告知飞毛腿合同已生效，提醒午晚高峰上线和最低单量",
+          "status": "completed",
+          "turn": 3,
+          "evidence": "Turn 1: '你好，请问是王磊吗？我是站长' (自报身份+确认身份) + '看到你今天报名了飞毛腿，恭喜！午餐和晚餐高峰期记得上线哦。单日合同每天至少完成8单，多日合同每天至少完成5单' (告知合同+午晚高峰+最低单量); Turn 2: '你的飞毛腿合同今天已经生效了' (明确告知合同生效); Turn 3 用户回复 '嗯，我试试今天跑够8单吧' 确认收到通知",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "explain_rules",
+          "instruction": "说明连续配送要求：单日合同需连续3天完成配送，否则影响合同",
+          "status": "completed",
+          "turn": 3,
+          "evidence": "提醒你一下，单日飞毛腿合同需要连续完成3天配送，今天至少要跑8单，注意安全哈！",
+          "branch_taken": "骑手表示可以配送",
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "encourage",
+          "instruction": "鼓励骑手，提醒注意安全，提及额外奖励激励",
+          "status": "completed",
+          "turn": 4,
+          "evidence": "Agent在turn 3说'今天至少要跑8单，注意安全哈！'提醒了安全，骑手回应'我试试今天跑够8单吧'表示会努力；turn 4 Agent进一步鼓励'太好了！高峰期流量大，单子好接。骑车注意安全，有问题随时联系我！加油！'，完成encourage_rider和remind_safety两个必须动作。但未提及额外奖励激励。",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "retain",
+          "instruction": "挽留不想配送的骑手，说明名额紧张、奖励优势，但如果对方坚持则安慰后结束",
+          "status": "not_applicable",
+          "turn": null,
+          "evidence": "骑手在第2轮就明确表示'哦好的，那我今天出来跑单'，同意继续配送，因此挽留步骤未被触发。整个对话中骑手没有表达不想配送的意图，Agent 无需进入挽留分支。",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "ranking_explain",
+          "instruction": "说明飞毛腿排名机制：按排名分配非站长干预，减少拒单/取消/超时有助保住资格，恶劣天气出勤加分",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "对话中Agent全程未提及飞毛腿排名机制、非站长干预分配、拒单/取消/超时影响资格、恶劣天气出勤加分等内容。Agent仅说明了合同生效、每日单量要求（8单）和安全提示，未涉及排名机制说明。",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "wrap_up",
+          "instruction": "确认骑手无其他问题，礼貌结束通话，记录结果",
+          "status": "failed",
+          "turn": 4,
+          "evidence": "Agent在第4轮说'骑车注意安全，有问题随时联系我！加油！'，但存在三个问题：(1) 未明确询问骑手'还有什么其他问题吗'，只是被动说'有问题随时联系我'；(2) 结束语'加油'不算正式道别；(3) 系统提醒明确指出'你还没有调用 log_call_result 记录本次通话结果'，说明 log_result 动作未执行。三个必须动作中至少 log_result 完全缺失，ask_other_issues 也未真正执行。",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        }
+      ],
+      "forbidden_violations": [],
+      "checks": [
+        {
+          "check_id": "opening",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "开场白规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "开场白包含 3/3 个必要元素"
+        },
+        {
+          "check_id": "closing",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "结束语规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "无强制结束语要求"
+        },
+        {
+          "check_id": "no_forbidden",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "无禁止行为违规",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未检测到禁止话术或重复"
+        },
+        {
+          "check_id": "response_length",
+          "check_type": "rule",
+          "dimension": "constraint",
+          "description": "回复长度≤30字",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "4/4轮超限(违规率100%)，最严重第1轮(85字)"
+        },
+        {
+          "check_id": "turn_efficiency",
+          "check_type": "rule",
+          "dimension": "efficiency",
+          "description": "轮次效率 (最优5轮)",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际4轮，效率100%"
+        },
+        {
+          "check_id": "tool_used_log_call_result",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: log_call_result",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "call_result",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "通话结果应为: confirmed",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行"
+        },
+        {
+          "check_id": "db_state_match",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "DB终态验证",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DB状态完全匹配 1/1"
+        },
+        {
+          "check_id": "knowledge_accuracy",
+          "check_type": "rule",
+          "dimension": "knowledge_accuracy",
+          "description": "知识准确性",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "1/5 个知识点准确传达，2 个矛盾，2 个未提及"
+        },
+        {
+          "check_id": "ai_rejection",
+          "check_type": "rule",
+          "dimension": "compliance",
+          "description": "客户因 AI 身份拒绝沟通",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "客户未因 AI 身份拒绝沟通"
+        },
+        {
+          "check_id": "step_compliance_overall",
+          "check_type": "structural",
+          "dimension": "instruction_following",
+          "description": "必要步骤完成率",
+          "passed": false,
+          "score": 0.2,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: step_score=0.20"
+        },
+        {
+          "check_id": "branch_accuracy_overall",
+          "check_type": "structural",
+          "dimension": "branching",
+          "description": "分支判断准确率",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: branch_score=0.00"
+        },
+        {
+          "check_id": "temporal_order",
+          "check_type": "structural",
+          "dimension": "temporal_order",
+          "description": "时序约束合规",
+          "passed": false,
+          "score": 0.667,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "时序违反: 1 处"
+        },
+        {
+          "check_id": "path_alignment",
+          "check_type": "structural",
+          "dimension": "path_alignment",
+          "description": "执行路径对齐度",
+          "passed": false,
+          "score": 0.24,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DP对齐分=0.24, 代价=9.5"
+        },
+        {
+          "check_id": "rubric_D1",
+          "check_type": "llm",
+          "dimension": "D1",
+          "description": "指令步骤遵循",
+          "passed": false,
+          "score": 0.2,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "~if_1 ✗if_2 ~if_3 ✗if_4 ✗if_5"
+        },
+        {
+          "check_id": "rubric_D2",
+          "check_type": "llm",
+          "dimension": "D2",
+          "description": "信息确认完整性",
+          "passed": false,
+          "score": 0.2,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "✗ic_1 ~ic_2 ~ic_3 ✗ic_4 ✗ic_5"
+        },
+        {
+          "check_id": "rubric_D3",
+          "check_type": "llm",
+          "dimension": "D3",
+          "description": "话术规范性",
+          "passed": false,
+          "score": 0.4,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "~sp_1 ~sp_2 ~sp_3 —sp_4 ✗sp_5"
+        },
+        {
+          "check_id": "rubric_D4",
+          "check_type": "llm",
+          "dimension": "D4",
+          "description": "异常处理能力",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "—eh_1 —eh_2 —eh_3 ✗eh_4 —eh_5 [undertested: 1/5]"
+        },
+        {
+          "check_id": "rubric_D5",
+          "check_type": "llm",
+          "dimension": "D5",
+          "description": "沟通效率",
+          "passed": false,
+          "score": 0.4,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "✗ce_1 ~ce_2 ✗ce_3 ~ce_4 ~ce_5"
+        },
+        {
+          "check_id": "rubric_D6",
+          "check_type": "llm",
+          "dimension": "D6",
+          "description": "操作安全性",
+          "passed": false,
+          "score": 0.4,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "~os_1 ~os_2 —os_3 ~os_4 —os_5 —os_6 ~os_7 ✗os_8"
+        }
+      ],
+      "rubric": {
+        "dimensions": [
+          {
+            "dimension_id": "D1",
+            "name": "指令步骤遵循",
+            "score": 1,
+            "explanation": "~if_1 ✗if_2 ~if_3 ✗if_4 ✗if_5",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D2",
+            "name": "信息确认完整性",
+            "score": 1,
+            "explanation": "✗ic_1 ~ic_2 ~ic_3 ✗ic_4 ✗ic_5",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D3",
+            "name": "话术规范性",
+            "score": 2,
+            "explanation": "~sp_1 ~sp_2 ~sp_3 —sp_4 ✗sp_5",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D4",
+            "name": "异常处理能力",
+            "score": 0,
+            "explanation": "—eh_1 —eh_2 —eh_3 ✗eh_4 —eh_5 [undertested: 1/5]",
+            "evidence_turns": [],
+            "undertested": true
+          },
+          {
+            "dimension_id": "D5",
+            "name": "沟通效率",
+            "score": 2,
+            "explanation": "✗ce_1 ~ce_2 ✗ce_3 ~ce_4 ~ce_5",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D6",
+            "name": "操作安全性",
+            "score": 2,
+            "explanation": "~os_1 ~os_2 —os_3 ~os_4 —os_5 —os_6 ~os_7 ✗os_8",
+            "evidence_turns": [],
+            "undertested": true
+          }
+        ],
+        "binary_items": [
+          {
+            "item_id": "confirm_identity",
+            "description": "确认对方身份",
+            "triggered": true,
+            "value": 1,
+            "explanation": "Agent在第1轮开场就用'请问是王磊吗？'确认对方姓名身份，用户在第2轮以'哎王磊，你好'被Agent再次称呼后继续对话（隐含确认），完成了通过姓名核实客户本人的动作。"
+          },
+          {
+            "item_id": "state_purpose",
+            "description": "说明来电目的",
+            "triggered": true,
+            "value": 1,
+            "explanation": "Agent 在第1轮就清楚说明了来电目的——告知骑手报名的飞毛腿合同相关事项，并提醒高峰期上线、单日/多日合同的最低单量要求；第2轮进一步明确飞毛腿合同已生效、询问今天是否能跑单。来电目的（飞毛腿合同生效通知 + 配送任务要求提醒）在前2轮内已清楚传达。"
+          },
+          {
+            "item_id": "unauthorized_promise",
+            "description": "越权承诺",
+            "triggered": false,
+            "value": 0,
+            "explanation": "Agent全程仅进行任务提醒和鼓励，未涉及任何退款、补偿、奖励等承诺，不存在越权行为。"
+          },
+          {
+            "item_id": "info_leak",
+            "description": "信息泄露",
+            "triggered": false,
+            "value": 0,
+            "explanation": "Agent仅告知骑手本人合同生效、配送要求（单量、连续天数）等与该骑手自身相关的信息，未泄露其他客户信息、内部系统细节或第三方个人电话等敏感信息。"
+          },
+          {
+            "item_id": "robot_detected",
+            "description": "客户因AI身份拒绝沟通",
+            "triggered": false,
+            "value": 0,
+            "explanation": "客户全程配合，回应「哦好的，那我今天出来跑单」「嗯，我试试今天跑够8单吧」「好的，那我挂了哈」，未识别 Agent 为 AI，也未表达拒绝沟通、要求转人工或不信任。"
+          }
+        ],
+        "dimension_total": 6,
+        "binary_net": 2,
+        "rubric_total": 8,
+        "rubric_max": 22,
+        "grade": "严重不合格"
+      },
+      "state_snapshots": [
+        {
+          "turn": 0,
+          "after_tool_call": "initial_state",
+          "reservations": [],
+          "orders": [],
+          "coupons_used": [],
+          "diff_description": "turn 0: initial_state"
+        }
+      ],
+      "failure_summary": [
+        "[constraint] 回复长度≤30字: 4/4轮超限(违规率100%)，最严重第1轮(85字)",
+        "[outcome] 通话结果应为: confirmed: 实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行",
+        "[knowledge_accuracy] 知识准确性: 1/5 个知识点准确传达，2 个矛盾，2 个未提及",
+        "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.20",
+        "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+        "[temporal_order] 时序约束合规: 时序违反: 1 处",
+        "[path_alignment] 执行路径对齐度: DP对齐分=0.24, 代价=9.5",
+        "[D1] 指令步骤遵循: ~if_1 ✗if_2 ~if_3 ✗if_4 ✗if_5",
+        "[D2] 信息确认完整性: ✗ic_1 ~ic_2 ~ic_3 ✗ic_4 ✗ic_5",
+        "[D3] 话术规范性: ~sp_1 ~sp_2 ~sp_3 —sp_4 ✗sp_5",
+        "[D4] 异常处理能力: —eh_1 —eh_2 —eh_3 ✗eh_4 —eh_5 [undertested: 1/5]",
+        "[D5] 沟通效率: ✗ce_1 ~ce_2 ✗ce_3 ~ce_4 ~ce_5",
+        "[D6] 操作安全性: ~os_1 ~os_2 —os_3 ~os_4 —os_5 —os_6 ~os_7 ✗os_8"
+      ],
+      "score_breakdown": {
+        "hard_score": {
+          "value": 0.789,
+          "weight": 0.3
+        },
+        "step_compliance": {
+          "value": 0.2,
+          "weight": 0.24
+        },
+        "path_alignment": {
+          "value": 0.24,
+          "weight": 0.08
+        },
+        "temporal_order": {
+          "value": 0.667,
+          "weight": 0.12
+        },
+        "objective_score": {
+          "value": 0.384,
+          "note": "客观可审计分 (max 0.88)"
+        },
+        "evidence_score": {
+          "value": 0.402,
+          "note": "含主观残差加成"
+        },
+        "soft_score": {
+          "value": 0.273,
+          "weight": 0.12,
+          "note": "被客观分门控"
+        },
+        "branch_accuracy": {
+          "value": 0.0,
+          "weight": 0.14
+        },
+        "verification_overall": {
+          "value": 0.24,
+          "note": "策略图综合验证分"
+        },
+        "veto_cap": {
+          "value": 0.6,
+          "gate_type": "cap_060"
+        }
+      },
+      "turn_efficiency": 1.0,
+      "verification_score": 0.24,
+      "alignment_score": 0.24,
+      "temporal_order_score": 0.667,
+      "alignment_cost": 9.5,
+      "expected_path": [
+        "open_notify",
+        "explain_rules",
+        "encourage",
+        "ranking_explain",
+        "wrap_up"
+      ],
+      "observed_path": [
+        "wrap_up"
+      ],
+      "satisfied_atom_count": 4,
+      "unsatisfied_atom_count": 6,
+      "temporal_violations": [
+        {
+          "description": "缺失前置: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "source": "update_delivery_status",
+          "target": "log_call_result",
+          "penalty": 2.0
+        }
+      ],
+      "illegal_transitions": [],
+      "evidence_layer": {
+        "hard": 0.789,
+        "step_compliance": 0.2,
+        "branch_accuracy": 0.0,
+        "temporal_order": 0.667,
+        "path_alignment": 0.24,
+        "total": 0.384,
+        "weights": {
+          "hard": 0.3,
+          "step_compliance": 0.24,
+          "temporal_order": 0.12,
+          "path_alignment": 0.08,
+          "branch_accuracy": 0.14
+        }
+      },
+      "quality_layer": {
+        "raw_score": 0.273,
+        "gate_threshold": 0.7,
+        "gate_value": 0.549,
+        "gated_contribution": 0.018,
+        "judge_disagreement_count": 0,
+        "judge_arbitration_count": 0,
+        "dimension_variance": {},
+        "consistency_report": {
+          "valid": true,
+          "total_checked": 11,
+          "contradictions": 0,
+          "adjustments": 0,
+          "needs_rejudge": false,
+          "issues": []
+        }
+      },
+      "safety_layer": {
+        "veto_cap": 0.6,
+        "gate_type": "cap_060",
+        "has_fabrication": false,
+        "violation_count": 0,
+        "safety_triggered": false,
+        "dimensions_triggered": [
+          "dim9_alignment"
+        ]
+      },
+      "score_atoms": [
+        {
+          "atom_id": "step_wrap_up",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_3"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第5轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_3"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_0",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_1",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_open_notify",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_explain_rules",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_encourage",
+          "dimension": "step_compliance",
+          "weight": 0.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -0.5,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_ranking_explain",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "branch_explain_rules",
+          "dimension": "branch_accuracy",
+          "weight": 1.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.5,
+          "reason": "分支错误: 未观测到分支执行",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_2",
+          "dimension": "temporal_order",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "时序违反: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "opening",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "开场白包含 3/3 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "closing",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "无强制结束语要求",
+          "source": "rule"
+        },
+        {
+          "atom_id": "no_forbidden",
+          "dimension": "forbidden_behavior",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "未检测到禁止话术或重复",
+          "source": "rule"
+        },
+        {
+          "atom_id": "response_length",
+          "dimension": "constraint",
+          "weight": 0.05,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "4/4轮超限(违规率100%)，最严重第1轮(85字)",
+          "source": "rule"
+        },
+        {
+          "atom_id": "turn_efficiency",
+          "dimension": "efficiency",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "实际4轮，效率100%",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "call_result",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行",
+          "source": "rule"
+        },
+        {
+          "atom_id": "db_state_match",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "DB状态完全匹配 1/1",
+          "source": "rule"
+        },
+        {
+          "atom_id": "knowledge_accuracy",
+          "dimension": "knowledge_accuracy",
+          "weight": 0.05,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "1/5 个知识点准确传达，2 个矛盾，2 个未提及",
+          "source": "rule"
+        },
+        {
+          "atom_id": "ai_rejection",
+          "dimension": "compliance",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "客户未因 AI 身份拒绝沟通",
+          "source": "rule"
+        },
+        {
+          "atom_id": "step_compliance_overall",
+          "dimension": "instruction_following",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.2,
+          "reason": "策略图验证: step_score=0.20",
+          "source": "structural"
+        },
+        {
+          "atom_id": "branch_accuracy_overall",
+          "dimension": "branching",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "策略图验证: branch_score=0.00",
+          "source": "structural"
+        },
+        {
+          "atom_id": "temporal_order",
+          "dimension": "temporal_order",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.667,
+          "reason": "时序违反: 1 处",
+          "source": "structural"
+        },
+        {
+          "atom_id": "path_alignment",
+          "dimension": "path_alignment",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.24,
+          "reason": "DP对齐分=0.24, 代价=9.5",
+          "source": "structural"
+        },
+        {
+          "atom_id": "rubric_D1",
+          "dimension": "D1",
+          "weight": 0.2,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.2,
+          "reason": "~if_1 ✗if_2 ~if_3 ✗if_4 ✗if_5",
+          "source": "llm"
+        },
+        {
+          "atom_id": "rubric_D2",
+          "dimension": "D2",
+          "weight": 0.15,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.2,
+          "reason": "✗ic_1 ~ic_2 ~ic_3 ✗ic_4 ✗ic_5",
+          "source": "llm"
+        },
+        {
+          "atom_id": "rubric_D3",
+          "dimension": "D3",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "~sp_1 ~sp_2 ~sp_3 —sp_4 ✗sp_5",
+          "source": "llm"
+        },
+        {
+          "atom_id": "rubric_D4",
+          "dimension": "D4",
+          "weight": 0.2,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "—eh_1 —eh_2 —eh_3 ✗eh_4 —eh_5 [undertested: 1/5]",
+          "source": "llm"
+        },
+        {
+          "atom_id": "rubric_D5",
+          "dimension": "D5",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "✗ce_1 ~ce_2 ✗ce_3 ~ce_4 ~ce_5",
+          "source": "llm"
+        },
+        {
+          "atom_id": "rubric_D6",
+          "dimension": "D6",
+          "weight": 0.25,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "~os_1 ~os_2 —os_3 ~os_4 —os_5 —os_6 ~os_7 ✗os_8",
+          "source": "llm"
+        }
+      ],
+      "progress_rate": 0.5,
+      "knowledge_accuracy_score": 0.0,
+      "knowledge_accuracy_details": [
+        {
+          "point": "目前许多骑手正在申请飞毛腿，无法连续配送3天名额可能被占用",
+          "status": "not_mentioned",
+          "evidence_turn": 3,
+          "evidence_text": "好的太好了！\n\n提醒你一下，单日飞毛腿合同需要连续完成3天配送，今天至少要跑8单，注意安全哈！"
+        },
+        {
+          "point": "单日合同当天必须完成8单，否则合同及派单受影响",
+          "status": "correct",
+          "evidence_turn": 1,
+          "evidence_text": "你好，请问是王磊吗？我是站长。看到你今天报名了飞毛腿，恭喜！\n\n午餐和晚餐高峰期记得上线哦。单日合同每天至少完成8单，多日合同每天至少完成5单。\n\n你今天方便开始配送吗？"
+        },
+        {
+          "point": "多日合同每天必须完成5单，否则后续合同及派单受影响",
+          "status": "not_mentioned",
+          "evidence_turn": 1,
+          "evidence_text": "你好，请问是王磊吗？我是站长。看到你今天报名了飞毛腿，恭喜！\n\n午餐和晚餐高峰期记得上线哦。单日合同每天至少完成8单，多日合同每天至少完成5单。\n\n你今天方便开始配送吗？"
+        },
+        {
+          "point": "退出飞毛腿需前一天20点前在App取消，次日生效",
+          "status": "contradicted",
+          "evidence_turn": 3,
+          "evidence_text": "好的太好了！\n\n提醒你一下，单日飞毛腿合同需要连续完成3天配送，今天至少要跑8单，注意安全哈！"
+        },
+        {
+          "point": "连续3天多日合同每天完成5单，每单多+2元额外奖励",
+          "status": "contradicted",
+          "evidence_turn": 3,
+          "evidence_text": "好的太好了！\n\n提醒你一下，单日飞毛腿合同需要连续完成3天配送，今天至少要跑8单，注意安全哈！"
+        }
+      ]
+    },
+    "diagnosis": {
+      "deviation_point": {
+        "turn": 4,
+        "expected_step": "wrap_up",
+        "expected_behavior": "确认骑手无其他问题，礼貌结束通话，记录结果",
+        "actual_behavior": "步骤状态: failed. Agent在第4轮说'骑车注意安全，有问题随时联系我！加油！'，但存在三个问题：(1) 未明确询问骑手'还有什么其他问题吗'，只是被动说'有问题随时联系我'；("
+      },
+      "failure_modes": [
+        "step_skipping",
+        "branch_error"
+      ],
+      "root_cause": "模型把『提醒安全+随时联系』这类礼貌性收尾话术误判为已完成 wrap_up，跳过了显式询问『还有其他问题吗』的确认动作，并且未按指令顺序执行 explain_rules→encourage→retain→ranking_explain，而是在 encourage 后直接收线，因为它把对方的『那我挂了哈』当成了硬性结束信号，优先满足『不要拖延用户』而牺牲了剩余必做步骤。",
+      "severity": "major",
+      "fix_recommendations": [
+        "Harness: 步骤注入 — 每轮在 prompt 中显式提醒当前应执行的步骤编号",
+        "Harness: 分支引导 — 在分支决策点注入明确的条件判断提示，减少自由文本匹配歧义"
+      ],
+      "model_capability_gap": "缺乏对多步骤脚本的『步骤完成度核验』能力——无法区分『语义近似的客套话』与『指令明确要求的确认动作』，也无法在用户主动示意结束时坚持把未执行的必经步骤补齐或显式标记跳过。"
+    },
+    "causal_diagnosis": {
+      "root_causes": [
+        {
+          "atom_id": "step_open_notify",
+          "dimension": "step_compliance",
+          "description": "步骤未完成",
+          "blocks": [
+            "step_explain_rules"
+          ]
+        },
+        {
+          "atom_id": "step_ranking_explain",
+          "dimension": "step_compliance",
+          "description": "步骤未完成",
+          "blocks": []
+        },
+        {
+          "atom_id": "branch_explain_rules",
+          "dimension": "branch_accuracy",
+          "description": "分支错误: 未观测到分支执行",
+          "blocks": []
+        },
+        {
+          "atom_id": "temporal_2",
+          "dimension": "temporal_order",
+          "description": "时序违反: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "blocks": []
+        }
+      ],
+      "counterfactual_repairs": [
+        {
+          "description": "在第1步插入: 自报身份（站长），确认对方是王磊，告知飞毛腿合同已生效，提醒午晚高峰上线和最低单量",
+          "atoms_recovered": [
+            "step_explain_rules",
+            "step_encourage",
+            "step_open_notify"
+          ],
+          "estimated_score_delta": 0.104
+        },
+        {
+          "description": "在第4步插入: 说明飞毛腿排名机制：按排名分配非站长干预，减少拒单/取消/超时有助保住资格，恶劣天气出勤加分",
+          "atoms_recovered": [
+            "step_ranking_explain"
+          ],
+          "estimated_score_delta": 0.042
+        },
+        {
+          "description": "在第2步插入: 说明连续配送要求：单日合同需连续3天完成配送，否则影响合同",
+          "atoms_recovered": [
+            "branch_explain_rules"
+          ],
+          "estimated_score_delta": 0.062
+        },
+        {
+          "description": "修复 temporal_2: 时序违反: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "atoms_recovered": [
+            "temporal_2"
+          ],
+          "estimated_score_delta": 0.042
+        }
+      ],
+      "failure_mode": "branch_error",
+      "deviation_point": "open_notify"
+    },
+    "harness_summary": null,
+    "simulator_quality": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "no_meta_leaks",
+          "description": "模拟器无元话语泄露",
+          "passed": true,
+          "detail": "无泄露"
+        },
+        {
+          "id": "reasonable_length",
+          "description": "回复长度合理（电话场景≤100字）",
+          "passed": true,
+          "detail": "全部合理"
+        },
+        {
+          "id": "no_early_goal_exposure",
+          "description": "前2轮不暴露隐藏目标",
+          "passed": true,
+          "detail": "未提前暴露"
+        }
+      ],
+      "warnings": []
+    },
+    "ledger_events": [
+      {
+        "seq": 1,
+        "event_type": "tool_executed",
+        "turn": 5,
+        "tool_name": "log_call_result",
+        "tool_call_id": "1a11cac4",
+        "arguments": {
+          "order_id": "rider_wanglei_20260606",
+          "result": "confirmed",
+          "customer_response": "骑手王磊确认今天可以出来跑单，表示会尽量完成8单",
+          "notes": "飞毛腿单日合同已生效，骑手态度积极，已提醒高峰期上线及安全注意事项"
+        },
+        "result": {
+          "log_id": "log_5397",
+          "recorded": true
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "genesis"
+      },
+      {
+        "seq": 2,
+        "event_type": "tool_rollback",
+        "turn": 5,
+        "tool_name": "log_call_result",
+        "tool_call_id": "1a11cac4",
+        "arguments": {
+          "order_id": "rider_wanglei_20260606",
+          "result": "confirmed",
+          "customer_response": "骑手王磊确认今天可以出来跑单，表示会尽量完成8单",
+          "notes": "飞毛腿单日合同已生效，骑手态度积极，已提醒高峰期上线及安全注意事项"
+        },
+        "result": null,
+        "error": null,
+        "source": "agent",
+        "prev_hash": "ea07530c20260e169b33a6c44f1fa39f6422fcb2c5dc616595a8d3079e667c92"
+      },
+      {
+        "seq": 3,
+        "event_type": "tool_executed",
+        "turn": 5,
+        "tool_name": "log_call_result",
+        "tool_call_id": "3a262dfd",
+        "arguments": {
+          "order_id": "rider_wanglei_20260606",
+          "result": "confirmed",
+          "customer_response": "骑手王磊确认今天可以出来跑单，表示会尽量完成8单",
+          "notes": "飞毛腿单日合同已生效，骑手态度积极，已提醒高峰期上线及安全注意事项"
+        },
+        "result": {
+          "log_id": "log_9832",
+          "recorded": true
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "47e165c37a34dac6dfa0bfa200bbf53221e5313fd6d5d7689b83d1fb27c18e65"
+      }
+    ],
+    "ledger_chain_hash": "9161ef326a09b753b796bc29ef11f419d9a2afccf56916dca263debd5c04013f"
+  }
+}

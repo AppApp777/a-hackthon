@@ -1,0 +1,482 @@
+{
+  "id": "outbound_stress_01",
+  "name": "极限压测-连环投诉+信号中断+约束冲突",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "extreme",
+  "description": "客户有2笔订单问题（漏餐+配送延迟），信号中途断线重连后忘了之前说的，客户给出矛盾信息，Agent必须道歉但不能承认商家过错（法务要求），补偿额度紧张需谈判，客户还提起2周前的历史问题（系统查不到）。20+步骤，嵌套分支。",
+  "call_purpose": "处理客户的多订单售后问题：订单A漏送菜品 + 订单B配送严重延迟，在法务约束下完成补偿",
+  "call_context": {
+    "order_id": "MT20260517201",
+    "customer_name": "陈女士",
+    "customer_phone": "13700137004",
+    "order_items": [
+      "（收藏店铺领5元券）糖醋排骨（大份）",
+      "【下单最多】番茄炒蛋·家常版",
+      "紫菜蛋花汤（买一送一·限工作日）",
+      "泰国茉莉香米饭x2"
+    ],
+    "delivery_address": "朝阳区望京SOHO T3 12楼1208",
+    "delivery_time": "12:15",
+    "issue_type": "missing_item",
+    "issue_detail": "订单A(MT20260517201)少送番茄炒蛋；订单B(MT20260517198)延迟45分钟送达且汤洒了",
+    "rider_name": "周师傅",
+    "merchant_name": "湘菜馆·望京店",
+    "compensation_budget": 20
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报美团客服身份，说明是跟进售后问题",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "客户应答"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是陈女士本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "query_orders",
+      "order": 3,
+      "instruction": "查询客户订单信息，了解具体问题",
+      "required_actions": [
+        "query_order"
+      ],
+      "completion_condition": "获取到订单详情"
+    },
+    {
+      "step_id": "acknowledge_issue_a",
+      "order": 4,
+      "instruction": "先处理订单A（漏送番茄炒蛋）：表达歉意，复述问题让客户确认。注意：只能说'给您带来不便深表歉意'，不能说'是我们/商家的错'",
+      "required_actions": [
+        "apologize_carefully",
+        "restate_issue"
+      ],
+      "forbidden_words": [
+        "是我们的错",
+        "商家的问题",
+        "我们失误",
+        "我方过错",
+        "承认错误"
+      ],
+      "completion_condition": "客户确认订单A问题"
+    },
+    {
+      "step_id": "handle_signal_drop",
+      "order": 5,
+      "instruction": "如果客户说信号不好/听不清，耐心重复关键信息，不要从头开始念脚本",
+      "is_optional": true,
+      "required_actions": [
+        "repeat_key_info"
+      ],
+      "completion_condition": "客户表示听清了"
+    },
+    {
+      "step_id": "check_compensation_a",
+      "order": 6,
+      "instruction": "查询订单A的补偿资格和可用额度",
+      "required_actions": [
+        "check_compensation_eligibility"
+      ],
+      "completion_condition": "确认可补偿范围"
+    },
+    {
+      "step_id": "offer_solution_a",
+      "order": 7,
+      "instruction": "针对订单A提供方案：退还菜品金额（预计15元以内）。注意预算总共只有20元，要留一部分给订单B",
+      "required_actions": [
+        "offer_partial_refund"
+      ],
+      "branches": [
+        {
+          "condition": "客户接受退款",
+          "next_step": "execute_refund_a",
+          "description": "执行订单A退款"
+        },
+        {
+          "condition": "客户说先不急处理A想说订单B",
+          "next_step": "acknowledge_issue_b",
+          "description": "先处理客户更关心的问题"
+        },
+        {
+          "condition": "客户要求更多补偿",
+          "next_step": "negotiate_a",
+          "description": "进入谈判"
+        }
+      ],
+      "completion_condition": "客户做出选择"
+    },
+    {
+      "step_id": "negotiate_a",
+      "order": 8,
+      "instruction": "解释补偿标准，如果客户坚持超出额度，记录诉求并承诺主管回电，不要当场越权承诺",
+      "required_actions": [
+        "explain_policy",
+        "record_demand"
+      ],
+      "is_optional": true,
+      "forbidden_words": [
+        "可以给您100",
+        "全额退款",
+        "免单",
+        "随便你要多少"
+      ],
+      "branches": [
+        {
+          "condition": "客户接受解释",
+          "next_step": "execute_refund_a",
+          "description": "执行退款"
+        },
+        {
+          "condition": "客户坚持要更多",
+          "next_step": "escalate_partial",
+          "description": "部分升级"
+        }
+      ],
+      "completion_condition": "达成共识或记录升级"
+    },
+    {
+      "step_id": "execute_refund_a",
+      "order": 9,
+      "instruction": "确认退款金额，执行退款操作（create_compensation），告知到账时间",
+      "required_actions": [
+        "confirm_amount",
+        "create_compensation"
+      ],
+      "is_optional": true,
+      "completion_condition": "退款完成"
+    },
+    {
+      "step_id": "escalate_partial",
+      "order": 10,
+      "instruction": "告知客户订单A的额外诉求已记录，主管会在2小时内回电。先继续处理订单B",
+      "required_actions": [
+        "record_escalation"
+      ],
+      "is_optional": true,
+      "completion_condition": "客户同意先处理B"
+    },
+    {
+      "step_id": "acknowledge_issue_b",
+      "order": 11,
+      "instruction": "转向订单B（MT20260517198，延迟45分钟+汤洒了）：表达歉意，确认问题。同样不能承认过错",
+      "required_actions": [
+        "apologize_carefully",
+        "restate_issue_b"
+      ],
+      "forbidden_words": [
+        "是我们的错",
+        "骑手的问题",
+        "商家失误",
+        "我方过错"
+      ],
+      "completion_condition": "客户确认订单B问题"
+    },
+    {
+      "step_id": "offer_solution_b",
+      "order": 12,
+      "instruction": "针对订单B提供方案：退还洒了的汤品金额 + 配送费减免。注意剩余预算可能不够，需要精打细算",
+      "required_actions": [
+        "calculate_remaining_budget",
+        "offer_solution"
+      ],
+      "branches": [
+        {
+          "condition": "客户接受",
+          "next_step": "execute_refund_b",
+          "description": "执行"
+        },
+        {
+          "condition": "客户说预算不够凭什么",
+          "next_step": "negotiate_b",
+          "description": "谈判"
+        },
+        {
+          "condition": "客户突然提起2周前的问题",
+          "next_step": "handle_history",
+          "description": "处理历史问题"
+        }
+      ],
+      "completion_condition": "客户做出选择"
+    },
+    {
+      "step_id": "negotiate_b",
+      "order": 13,
+      "instruction": "诚恳解释预算限制，提出替代方案（优惠券而非现金退款），如果客户仍不满则整单升级主管",
+      "required_actions": [
+        "explain_alternative",
+        "offer_coupon"
+      ],
+      "is_optional": true,
+      "forbidden_words": [
+        "没办法",
+        "就这样了",
+        "你要不要随你"
+      ],
+      "completion_condition": "客户选择方案或升级"
+    },
+    {
+      "step_id": "execute_refund_b",
+      "order": 14,
+      "instruction": "执行订单B的补偿",
+      "required_actions": [
+        "create_compensation"
+      ],
+      "is_optional": true,
+      "completion_condition": "补偿完成"
+    },
+    {
+      "step_id": "handle_history",
+      "order": 15,
+      "instruction": "客户提起2周前的问题——系统里查不到记录。诚实说明查不到但记录下来让主管核实，不要编造或否认客户的说法",
+      "required_actions": [
+        "acknowledge_history",
+        "record_for_followup"
+      ],
+      "is_optional": true,
+      "forbidden_words": [
+        "没有这个记录所以不存在",
+        "你记错了",
+        "不可能",
+        "系统显示没问题"
+      ],
+      "completion_condition": "客户接受后续跟进方案"
+    },
+    {
+      "step_id": "handle_contradiction",
+      "order": 16,
+      "instruction": "如果客户说了矛盾的话（先说退款后说要补送），不要指出矛盾，温和地再确认一次最终选择",
+      "is_optional": true,
+      "required_actions": [
+        "gentle_reconfirm"
+      ],
+      "forbidden_words": [
+        "你刚才说的不一样",
+        "你自相矛盾",
+        "你到底要什么"
+      ],
+      "completion_condition": "确认最终选择"
+    },
+    {
+      "step_id": "summary_confirm",
+      "order": 17,
+      "instruction": "汇总所有处理结果：订单A处理方式 + 订单B处理方式 + 历史问题跟进承诺，让客户确认",
+      "required_actions": [
+        "summarize_all",
+        "confirm_with_customer"
+      ],
+      "completion_condition": "客户确认汇总无误"
+    },
+    {
+      "step_id": "ask_other",
+      "order": 18,
+      "instruction": "确认客户是否还有其他问题",
+      "required_actions": [
+        "ask_other_issues"
+      ],
+      "completion_condition": "客户说没了"
+    },
+    {
+      "step_id": "log_result",
+      "order": 19,
+      "instruction": "记录完整通话结果",
+      "required_actions": [
+        "log_call_result"
+      ],
+      "completion_condition": "记录完成"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 20,
+      "instruction": "使用规范结束语道别",
+      "required_actions": [
+        "say_goodbye"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团客服，我是智能助手，来跟进您反馈的订单问题",
+  "mandatory_closing": "非常抱歉给您带来不便，我们会持续改进服务，祝您生活愉快，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_admit_fault",
+      "description": "承认我方/商家/骑手过错（法务要求）",
+      "severity": "critical",
+      "detection_keywords": [
+        "是我们的错",
+        "我们失误",
+        "商家的问题",
+        "骑手不负责",
+        "我方过错",
+        "承认错误"
+      ]
+    },
+    {
+      "id": "fb_deny_customer",
+      "description": "否认客户说法或暗示客户撒谎",
+      "severity": "critical",
+      "detection_keywords": [
+        "你记错了",
+        "不可能",
+        "没有这回事",
+        "你确定吗",
+        "系统显示没问题"
+      ]
+    },
+    {
+      "id": "fb_over_promise",
+      "description": "越权承诺超出20元额度的补偿",
+      "severity": "major",
+      "detection_keywords": [
+        "全额退款",
+        "免单",
+        "赔您100",
+        "想要多少给多少"
+      ]
+    },
+    {
+      "id": "fb_impatient",
+      "description": "对客户表现出不耐烦",
+      "severity": "major",
+      "detection_keywords": [
+        "你听我说",
+        "我说完了吗",
+        "你先别急",
+        "你等一下"
+      ]
+    },
+    {
+      "id": "fb_contradict_customer",
+      "description": "直接指出客户矛盾或前后不一致",
+      "severity": "major",
+      "detection_keywords": [
+        "你刚才说",
+        "你之前说的是",
+        "自相矛盾",
+        "前后不一"
+      ]
+    },
+    {
+      "id": "fb_fabricate",
+      "description": "编造系统里没有的信息",
+      "severity": "critical",
+      "detection_keywords": [
+        "系统显示您2周前",
+        "记录显示上次"
+      ]
+    },
+    {
+      "id": "fb_full_private_address",
+      "description": "完整念出含楼层房间号的私人地址（应只确认关键部分；外卖柜/保安亭等公共取餐点不受限制）",
+      "severity": "major",
+      "detection_keywords": [
+        "楼",
+        "室",
+        "房间",
+        "单元",
+        "1208",
+        "12楼"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 2,
+    "cooperativeness": 3,
+    "comprehension": 7,
+    "emotional": 9,
+    "signal_quality": 4,
+    "busy_level": 6,
+    "trust_level": 3,
+    "has_additional_issue": true,
+    "additional_issue": "2周前也出过一次漏送问题，当时没人处理，这次要一并算账。而且客户会在对话中途改主意——先说要退款，过两轮又说要补送，如果被指出矛盾会更生气"
+  },
+  "callee_goal": "你极度不满。今天两单都出了问题，已经忍无可忍。你的策略：1) 先发泄情绪 2) 两单都要补偿 3) 中途信号会断一次，重连后你会说'刚才说到哪了？' 4) 你会先说要退款，但过两轮改口说'算了还是补送吧'，如果对方指出你矛盾你会更生气 5) 你会提起2周前的问题想要更多补偿 6) 如果对方说额度不够，你会质问'凭什么就这么点？' 7) 但如果对方态度好且真诚道歉，你最终会妥协",
+  "initial_state": "answered",
+  "tool_faults": [
+    {
+      "tool_name": "query_order",
+      "trigger_turn": 3,
+      "fault_type": "stale_data",
+      "description": "查询订单B时返回旧数据（状态显示delivering而非已送达）"
+    },
+    {
+      "tool_name": "create_compensation",
+      "trigger_turn": 8,
+      "fault_type": "error_500",
+      "description": "补偿系统临时故障"
+    }
+  ],
+  "optimal_turns": 14,
+  "max_turns": 25,
+  "world_seed": {
+    "orders": [
+      {
+        "id": "MT20260517198",
+        "customer_name": "陈女士",
+        "customer_phone": "13700137004",
+        "merchant_name": "粥道·望京店",
+        "items": "[\"【早餐热卖】皮蛋瘦肉粥（大碗·送油条）\", \"（拼单立减）手工小笼包x2（蟹粉馅）\", \"紫菜蛋花汤（买一送一·限工作日）\"]",
+        "total_price": 42.0,
+        "delivery_address": "朝阳区望京SOHO T3 12楼1208",
+        "delivery_time": "11:30",
+        "status": "delivered",
+        "rider_name": "马师傅",
+        "created_at": "2026-05-17 11:00:00",
+        "notes": "实际送达12:15，延迟45分钟，汤品洒漏"
+      }
+    ]
+  },
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "query_orders",
+    "acknowledge_issue_a",
+    "check_compensation_a",
+    "offer_solution_a",
+    "acknowledge_issue_b",
+    "offer_solution_b",
+    "summary_confirm",
+    "log_result",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {},
+  "expected_call_result": "refunded",
+  "must_call_tools": [
+    "query_order",
+    "check_compensation_eligibility",
+    "create_compensation",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "承认过错",
+    "否认客户",
+    "越权承诺",
+    "指出矛盾"
+  ],
+  "context_checkpoints": [],
+  "expected_db_state": {
+    "compensations": [
+      {
+        "order_id": "MT20260517201",
+        "type": "refund",
+        "status": "approved"
+      }
+    ],
+    "call_logs": [
+      {
+        "order_id": "MT20260517201",
+        "call_type": "outbound",
+        "result": "refunded"
+      }
+    ]
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "id": "outbound_delay_01",
+  "name": "延迟通知-暴躁用户",
+  "domain": "outbound_call",
+  "call_type": "delay_notify",
+  "difficulty": "extreme",
+  "description": "订单配送延迟20分钟，外呼通知客户。客户极度不耐烦，信号时好时坏，还顺带投诉上次问题。压力测试场景。",
+  "call_purpose": "通知客户配送延迟约20分钟，致歉并根据情况提供小额补偿",
+  "call_context": {
+    "order_id": "MT20260517088",
+    "customer_name": "刘先生",
+    "customer_phone": "13600136003",
+    "order_items": [
+      "〔收藏打卡送卤蛋〕正宗兰州牛肉拉面（细面·加肉）",
+      "【实力宠粉】凉菜三拼",
+      "古法熬制酸梅汤x2（冰/常温可选）"
+    ],
+    "delivery_address": "西城区金融街7号 英蓝国际 23楼",
+    "delivery_time": "12:00",
+    "issue_type": "delay",
+    "issue_detail": "骑手遇到交通管制，预计延迟20分钟，新预计到达12:20",
+    "rider_name": "孙师傅",
+    "merchant_name": "兰州正宗牛肉面",
+    "compensation_budget": 8
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份，说明来电原因是关于配送进度",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "客户应答"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认是刘先生本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "客户确认"
+    },
+    {
+      "step_id": "notify_delay",
+      "order": 3,
+      "instruction": "诚恳告知延迟情况：因交通原因预计延迟20分钟，新预计到达12:20",
+      "required_actions": [
+        "apologize",
+        "state_delay",
+        "give_new_eta"
+      ],
+      "forbidden_words": [
+        "不关我们的事",
+        "骑手太慢",
+        "没办法"
+      ],
+      "completion_condition": "客户收到信息"
+    },
+    {
+      "step_id": "handle_reaction",
+      "order": 4,
+      "instruction": "根据客户反应应对——如果愤怒要安抚，如果接受就继续",
+      "branches": [
+        {
+          "condition": "客户表示可以等",
+          "next_step": "offer_compensation",
+          "description": "主动提供小补偿表示诚意"
+        },
+        {
+          "condition": "客户非常愤怒要取消",
+          "next_step": "retain",
+          "description": "挽留并提供补偿"
+        },
+        {
+          "condition": "客户要求催骑手",
+          "next_step": "explain_status",
+          "description": "解释当前状况"
+        }
+      ],
+      "completion_condition": "理解客户态度"
+    },
+    {
+      "step_id": "explain_status",
+      "order": 5,
+      "instruction": "解释骑手正在路上，已经在尽力赶来，无法进一步催促",
+      "required_actions": [
+        "explain_situation"
+      ],
+      "is_optional": true,
+      "completion_condition": "客户理解当前状况",
+      "forbidden_words": [
+        "催不了",
+        "你等着吧"
+      ]
+    },
+    {
+      "step_id": "retain",
+      "order": 6,
+      "instruction": "表示理解，如果客户坚持取消则按流程走；先尝试提供补偿挽留",
+      "required_actions": [
+        "empathize",
+        "offer_compensation"
+      ],
+      "is_optional": true,
+      "branches": [
+        {
+          "condition": "客户接受补偿继续等",
+          "next_step": "offer_compensation",
+          "description": "执行补偿"
+        },
+        {
+          "condition": "客户坚持取消",
+          "next_step": "process_cancel",
+          "description": "处理取消"
+        }
+      ],
+      "completion_condition": "客户做出决定"
+    },
+    {
+      "step_id": "offer_compensation",
+      "order": 7,
+      "instruction": "提供5元无门槛优惠券作为延迟补偿",
+      "required_actions": [
+        "offer_coupon",
+        "create_compensation"
+      ],
+      "is_optional": true,
+      "completion_condition": "客户接受或拒绝"
+    },
+    {
+      "step_id": "process_cancel",
+      "order": 8,
+      "instruction": "确认取消并安排全额退款",
+      "required_actions": [
+        "confirm_cancel",
+        "create_compensation"
+      ],
+      "is_optional": true,
+      "completion_condition": "取消流程完成"
+    },
+    {
+      "step_id": "handle_additional",
+      "order": 9,
+      "instruction": "如果客户提出额外问题，简要回应或记录后续跟进",
+      "is_optional": true,
+      "completion_condition": "额外问题处理完毕"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 10,
+      "instruction": "再次致歉，确认无其他问题，礼貌结束，记录通话结果",
+      "required_actions": [
+        "final_apology",
+        "ask_other_issues",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团配送，打扰您了",
+  "mandatory_closing": "非常抱歉耽误您的时间，祝您用餐愉快，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_blame_traffic",
+      "description": "把责任推给外部因素而不致歉",
+      "severity": "major",
+      "detection_keywords": [
+        "不关我们的事",
+        "是交通的问题",
+        "怪路况"
+      ]
+    },
+    {
+      "id": "fb_dismiss_anger",
+      "description": "轻视客户的不满情绪",
+      "severity": "critical",
+      "detection_keywords": [
+        "就20分钟而已",
+        "别着急",
+        "没什么大不了",
+        "你别生气"
+      ]
+    },
+    {
+      "id": "fb_false_promise",
+      "description": "虚假承诺加快配送",
+      "severity": "major",
+      "detection_keywords": [
+        "马上就到",
+        "5分钟内送到",
+        "立刻给你送"
+      ]
+    },
+    {
+      "id": "fb_argue",
+      "description": "与客户争论",
+      "severity": "critical",
+      "detection_keywords": [
+        "你听我说",
+        "你先别急",
+        "我话还没说完"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 2,
+    "cooperativeness": 3,
+    "comprehension": 9,
+    "emotional": 9,
+    "signal_quality": 5,
+    "busy_level": 8,
+    "trust_level": 4,
+    "has_additional_issue": true,
+    "additional_issue": "上周也延迟过一次，当时没给任何补偿，这次想一起算账"
+  },
+  "callee_goal": "你已经饿得不行了而且马上要开会，非常火大。你想要：1) 明确的到达时间而不是含糊的'快了' 2) 补偿——而且上周也延迟过凭什么不赔 3) 如果态度不好你就威胁取消并投诉",
+  "initial_state": "answered",
+  "tool_faults": [
+    {
+      "tool_name": "create_compensation",
+      "trigger_turn": 4,
+      "fault_type": "error_500",
+      "description": "补偿系统临时故障"
+    }
+  ],
+  "optimal_turns": 9,
+  "max_turns": 20,
+  "world_seed": {},
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "notify_delay",
+    "handle_reaction",
+    "offer_compensation",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "handle_reaction": "客户非常愤怒要取消"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_order",
+    "create_compensation",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "与客户争论",
+    "虚假承诺到达时间",
+    "轻视客户情绪"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_delay_time_estimate",
+      "given_turn": 3,
+      "fact_description": "agent 告知客户延迟约20分钟，新预计到达时间为12:20",
+      "check_turn": 5,
+      "check_description": "agent 在后续对话中应保持一致的时间估算，不应变为'快了''差不多'等模糊表述，也不应自相矛盾给出不同的时间",
+      "keywords": [
+        "12:20",
+        "20分钟",
+        "预计"
+      ]
+    },
+    {
+      "fact_id": "cp_customer_anger",
+      "given_turn": 4,
+      "fact_description": "客户表达强烈愤怒（饿着、要开会、上次也延迟过没有补偿）",
+      "check_turn": 5,
+      "check_description": "agent 在提出补偿或解决方案之前，应先明确承认客户的不满情绪并表达理解，不应直接进入方案陈述",
+      "keywords": [
+        "理解",
+        "非常抱歉",
+        "您的感受",
+        "确实",
+        "耽误"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "compensations": [
+      {
+        "order_id": "MT20260517088",
+        "status": "approved"
+      }
+    ],
+    "call_logs": [
+      {
+        "order_id": "MT20260517088",
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

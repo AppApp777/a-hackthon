@@ -1,0 +1,353 @@
+{
+  "id": "outbound_multi_issue_01",
+  "name": "多问题叠加-配送迟到+商品缺少",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "hard",
+  "description": "客户同时遇到两个独立问题：订单配送迟到40分钟要求补偿，以及商品少送了一份凉拌黄瓜。Agent必须分别处理两个问题，不能合并处理或遗漏任一问题。难点在于Agent容易只处理第一个问题就匆忙结束。",
+  "call_purpose": "跟进客户的双重售后问题（配送延迟+漏送商品），分别提供解决方案",
+  "call_context": {
+    "order_id": "MT20260519301",
+    "customer_name": "林先生",
+    "customer_phone": "13600136001",
+    "order_items": [
+      "🔥销量TOP1🔥 红烧牛腩饭（大份·加卤蛋）",
+      "（点亮5星好评返2元）凉拌黄瓜",
+      "秘制酸辣汤（微辣）",
+      "东北珍珠米饭x1"
+    ],
+    "delivery_address": "朝阳区三里屯SOHO 5号楼 12层1205",
+    "delivery_time": "12:00",
+    "issue_type": "multiple",
+    "issue_detail": "订单配送延迟40分钟（12:40才到），且少送了一份凉拌黄瓜",
+    "rider_name": "孙师傅",
+    "merchant_name": "老北京炸酱面馆",
+    "compensation_budget": 30
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报美团客服身份，说明来电是跟进订单售后问题",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "客户应答表示在听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是林先生本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "query_order_info",
+      "order": 3,
+      "instruction": "通过query_order查询订单详情，了解问题全貌",
+      "required_actions": [
+        "query_order"
+      ],
+      "completion_condition": "获取到订单详情",
+      "weight": 1.5
+    },
+    {
+      "step_id": "acknowledge_issue_delay",
+      "order": 4,
+      "instruction": "先处理问题一（配送延迟40分钟）：表达歉意，确认延迟情况，让客户感受到被重视",
+      "required_actions": [
+        "apologize",
+        "restate_delay_issue"
+      ],
+      "completion_condition": "客户确认配送延迟问题",
+      "weight": 1.5
+    },
+    {
+      "step_id": "check_eligibility_delay",
+      "order": 5,
+      "instruction": "查询配送延迟的补偿资格和可用额度",
+      "required_actions": [
+        "check_compensation_eligibility"
+      ],
+      "completion_condition": "确认可补偿范围",
+      "weight": 1.5
+    },
+    {
+      "step_id": "offer_solution_delay",
+      "order": 6,
+      "instruction": "针对配送延迟提供补偿方案（配送费退还或优惠券，控制在15元以内，留预算给第二个问题）",
+      "required_actions": [
+        "offer_delay_compensation"
+      ],
+      "branches": [
+        {
+          "condition": "客户接受延迟补偿",
+          "next_step": "execute_comp_delay",
+          "description": "执行延迟补偿"
+        },
+        {
+          "condition": "客户不满意金额",
+          "next_step": "negotiate_delay",
+          "description": "进入谈判"
+        }
+      ],
+      "completion_condition": "客户对延迟补偿方案做出回应",
+      "weight": 1.5
+    },
+    {
+      "step_id": "negotiate_delay",
+      "order": 7,
+      "instruction": "解释补偿标准，适度调整方案但不超出总预算的一半",
+      "required_actions": [
+        "explain_policy"
+      ],
+      "is_optional": true,
+      "forbidden_words": [
+        "全额退款",
+        "免单",
+        "想要多少都行"
+      ],
+      "completion_condition": "达成共识"
+    },
+    {
+      "step_id": "execute_comp_delay",
+      "order": 8,
+      "instruction": "执行配送延迟的补偿（create_compensation），告知客户到账时间",
+      "required_actions": [
+        "create_compensation"
+      ],
+      "completion_condition": "延迟补偿已创建",
+      "weight": 1.5
+    },
+    {
+      "step_id": "transition_to_issue2",
+      "order": 9,
+      "instruction": "明确过渡到第二个问题：告知客户'关于您反馈的另一个问题——少送的凉拌黄瓜，我们也一并处理'",
+      "required_actions": [
+        "explicit_transition"
+      ],
+      "completion_condition": "客户确认还有漏送问题需要处理",
+      "weight": 1.5
+    },
+    {
+      "step_id": "acknowledge_issue_missing",
+      "order": 10,
+      "instruction": "处理问题二（漏送凉拌黄瓜）：确认漏送情况，表达歉意",
+      "required_actions": [
+        "apologize",
+        "restate_missing_issue"
+      ],
+      "completion_condition": "客户确认漏送问题",
+      "weight": 1.5
+    },
+    {
+      "step_id": "offer_solution_missing",
+      "order": 11,
+      "instruction": "针对漏送提供方案：退还菜品金额或补送。使用剩余预算",
+      "required_actions": [
+        "offer_missing_compensation"
+      ],
+      "branches": [
+        {
+          "condition": "客户选择退款",
+          "next_step": "execute_comp_missing",
+          "description": "退还菜品金额"
+        },
+        {
+          "condition": "客户选择补送",
+          "next_step": "execute_comp_missing",
+          "description": "安排补送"
+        }
+      ],
+      "completion_condition": "客户选择方案",
+      "weight": 1.5
+    },
+    {
+      "step_id": "execute_comp_missing",
+      "order": 12,
+      "instruction": "执行漏送的补偿方案",
+      "required_actions": [
+        "create_compensation"
+      ],
+      "completion_condition": "漏送补偿已创建",
+      "weight": 1.5
+    },
+    {
+      "step_id": "summary_both",
+      "order": 13,
+      "instruction": "汇总两个问题的处理结果：问题一（延迟）处理方式 + 问题二（漏送）处理方式，让客户确认",
+      "required_actions": [
+        "summarize_all",
+        "confirm_with_customer"
+      ],
+      "completion_condition": "客户确认两个问题都已处理",
+      "weight": 1.5
+    },
+    {
+      "step_id": "ask_other",
+      "order": 14,
+      "instruction": "确认客户是否还有其他问题",
+      "required_actions": [
+        "ask_other_issues"
+      ],
+      "completion_condition": "客户说没了"
+    },
+    {
+      "step_id": "log_result",
+      "order": 15,
+      "instruction": "记录通话结果，备注双问题处理",
+      "required_actions": [
+        "log_call_result"
+      ],
+      "completion_condition": "记录完成"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 16,
+      "instruction": "使用规范结束语道别",
+      "required_actions": [
+        "say_goodbye"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好林先生，我是美团客服，关于您订单遇到的问题给您来电跟进",
+  "mandatory_closing": "两个问题都已为您处理好，感谢您的耐心，祝您用餐愉快",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_skip_second_issue",
+      "description": "只处理一个问题就试图结束通话，遗漏第二个问题",
+      "severity": "critical",
+      "detection_keywords": [
+        "没有其他问题了吧",
+        "那就这样",
+        "问题已经解决了"
+      ]
+    },
+    {
+      "id": "fb_merge_issues",
+      "description": "将两个独立问题合并为一个处理，给一笔补偿了事",
+      "severity": "major",
+      "detection_keywords": [
+        "一起补偿",
+        "总共给您",
+        "一并处理就给您一个"
+      ]
+    },
+    {
+      "id": "fb_over_promise",
+      "description": "承诺超出30元总预算的补偿",
+      "severity": "critical",
+      "detection_keywords": [
+        "全额退款",
+        "免单",
+        "退您50",
+        "退您40"
+      ]
+    },
+    {
+      "id": "fb_blame_rider",
+      "description": "把责任推给骑手或商家",
+      "severity": "major",
+      "detection_keywords": [
+        "骑手的问题",
+        "商家的错",
+        "都怪骑手",
+        "是店家的责任"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 5,
+    "cooperativeness": 6,
+    "comprehension": 8,
+    "emotional": 6,
+    "signal_quality": 9,
+    "busy_level": 4,
+    "trust_level": 5,
+    "has_additional_issue": false
+  },
+  "callee_goal": "你有两个问题要解决：1) 配送迟到40分钟，午饭都凉了，要求补偿配送费；2) 少送了一份凉拌黄瓜。你会先说延迟的事，如果客服处理完延迟就要挂电话，你会主动提醒'等等，我的凉拌黄瓜也没送到'。两个问题都要有说法你才满意。",
+  "callee_role": "不满但理性的客户",
+  "callee_context": "午餐点了老北京炸酱面馆的外卖，说好12:00送到，结果12:40才到，饭都凉了。打开一看还少了一份凉拌黄瓜。已经在App上投诉了。如果客服只处理一个问题就想结束，你会主动提起另一个。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 10,
+  "max_turns": 18,
+  "world_seed": {},
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "query_order_info",
+    "acknowledge_issue_delay",
+    "check_eligibility_delay",
+    "offer_solution_delay",
+    "execute_comp_delay",
+    "transition_to_issue2",
+    "acknowledge_issue_missing",
+    "offer_solution_missing",
+    "execute_comp_missing",
+    "summary_both",
+    "log_result",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "offer_solution_delay": "客户接受延迟补偿",
+    "offer_solution_missing": "客户选择退款"
+  },
+  "expected_call_result": "refunded",
+  "must_call_tools": [
+    "query_order",
+    "check_compensation_eligibility",
+    "create_compensation",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "遗漏第二个问题",
+    "合并两个问题为一笔补偿",
+    "超出30元预算"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_delay_duration",
+      "given_turn": 2,
+      "fact_description": "客户提到配送迟到了40分钟",
+      "check_turn": 6,
+      "check_description": "Agent在提供延迟补偿方案时应引用40分钟的延迟时长，而非含糊说'迟到了'",
+      "keywords": [
+        "40分钟",
+        "延迟",
+        "迟到"
+      ]
+    },
+    {
+      "fact_id": "cp_missing_item_name",
+      "given_turn": 2,
+      "fact_description": "客户提到少送了一份凉拌黄瓜",
+      "check_turn": 10,
+      "check_description": "Agent在处理第二个问题时应准确说出漏送的是'凉拌黄瓜'，不应说错菜名或泛指'一道菜'",
+      "keywords": [
+        "凉拌黄瓜"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "compensations": [
+      {
+        "order_id": "MT20260519301",
+        "type": "refund",
+        "status": "approved"
+      }
+    ],
+    "call_logs": [
+      {
+        "order_id": "MT20260519301",
+        "call_type": "outbound",
+        "result": "refunded"
+      }
+    ]
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "id": "outbound_aftersales_01_cg12",
+  "name": "售后外呼-漏餐投诉 (覆盖率引导变体 #3)",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "hard",
+  "description": "客户投诉少送了一份菜，系统外呼确认情况并处理补偿。客户情绪较大，需要安抚。 | 目标: 覆盖分支 offer_solution:客户都不满意要求更多补偿",
+  "call_purpose": "跟进客户的漏餐投诉，确认问题后提供补偿方案（退款或补送）",
+  "call_context": {
+    "order_id": "MT20260517042",
+    "customer_name": "王女士",
+    "customer_phone": "13900139002",
+    "order_items": [
+      "（月售8000+）宫保鸡丁",
+      "★热销★ 鱼香肉丝盖饭（含米饭）",
+      "❤回头客必点❤ 蛋花汤",
+      "香糯米饭x3"
+    ],
+    "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+    "delivery_time": "11:45",
+    "issue_type": "missing_item",
+    "issue_detail": "客户反映少送了一份鱼香肉丝",
+    "rider_name": "赵师傅",
+    "merchant_name": "家常菜馆",
+    "compensation_budget": 25.0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份，说明是跟进之前的订单问题来电",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "客户应答",
+      "branches": [],
+      "is_optional": false,
+      "max_attempts": 3,
+      "weight": 1.0,
+      "source_quote": ""
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是王女士本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "客户确认身份",
+      "branches": [],
+      "is_optional": false,
+      "max_attempts": 3,
+      "weight": 1.0,
+      "source_quote": ""
+    },
+    {
+      "step_id": "acknowledge_issue",
+      "order": 3,
+      "instruction": "先表达歉意（允许：'给您带来不便深表歉意'、'非常抱歉'；禁止：'是我们的错'、'都怪我们'），再复述问题（少了一份鱼香肉丝），请客户确认",
+      "required_actions": [
+        "apologize",
+        "restate_issue",
+        "confirm_issue"
+      ],
+      "forbidden_words": [
+        "这不是我们的错",
+        "你确定吗",
+        "不可能",
+        "都怪我们",
+        "是我们的错"
+      ],
+      "completion_condition": "客户确认问题描述正确",
+      "branches": [],
+      "is_optional": false,
+      "max_attempts": 3,
+      "weight": 1.5,
+      "source_quote": ""
+    },
+    {
+      "step_id": "check_eligibility",
+      "order": 4,
+      "instruction": "查询补偿资格（调用工具），确认可补偿范围",
+      "required_actions": [
+        "check_compensation_eligibility"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "获取到可用补偿额度",
+      "branches": [],
+      "is_optional": false,
+      "max_attempts": 3,
+      "weight": 2.0,
+      "source_quote": ""
+    },
+    {
+      "step_id": "offer_solution",
+      "order": 5,
+      "instruction": "提供两个方案：1) 退还该菜品金额 2) 补送一份（约30分钟）。让客户选择",
+      "required_actions": [
+        "offer_refund",
+        "offer_redelivery"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "客户做出选择",
+      "branches": [
+        {
+          "condition": "客户选退款",
+          "next_step": "execute_refund",
+          "description": "执行退款"
+        },
+        {
+          "condition": "客户选补送",
+          "next_step": "execute_redelivery",
+          "description": "安排补送"
+        },
+        {
+          "condition": "客户都不满意要求更多补偿",
+          "next_step": "escalate",
+          "description": "超出权限，转人工"
+        }
+      ],
+      "is_optional": false,
+      "max_attempts": 3,
+      "weight": 2.0,
+      "source_quote": ""
+    },
+    {
+      "step_id": "execute_refund",
+      "order": 6,
+      "instruction": "确认退款金额和退款方式（原路退回），执行退款操作",
+      "required_actions": [
+        "confirm_amount",
+        "create_compensation"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "退款操作完成",
+      "branches": [],
+      "is_optional": true,
+      "max_attempts": 3,
+      "weight": 1.0,
+      "source_quote": ""
+    },
+    {
+      "step_id": "execute_redelivery",
+      "order": 7,
+      "instruction": "确认补送时间和地址是否跟原单一致，安排补送",
+      "required_actions": [
+        "confirm_address",
+        "reschedule_delivery"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "补送安排完成",
+      "branches": [],
+      "is_optional": true,
+      "max_attempts": 3,
+      "weight": 1.0,
+      "source_quote": ""
+    },
+    {
+      "step_id": "escalate",
+      "order": 8,
+      "instruction": "表示理解客户诉求，说明需要转接主管处理，请客户稍等",
+      "required_actions": [
+        "empathize",
+        "transfer_to_human"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "转接成功",
+      "branches": [],
+      "is_optional": true,
+      "max_attempts": 3,
+      "weight": 1.0,
+      "source_quote": ""
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 9,
+      "instruction": "确认客户是否还有其他问题，表达歉意和感谢，礼貌结束",
+      "required_actions": [
+        "ask_other_issues",
+        "final_apology",
+        "say_goodbye",
+        "log_result"
+      ],
+      "forbidden_words": [],
+      "completion_condition": "通话结束",
+      "branches": [],
+      "is_optional": false,
+      "max_attempts": 3,
+      "weight": 1.0,
+      "source_quote": ""
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团客服，我是智能助手，针对您反馈的订单问题来跟您确认",
+  "mandatory_closing": "非常抱歉给您带来不便，感谢您的理解和配合，祝您生活愉快，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_blame_customer",
+      "description": "暗示问题是客户的错",
+      "severity": "critical",
+      "detection_keywords": [
+        "你确定吗",
+        "你是不是记错了",
+        "不可能少",
+        "你自己"
+      ],
+      "source_quote": ""
+    },
+    {
+      "id": "fb_blame_rider",
+      "description": "直接指责骑手",
+      "severity": "major",
+      "detection_keywords": [
+        "骑手的错",
+        "骑手偷吃",
+        "骑手不负责"
+      ],
+      "source_quote": ""
+    },
+    {
+      "id": "fb_over_promise",
+      "description": "承诺超出授权额度的补偿",
+      "severity": "major",
+      "detection_keywords": [
+        "全额退款",
+        "免费再送一整单",
+        "赔偿100"
+      ],
+      "source_quote": ""
+    },
+    {
+      "id": "fb_dismiss",
+      "description": "轻视客户感受",
+      "severity": "major",
+      "detection_keywords": [
+        "就一个菜而已",
+        "没什么大不了",
+        "小事情"
+      ],
+      "source_quote": ""
+    }
+  ],
+  "callee_persona": {
+    "patience": 6,
+    "cooperativeness": 2,
+    "comprehension": 7,
+    "emotional": 5,
+    "signal_quality": 9,
+    "busy_level": 3,
+    "trust_level": 3,
+    "has_additional_issue": true,
+    "additional_issue": "上次也出过类似问题，这次想问能不能给个长期优惠券补偿",
+    "archetype": "stubborn",
+    "never_disclose": [],
+    "gated_disclosure": {},
+    "scenario_hints": [],
+    "adversarial_mode": false
+  },
+  "callee_goal": "你很不满——中午等了很久结果少了一个菜，同事都吃上了就你没有。你最好能拿到退款，而且上次也出过问题所以你想多要点补偿。但如果对方态度好你不会太为难。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "max_turns": 18,
+  "optimal_turns": 8,
+  "world_seed": {},
+  "raw_instruction": "",
+  "custom_tool_defs": [],
+  "mock_tool_responses": {},
+  "response_length_limit": 0,
+  "knowledge_points": [],
+  "callee_role": "",
+  "callee_context": "",
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_complaint_detail",
+      "given_turn": 2,
+      "fact_description": "客户提到具体投诉内容：少送了一份鱼香肉丝",
+      "check_turn": 4,
+      "check_description": "agent 在后续确认问题时应明确引用具体菜品名称，而非泛称'少了一样东西'",
+      "keywords": [
+        "漏餐",
+        "缺少",
+        "鱼香肉丝"
+      ]
+    },
+    {
+      "fact_id": "cp_order_id",
+      "given_turn": 1,
+      "fact_description": "agent 来电已知晓订单号 MT20260517042，客户在通话中确认了该订单",
+      "check_turn": 3,
+      "check_description": "agent 在核实问题时应正确引用订单号，不应与其他订单混淆",
+      "keywords": [
+        "MT20260517042",
+        "订单",
+        "那笔"
+      ]
+    },
+    {
+      "fact_id": "cp_emotional_escalation",
+      "given_turn": 3,
+      "fact_description": "客户情绪升温，表达强烈不满（等了很久、同事都吃上了只有自己没有）",
+      "check_turn": 4,
+      "check_description": "agent 在进入解决方案前应先明确回应客户情绪，表达共情，而不是直接跳到补偿方案",
+      "keywords": [
+        "理解",
+        "抱歉",
+        "感受",
+        "不便",
+        "着急"
+      ]
+    }
+  ],
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "acknowledge_issue",
+    "check_eligibility",
+    "offer_solution",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "offer_solution": "客户选退款"
+  },
+  "expected_call_result": "refunded",
+  "must_call_tools": [
+    "query_order",
+    "check_compensation_eligibility",
+    "create_compensation",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "暗示客户说谎",
+    "指责骑手",
+    "越权承诺"
+  ],
+  "canonical_intent": [],
+  "expected_db_state": {
+    "compensations": [
+      {
+        "order_id": "MT20260517042",
+        "type": "refund",
+        "status": "approved"
+      }
+    ],
+    "call_logs": [
+      {
+        "order_id": "MT20260517042",
+        "call_type": "outbound",
+        "result": "refunded"
+      }
+    ]
+  },
+  "trace_match_mode": "ordered"
+}

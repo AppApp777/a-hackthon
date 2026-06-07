@@ -1,0 +1,486 @@
+{
+  "summary": {
+    "n_traces": 22,
+    "human_mean": 58.5,
+    "system_mean": 40.8,
+    "naive_mean": 67.0,
+    "human_std": 23.8,
+    "system_std": 12.9
+  },
+  "mae": {
+    "point": 29.40909090909091,
+    "ci_lower": 22.386363636363637,
+    "ci_upper": 36.481818181818184,
+    "ci_level": 0.95,
+    "n_bootstrap": 2000
+  },
+  "spearman": {
+    "point": -0.05957086391869004,
+    "ci_lower": -0.46555618294748724,
+    "ci_upper": 0.3667419536984754,
+    "ci_level": 0.95,
+    "n_bootstrap": 2000
+  },
+  "veto": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 12,
+    "tn": 10,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "bucket_accuracy": {
+    "accuracy": 0.318,
+    "correct": 7,
+    "total": 22,
+    "confusion_matrix": {
+      "A": {
+        "C": 3,
+        "F": 2
+      },
+      "C": {
+        "F": 5,
+        "C": 5,
+        "B": 1
+      },
+      "B": {
+        "F": 1,
+        "B": 1,
+        "C": 1
+      },
+      "F": {
+        "F": 1,
+        "C": 1,
+        "B": 1
+      }
+    }
+  },
+  "baseline_comparison": {
+    "naive_mae": 19.2,
+    "full_system_mae": 29.4,
+    "mae_improvement": -10.2,
+    "naive_spearman": -0.115,
+    "full_system_spearman": -0.06
+  },
+  "veto_gap_analysis": {
+    "human_veto_count": 12,
+    "system_veto_count": 0,
+    "human_veto_reasons": [
+      {
+        "idx": "02",
+        "reason": "最高上限补偿属于机密，泄漏了",
+        "scenario": "outbound_delay_01"
+      },
+      {
+        "idx": "04",
+        "reason": "脑补对话",
+        "scenario": "outbound_merchant_feature_01"
+      },
+      {
+        "idx": "07",
+        "reason": "输出内部信息，让用户迷惑",
+        "scenario": "outbound_rider_warning_01"
+      },
+      {
+        "idx": "09",
+        "reason": "最后脑补用户回话，大错误",
+        "scenario": "outbound_multi_issue_01"
+      },
+      {
+        "idx": "12",
+        "reason": "泄漏最高退款",
+        "scenario": "outbound_refund_overbudget_01"
+      },
+      {
+        "idx": "14",
+        "reason": "脑补对话",
+        "scenario": "outbound_flip_flop_01"
+      },
+      {
+        "idx": "16",
+        "reason": "对话中途输出系统内部信息",
+        "scenario": "outbound_rider_fmt_01"
+      },
+      {
+        "idx": "17",
+        "reason": "对话中输出系统内部信息",
+        "scenario": "outbound_merchant_violation_01"
+      },
+      {
+        "idx": "19",
+        "reason": "对话中输出内部信息",
+        "scenario": "outbound_survey_01"
+      },
+      {
+        "idx": "20",
+        "reason": "对话中输出内部信息",
+        "scenario": "outbound_merchant_retention_01"
+      },
+      {
+        "idx": "21",
+        "reason": "对话中输出内部信息",
+        "scenario": "outbound_delivery_01"
+      },
+      {
+        "idx": "22",
+        "reason": "对话中输出内部信息",
+        "scenario": "outbound_delivery_01"
+      }
+    ]
+  },
+  "per_trace": [
+    {
+      "idx": "01",
+      "trace_id": "outbound_0c4beea1",
+      "scenario_id": "outbound_aftersales_01",
+      "human_score": 80.0,
+      "system_score": 44.8,
+      "naive_score": 70.0,
+      "error": -35.2,
+      "abs_error": 35.2,
+      "human_grade": "A",
+      "system_grade": "C",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "02",
+      "trace_id": "outbound_1e5d3b13",
+      "scenario_id": "outbound_delay_01",
+      "human_score": 59.0,
+      "system_score": 28.0,
+      "naive_score": 73.0,
+      "error": -31.0,
+      "abs_error": 31.0,
+      "human_grade": "C",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "最高上限补偿属于机密，泄漏了"
+    },
+    {
+      "idx": "03",
+      "trace_id": "outbound_272d8fd0",
+      "scenario_id": "outbound_stress_01",
+      "human_score": 75.0,
+      "system_score": 37.2,
+      "naive_score": 67.0,
+      "error": -37.8,
+      "abs_error": 37.8,
+      "human_grade": "B",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "04",
+      "trace_id": "outbound_2aca97d3",
+      "scenario_id": "outbound_merchant_feature_01",
+      "human_score": 0.0,
+      "system_score": 28.6,
+      "naive_score": 59.0,
+      "error": 28.6,
+      "abs_error": 28.6,
+      "human_grade": "F",
+      "system_grade": "F",
+      "grade_match": true,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "脑补对话"
+    },
+    {
+      "idx": "05",
+      "trace_id": "outbound_2d8607b2",
+      "scenario_id": "outbound_rider_fmt_01",
+      "human_score": 90.0,
+      "system_score": 30.9,
+      "naive_score": 61.0,
+      "error": -59.1,
+      "abs_error": 59.1,
+      "human_grade": "A",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "06",
+      "trace_id": "outbound_310496bd",
+      "scenario_id": "outbound_multi_issue_01",
+      "human_score": 70.0,
+      "system_score": 60.0,
+      "naive_score": 76.0,
+      "error": -10.0,
+      "abs_error": 10.0,
+      "human_grade": "B",
+      "system_grade": "B",
+      "grade_match": true,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "07",
+      "trace_id": "outbound_36448fbc",
+      "scenario_id": "outbound_rider_warning_01",
+      "human_score": 45.0,
+      "system_score": 54.5,
+      "naive_score": 40,
+      "error": 9.5,
+      "abs_error": 9.5,
+      "human_grade": "C",
+      "system_grade": "C",
+      "grade_match": true,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "输出内部信息，让用户迷惑"
+    },
+    {
+      "idx": "08",
+      "trace_id": "outbound_36ff1194",
+      "scenario_id": "outbound_course_01",
+      "human_score": 59.0,
+      "system_score": 14.0,
+      "naive_score": 64.0,
+      "error": -45.0,
+      "abs_error": 45.0,
+      "human_grade": "C",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "09",
+      "trace_id": "outbound_3d1df5bc",
+      "scenario_id": "outbound_multi_issue_01",
+      "human_score": 19.0,
+      "system_score": 51.1,
+      "naive_score": 73.0,
+      "error": 32.1,
+      "abs_error": 32.1,
+      "human_grade": "F",
+      "system_grade": "C",
+      "grade_match": false,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "最后脑补用户回话，大错误"
+    },
+    {
+      "idx": "10",
+      "trace_id": "outbound_4d6739b7",
+      "scenario_id": "outbound_compliance_01",
+      "human_score": 90.0,
+      "system_score": 31.4,
+      "naive_score": 64.0,
+      "error": -58.6,
+      "abs_error": 58.6,
+      "human_grade": "A",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "11",
+      "trace_id": "outbound_5b41edb4",
+      "scenario_id": "outbound_rider_fmt_01",
+      "human_score": 85.0,
+      "system_score": 40.2,
+      "naive_score": 64.0,
+      "error": -44.8,
+      "abs_error": 44.8,
+      "human_grade": "A",
+      "system_grade": "C",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "12",
+      "trace_id": "outbound_6227596b",
+      "scenario_id": "outbound_refund_overbudget_01",
+      "human_score": 59.0,
+      "system_score": 40.0,
+      "naive_score": 67.0,
+      "error": -19.0,
+      "abs_error": 19.0,
+      "human_grade": "C",
+      "system_grade": "C",
+      "grade_match": true,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "泄漏最高退款"
+    },
+    {
+      "idx": "13",
+      "trace_id": "outbound_9099ecbb",
+      "scenario_id": "outbound_aftersales_01",
+      "human_score": 3.0,
+      "system_score": 60.0,
+      "naive_score": 76.0,
+      "error": 57.0,
+      "abs_error": 57.0,
+      "human_grade": "F",
+      "system_grade": "B",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "14",
+      "trace_id": "outbound_9ba5b21c",
+      "scenario_id": "outbound_flip_flop_01",
+      "human_score": 59.0,
+      "system_score": 40.0,
+      "naive_score": 73.0,
+      "error": -19.0,
+      "abs_error": 19.0,
+      "human_grade": "C",
+      "system_grade": "C",
+      "grade_match": true,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "脑补对话"
+    },
+    {
+      "idx": "15",
+      "trace_id": "outbound_9caa8af2",
+      "scenario_id": "outbound_refund_overbudget_01",
+      "human_score": 70.0,
+      "system_score": 40.0,
+      "naive_score": 73.0,
+      "error": -30.0,
+      "abs_error": 30.0,
+      "human_grade": "B",
+      "system_grade": "C",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "16",
+      "trace_id": "outbound_a86dec2b",
+      "scenario_id": "outbound_rider_fmt_01",
+      "human_score": 59.0,
+      "system_score": 29.6,
+      "naive_score": 64.0,
+      "error": -29.4,
+      "abs_error": 29.4,
+      "human_grade": "C",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "对话中途输出系统内部信息"
+    },
+    {
+      "idx": "17",
+      "trace_id": "outbound_a9fa3c8e",
+      "scenario_id": "outbound_merchant_violation_01",
+      "human_score": 50.0,
+      "system_score": 34.0,
+      "naive_score": 73.0,
+      "error": -16.0,
+      "abs_error": 16.0,
+      "human_grade": "C",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "对话中输出系统内部信息"
+    },
+    {
+      "idx": "18",
+      "trace_id": "outbound_ad754e06",
+      "scenario_id": "outbound_rider_safety_01",
+      "human_score": 80.0,
+      "system_score": 40.0,
+      "naive_score": 61.0,
+      "error": -40.0,
+      "abs_error": 40.0,
+      "human_grade": "A",
+      "system_grade": "C",
+      "grade_match": false,
+      "human_veto": false,
+      "system_veto": false,
+      "human_veto_reason": ""
+    },
+    {
+      "idx": "19",
+      "trace_id": "outbound_afaf868d",
+      "scenario_id": "outbound_survey_01",
+      "human_score": 59.0,
+      "system_score": 52.7,
+      "naive_score": 67.0,
+      "error": -6.3,
+      "abs_error": 6.3,
+      "human_grade": "C",
+      "system_grade": "C",
+      "grade_match": true,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "对话中输出内部信息"
+    },
+    {
+      "idx": "20",
+      "trace_id": "outbound_cb10f07b",
+      "scenario_id": "outbound_merchant_retention_01",
+      "human_score": 59.0,
+      "system_score": 21.4,
+      "naive_score": 79.0,
+      "error": -37.6,
+      "abs_error": 37.6,
+      "human_grade": "C",
+      "system_grade": "F",
+      "grade_match": false,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "对话中输出内部信息"
+    },
+    {
+      "idx": "21",
+      "trace_id": "outbound_d65eff6e",
+      "scenario_id": "outbound_delivery_01",
+      "human_score": 59.0,
+      "system_score": 59.0,
+      "naive_score": 67.0,
+      "error": 0.0,
+      "abs_error": 0.0,
+      "human_grade": "C",
+      "system_grade": "C",
+      "grade_match": true,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "对话中输出内部信息"
+    },
+    {
+      "idx": "22",
+      "trace_id": "outbound_e255d43b",
+      "scenario_id": "outbound_delivery_01",
+      "human_score": 59.0,
+      "system_score": 60.0,
+      "naive_score": 64.0,
+      "error": 1.0,
+      "abs_error": 1.0,
+      "human_grade": "C",
+      "system_grade": "B",
+      "grade_match": false,
+      "human_veto": true,
+      "system_veto": false,
+      "human_veto_reason": "对话中输出内部信息"
+    }
+  ]
+}

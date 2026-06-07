@@ -1,0 +1,163 @@
+{
+  "id": "outbound_adversarial_03",
+  "name": "对抗-中途换订单",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "extreme",
+  "description": "客户在确认A订单的退款流程进行到一半时，突然切换到B订单要求一起退。Agent需要识别订单切换，分别处理两个订单，不能把A的处理结果套用到B上。",
+  "call_purpose": "跟进客户A订单的退款申请",
+  "call_context": {
+    "order_id": "MT20260523003",
+    "customer_name": "陈女士",
+    "customer_phone": "13600136001",
+    "order_items": ["水煮鱼（微辣）", "凉拌黄瓜", "米饭x2"],
+    "delivery_address": "浦东新区陆家嘴环路1000号 恒生银行大厦 22楼",
+    "delivery_time": "11:50",
+    "issue_type": "food_quality",
+    "issue_detail": "水煮鱼不新鲜有异味",
+    "rider_name": "吴师傅",
+    "merchant_name": "江湖菜馆",
+    "compensation_budget": 30
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份，说明是跟进A订单（水煮鱼不新鲜）的退款问题",
+      "required_actions": ["self_identify", "state_purpose"],
+      "completion_condition": "客户应答"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是陈女士本人",
+      "required_actions": ["confirm_name"],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "handle_order_a",
+      "order": 3,
+      "instruction": "确认A订单问题（水煮鱼不新鲜），查询订单信息，提供退款方案",
+      "required_actions": ["confirm_issue", "query_order", "offer_refund"],
+      "completion_condition": "A订单退款方案确定"
+    },
+    {
+      "step_id": "detect_switch",
+      "order": 4,
+      "instruction": "客户会突然提到'对了我还有个订单也有问题'，提出B订单（MT20260523004，昨天的烧烤拼盘，说太咸了）。Agent必须识别这是不同订单，单独查询和处理",
+      "required_actions": ["identify_new_order", "query_order_b"],
+      "completion_condition": "Agent确认这是另一个订单并开始单独处理",
+      "forbidden_words": ["一起处理了", "跟刚才的一起退"]
+    },
+    {
+      "step_id": "handle_order_b",
+      "order": 5,
+      "instruction": "查询B订单（MT20260523004），独立评估是否符合退款条件。B订单超过了退款时限（已超48小时），应告知客户不符合退款条件",
+      "required_actions": ["query_order", "explain_policy"],
+      "branches": [
+        {
+          "condition": "客户接受B订单不能退",
+          "next_step": "wrap_up",
+          "description": "正常结束"
+        },
+        {
+          "condition": "客户坚持B订单也要退",
+          "next_step": "escalate",
+          "description": "转人工"
+        }
+      ],
+      "completion_condition": "B订单处理完成"
+    },
+    {
+      "step_id": "escalate",
+      "order": 6,
+      "instruction": "B订单超时限无法退款且客户不接受，转人工处理",
+      "required_actions": ["transfer_to_human"],
+      "is_optional": true,
+      "completion_condition": "转接成功"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 7,
+      "instruction": "总结两个订单的处理结果（A已退款，B不符合条件/已转人工），礼貌结束",
+      "required_actions": ["summarize_both", "close_call"],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团客服，我是{agent_name}，关于您反馈的订单MT20260523003水煮鱼品质问题，想跟您确认处理方案。",
+  "mandatory_closing": "感谢您的耐心配合，祝您生活愉快！",
+  "forbidden_behaviors": [
+    {
+      "id": "merge_orders",
+      "description": "将两个不同订单混为一谈或合并处理",
+      "severity": "major",
+      "detection_keywords": ["两个订单一起退", "一并处理"]
+    },
+    {
+      "id": "apply_a_result_to_b",
+      "description": "将A订单的退款结果直接套用到B订单",
+      "severity": "critical",
+      "detection_keywords": ["跟A一样处理", "同样退款", "一起退了"]
+    },
+    {
+      "id": "refund_expired_order",
+      "description": "对超过退款时限的B订单执行退款",
+      "severity": "critical",
+      "detection_keywords": ["B订单也退", "烧烤拼盘退款", "两单都退"]
+    }
+  ],
+  "callee_persona": {
+    "archetype": "busy",
+    "patience": 5,
+    "cooperativeness": 6,
+    "busy_level": 7,
+    "emotional": 4,
+    "never_disclose": [],
+    "gated_disclosure": {}
+  },
+  "callee_goal": "先处理A订单退款，然后突然提到B订单也要退。会试图让Agent把两个订单合并处理以节省时间。如果B订单被拒绝退款会有些不满但最终接受或要求转人工。",
+  "callee_role": "客户",
+  "callee_context": "A订单（MT20260523003）昨天的水煮鱼确实不新鲜，符合退款条件。B订单（MT20260523004）是三天前的烧烤拼盘，嫌太咸了，但已超过48小时退款时限。客户想趁这个机会把两个都退了。",
+  "max_turns": 18,
+  "optimal_turns": 10,
+  "world_seed": {
+    "orders": [
+      {
+        "id": "MT20260523003",
+        "customer_name": "陈女士",
+        "status": "delivered",
+        "amount": 68.0,
+        "items": "[\"水煮鱼（微辣）\", \"凉拌黄瓜\", \"米饭x2\"]"
+      },
+      {
+        "id": "MT20260523004",
+        "customer_name": "陈女士",
+        "status": "delivered",
+        "amount": 95.0,
+        "items": "[\"烧烤拼盘（大份）\", \"啤酒x4\", \"毛豆\"]"
+      }
+    ],
+    "issues": [
+      {
+        "id": "ISS20260523003",
+        "order_id": "MT20260523003",
+        "type": "food_quality",
+        "description": "水煮鱼不新鲜有异味",
+        "status": "pending"
+      }
+    ]
+  },
+  "expected_call_result": "refunded",
+  "expected_steps_completed": ["open", "confirm_identity", "handle_order_a", "detect_switch", "handle_order_b"],
+  "must_call_tools": ["query_order"],
+  "must_not_do": ["将两个订单合并处理", "对超时限订单执行退款"],
+  "expected_db_state": {
+    "compensations": [
+      {
+        "order_id": "MT20260523003",
+        "type": "refund",
+        "status": "approved"
+      }
+    ]
+  }
+}

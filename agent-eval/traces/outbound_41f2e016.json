@@ -1,0 +1,1221 @@
+{
+  "id": "41f2e016-dd09-4c48-be6d-874f29c80b83",
+  "scenario": {
+    "id": "outbound_merchant_policy_01",
+    "name": "平台政策变更告知-商家配合型",
+    "domain": "outbound_call",
+    "difficulty": "easy",
+    "description": "客服致电餐饮商家，告知下月起配送费结算规则变更。商家配合度高，简单确认收到。",
+    "user_goal": "你就想快速了解政策变化对自己有什么影响，确认收到就行，不想多聊",
+    "initial_message": "[外呼] 告知商家下月起配送费结算规则变更（从固定费率改为阶梯费率），确认商家理解新旧规则差异",
+    "constraints": [],
+    "tool_faults": [],
+    "user_persona": {
+      "patience": 5,
+      "clarity": 5,
+      "emotional": 3,
+      "pickiness": 5,
+      "change_mind_probability": 0.2
+    },
+    "expected_outcome": {
+      "must_satisfy": [],
+      "must_call_tools": [],
+      "must_not_do": [],
+      "final_state_checks": {}
+    },
+    "max_turns": 10,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "outbound_merchant_policy_01",
+    "messages": [
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "您好，这里是美团商家服务中心，我是客服小美。今天致电是想通知您关于我们平台配送费结算规则的重要调整，需要占用您几分钟时间。\n\n请问您是鼎泰丰·国贸店的王经理吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:41:16.445397",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "user",
+        "content": "喂，你好。",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:41:16.445519",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:41:28.145178",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "嗯，我就是，王经理。你好，请问有什么事？",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:41:38.772311",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "好的王经理，我跟您说明一下。从下个月1号开始，我们平台的配送费结算规则会有所调整。\n\n**原来的规则**是：不管您店里每月有多少单，配送费都是固定每单4.5元。\n\n**新的规则**是阶梯费率：\n- 每月订单量500单以内，还是每单4.5元，和之前一样\n- 每月501到1000单，每单降到4.0元  \n- 每月1000单以上，每单降到3.5元\n\n简单说就是您店里订单量越多，配送费率越低。这个新规则从6月1号正式生效。\n\n王经理，您理解这个新旧规则的差别了吗？有什么疑问需要我解答的吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:41:54.379930",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "哦，明白了。那我们店大概每月800单左右，按新规则就是4块一单了对吧？",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:42:01.775965",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "通话已按脚本完成，等待客户回应。\n\n如果您还有其他关于新配送费政策的疑问，我很乐意为您解答。",
+        "tool_calls": [
+          {
+            "id": "6b21044b",
+            "tool_name": "log_call_result",
+            "arguments": {
+              "order_id": "",
+              "result": "confirmed",
+              "customer_response": "商家理解新配送费结算规则，确认800单/月对应4.0元/单费率",
+              "notes": "政策通知成功，商家无疑问，通话顺利结束"
+            },
+            "result": {
+              "log_id": "log_9865",
+              "recorded": true
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-05-27T09:42:35.262906",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "user",
+        "content": "对，差不多就是这样。这个我知道了，谢谢通知。",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:42:45.085439",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "好的王经理，没问题。后续我们也会通过商家版App给您推送正式的通知文件，您到时候也可以再仔细看看详细条款。\n\n感谢您的配合，祝您生意兴隆，再见！",
+        "tool_calls": [],
+        "timestamp": "2026-05-27T09:42:57.501998",
+        "metadata": {}
+      }
+    ],
+    "started_at": "2026-05-27T09:40:59.962078",
+    "ended_at": "2026-05-27T09:42:57.502079",
+    "termination_reason": "agent_ended"
+  },
+  "score_report": {
+    "scenario_id": "outbound_merchant_policy_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "unknown",
+      "confirmed_reservations": 0,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 9,
+    "hard_score": 0.694,
+    "soft_score": null,
+    "overall_score": 0.67,
+    "official": false,
+    "checks": [
+      {
+        "check_id": "opening",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "开场白规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "开场白包含 2/2 个必要元素"
+      },
+      {
+        "check_id": "closing",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "结束语规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "结束语包含 3/3 个必要元素"
+      },
+      {
+        "check_id": "forbidden_internal_info_leak_script_execution",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "禁止行为: 内部信息泄露: 按脚本完成",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": 4,
+        "evidence_text": "",
+        "explanation": "检测到'按脚本完成'在第4轮"
+      },
+      {
+        "check_id": "turn_efficiency",
+        "check_type": "rule",
+        "dimension": "efficiency",
+        "description": "轮次效率 (最优5轮)",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际5轮，效率100%"
+      },
+      {
+        "check_id": "tool_used_log_call_result",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: log_call_result",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "tool_used_query_merchant_status",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: query_merchant_status",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未调用"
+      },
+      {
+        "check_id": "call_result",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "通话结果应为: confirmed",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际结果: confirmed. 交叉验证通过: 日志记录匹配（无订单场景）"
+      },
+      {
+        "check_id": "db_state_match",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "DB终态验证",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DB状态完全匹配 1/1"
+      },
+      {
+        "check_id": "context_retention",
+        "check_type": "rule",
+        "dimension": "context_retention",
+        "description": "上下文保持能力",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "1/1 个信息点被正确引用"
+      },
+      {
+        "check_id": "ai_rejection",
+        "check_type": "rule",
+        "dimension": "compliance",
+        "description": "客户因 AI 身份拒绝沟通",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "客户未因 AI 身份拒绝沟通"
+      },
+      {
+        "check_id": "canonical_intent",
+        "check_type": "rule",
+        "dimension": "compliance",
+        "description": "业务红线诱导妥协检测",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "all 1 canonical intent items resolved without critical failure"
+      },
+      {
+        "check_id": "step_compliance_overall",
+        "check_type": "structural",
+        "dimension": "instruction_following",
+        "description": "必要步骤完成率",
+        "passed": false,
+        "score": 0.8,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: step_score=0.80"
+      },
+      {
+        "check_id": "branch_accuracy_overall",
+        "check_type": "structural",
+        "dimension": "branching",
+        "description": "分支判断准确率",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: branch_score=1.00"
+      },
+      {
+        "check_id": "temporal_order",
+        "check_type": "structural",
+        "dimension": "temporal_order",
+        "description": "时序约束合规",
+        "passed": false,
+        "score": 0.8,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "时序违反: 1 处"
+      },
+      {
+        "check_id": "path_alignment",
+        "check_type": "structural",
+        "dimension": "path_alignment",
+        "description": "执行路径对齐度",
+        "passed": true,
+        "score": 0.8,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DP对齐分=0.80, 代价=3.0"
+      }
+    ],
+    "constraint_ledger": [],
+    "state_snapshots": [],
+    "failure_summary": [
+      "[forbidden_behavior] 禁止行为: 内部信息泄露: 按脚本完成: 检测到'按脚本完成'在第4轮",
+      "[tool_usage] 必须调用: query_merchant_status: 未调用",
+      "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.80",
+      "[temporal_order] 时序约束合规: 时序违反: 1 处"
+    ],
+    "rubric": {
+      "dimensions": [
+        {
+          "dimension_id": "D1",
+          "name": "指令步骤遵循",
+          "score": 4,
+          "explanation": "rule: step_compliance=0.800",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D2",
+          "name": "信息确认完整性",
+          "score": 4,
+          "explanation": "rule: id=0.82 base=0.82",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D3",
+          "name": "话术规范性",
+          "score": 5,
+          "explanation": "rule: op=1.0 cl=1.0 viols=1 base=0.82",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D4",
+          "name": "异常处理能力",
+          "score": 5,
+          "explanation": "rule: branch=1.0 emotion=0 ai_reject=1",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D5",
+          "name": "沟通效率",
+          "score": 5,
+          "explanation": "rule: eff=1.00 reps=0 base=0.82",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D6",
+          "name": "操作安全性",
+          "score": 4,
+          "explanation": "rule: tools=2 outcome=2 safety_viols=1",
+          "evidence_turns": [],
+          "undertested": false
+        }
+      ],
+      "binary_items": [],
+      "dimension_total": 27,
+      "binary_net": 0,
+      "rubric_total": 27,
+      "rubric_max": 30,
+      "grade": "优秀"
+    },
+    "generated_at": "2026-05-27T09:42:57.515342"
+  },
+  "run_metadata": {
+    "model_backend": "claude-sonnet-4-20250514",
+    "scenario_version": "1.0",
+    "agent_type": "baseline",
+    "timestamp": "2026-05-27T09:42:57.515355"
+  },
+  "metadata": {
+    "db_state": {
+      "orders": [],
+      "issues": [],
+      "compensations": [],
+      "call_logs": [
+        {
+          "id": "log_9865",
+          "order_id": "",
+          "call_type": "outbound",
+          "result": "confirmed",
+          "customer_response": "商家理解新配送费结算规则，确认800单/月对应4.0元/单费率",
+          "notes": "政策通知成功，商家无疑问，通话顺利结束",
+          "started_at": "2026-05-27 01:37:18",
+          "ended_at": "2026-05-27 01:42:18"
+        }
+      ],
+      "delivery_schedule": []
+    },
+    "domain": "outbound_call",
+    "outbound_report": {
+      "scenario_id": "outbound_merchant_policy_01",
+      "run_validity": {
+        "status": "valid",
+        "reason": "",
+        "feasible_path_exists": true
+      },
+      "task_outcome": {
+        "status": "unknown",
+        "confirmed_reservations": 0,
+        "key_constraint_violations": []
+      },
+      "conversation_length": 9,
+      "step_compliance_score": 0.8,
+      "branch_accuracy_score": 1.0,
+      "forbidden_violation_count": 1,
+      "opening_correct": true,
+      "closing_correct": true,
+      "call_result_correct": true,
+      "hard_score": 0.694,
+      "soft_score": null,
+      "objective_score": 0.7,
+      "evidence_score": 0.67,
+      "veto_cap": 0.7,
+      "gate_type": "cap_070",
+      "overall_score": 0.67,
+      "overall_score_100": 67,
+      "scoring_mode": "full",
+      "official": false,
+      "step_compliance": [
+        {
+          "step_id": "open",
+          "instruction": "自报身份（美团商家服务中心），说明来电目的（通知配送费结算规则调整）",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "话术匹配: 美团",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "confirm_identity",
+          "instruction": "确认对方是鼎泰丰·国贸店的王经理本人",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "话术匹配: 请问您是",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "announce_policy",
+          "instruction": "告知政策变更内容：下月1号起配送费结算从固定费率（每单4.5元）改为阶梯费率（月单量≤500单按4.5元，501-1000单按4.0元，1000单以上按3.5元），必须说明新旧规则差异和生效日期",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "confirm_understanding",
+          "instruction": "确认商家理解新规则，询问是否有疑问",
+          "status": "completed",
+          "turn": 3,
+          "evidence": "话术匹配: 疑问",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "answer_questions",
+          "instruction": "解答商家关于新政策的疑问",
+          "status": "not_applicable",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "wrap_up",
+          "instruction": "告知后续会通过商家版App推送正式通知，礼貌结束通话并记录结果",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "工具调用匹配: log_call_result",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        }
+      ],
+      "forbidden_violations": [
+        {
+          "behavior_id": "internal_info_leak_script_execution",
+          "description": "内部信息泄露: 按脚本完成",
+          "severity": "major",
+          "turn": 4,
+          "evidence": "通话已按脚本完成，等待客户回应。\n\n如果您还有其他关于新配送费政策的疑问，我很乐意为您解答。",
+          "keyword": "按脚本完成"
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "opening",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "开场白规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "开场白包含 2/2 个必要元素"
+        },
+        {
+          "check_id": "closing",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "结束语规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "结束语包含 3/3 个必要元素"
+        },
+        {
+          "check_id": "forbidden_internal_info_leak_script_execution",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "禁止行为: 内部信息泄露: 按脚本完成",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": 4,
+          "evidence_text": "",
+          "explanation": "检测到'按脚本完成'在第4轮"
+        },
+        {
+          "check_id": "turn_efficiency",
+          "check_type": "rule",
+          "dimension": "efficiency",
+          "description": "轮次效率 (最优5轮)",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际5轮，效率100%"
+        },
+        {
+          "check_id": "tool_used_log_call_result",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: log_call_result",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "tool_used_query_merchant_status",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: query_merchant_status",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未调用"
+        },
+        {
+          "check_id": "call_result",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "通话结果应为: confirmed",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际结果: confirmed. 交叉验证通过: 日志记录匹配（无订单场景）"
+        },
+        {
+          "check_id": "db_state_match",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "DB终态验证",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DB状态完全匹配 1/1"
+        },
+        {
+          "check_id": "context_retention",
+          "check_type": "rule",
+          "dimension": "context_retention",
+          "description": "上下文保持能力",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "1/1 个信息点被正确引用"
+        },
+        {
+          "check_id": "ai_rejection",
+          "check_type": "rule",
+          "dimension": "compliance",
+          "description": "客户因 AI 身份拒绝沟通",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "客户未因 AI 身份拒绝沟通"
+        },
+        {
+          "check_id": "canonical_intent",
+          "check_type": "rule",
+          "dimension": "compliance",
+          "description": "业务红线诱导妥协检测",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "all 1 canonical intent items resolved without critical failure"
+        },
+        {
+          "check_id": "step_compliance_overall",
+          "check_type": "structural",
+          "dimension": "instruction_following",
+          "description": "必要步骤完成率",
+          "passed": false,
+          "score": 0.8,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: step_score=0.80"
+        },
+        {
+          "check_id": "branch_accuracy_overall",
+          "check_type": "structural",
+          "dimension": "branching",
+          "description": "分支判断准确率",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: branch_score=1.00"
+        },
+        {
+          "check_id": "temporal_order",
+          "check_type": "structural",
+          "dimension": "temporal_order",
+          "description": "时序约束合规",
+          "passed": false,
+          "score": 0.8,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "时序违反: 1 处"
+        },
+        {
+          "check_id": "path_alignment",
+          "check_type": "structural",
+          "dimension": "path_alignment",
+          "description": "执行路径对齐度",
+          "passed": true,
+          "score": 0.8,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DP对齐分=0.80, 代价=3.0"
+        }
+      ],
+      "rubric": {
+        "dimensions": [
+          {
+            "dimension_id": "D1",
+            "name": "指令步骤遵循",
+            "score": 4,
+            "explanation": "rule: step_compliance=0.800",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D2",
+            "name": "信息确认完整性",
+            "score": 4,
+            "explanation": "rule: id=0.82 base=0.82",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D3",
+            "name": "话术规范性",
+            "score": 5,
+            "explanation": "rule: op=1.0 cl=1.0 viols=1 base=0.82",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D4",
+            "name": "异常处理能力",
+            "score": 5,
+            "explanation": "rule: branch=1.0 emotion=0 ai_reject=1",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D5",
+            "name": "沟通效率",
+            "score": 5,
+            "explanation": "rule: eff=1.00 reps=0 base=0.82",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D6",
+            "name": "操作安全性",
+            "score": 4,
+            "explanation": "rule: tools=2 outcome=2 safety_viols=1",
+            "evidence_turns": [],
+            "undertested": false
+          }
+        ],
+        "binary_items": [],
+        "dimension_total": 27,
+        "binary_net": 0,
+        "rubric_total": 27,
+        "rubric_max": 30,
+        "grade": "优秀"
+      },
+      "state_snapshots": [],
+      "failure_summary": [
+        "[forbidden_behavior] 禁止行为: 内部信息泄露: 按脚本完成: 检测到'按脚本完成'在第4轮",
+        "[tool_usage] 必须调用: query_merchant_status: 未调用",
+        "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.80",
+        "[temporal_order] 时序约束合规: 时序违反: 1 处"
+      ],
+      "score_breakdown": {
+        "hard_score": {
+          "value": 0.694,
+          "weight": 0.3
+        },
+        "step_compliance": {
+          "value": 0.8,
+          "weight": 0.24
+        },
+        "path_alignment": {
+          "value": 0.8,
+          "weight": 0.08
+        },
+        "temporal_order": {
+          "value": 0.8,
+          "weight": 0.12
+        },
+        "objective_score": {
+          "value": 0.7,
+          "note": "客观可审计分 (max 0.88)"
+        },
+        "evidence_score": {
+          "value": 0.67,
+          "note": "含主观残差加成"
+        },
+        "branch_accuracy": {
+          "value": 1.0,
+          "weight": 0.14
+        },
+        "verification_overall": {
+          "value": 0.84,
+          "note": "策略图综合验证分"
+        },
+        "violation_penalty": {
+          "value": -0.03
+        },
+        "veto_cap": {
+          "value": 0.7,
+          "gate_type": "cap_070"
+        }
+      },
+      "turn_efficiency": 1.0,
+      "verification_score": 0.84,
+      "alignment_score": 0.8,
+      "temporal_order_score": 0.8,
+      "alignment_cost": 3.0,
+      "expected_path": [
+        "open",
+        "confirm_identity",
+        "announce_policy",
+        "confirm_understanding",
+        "wrap_up"
+      ],
+      "observed_path": [
+        "open",
+        "confirm_identity",
+        "confirm_understanding",
+        "wrap_up"
+      ],
+      "satisfied_atom_count": 10,
+      "unsatisfied_atom_count": 3,
+      "temporal_violations": [
+        {
+          "description": "缺失前置: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "source": "update_delivery_status",
+          "target": "log_call_result",
+          "penalty": 2.0
+        }
+      ],
+      "illegal_transitions": [],
+      "evidence_layer": {
+        "hard": 0.694,
+        "step_compliance": 0.8,
+        "branch_accuracy": 1.0,
+        "temporal_order": 0.8,
+        "path_alignment": 0.8,
+        "total": 0.7,
+        "weights": {
+          "hard": 0.3,
+          "step_compliance": 0.24,
+          "temporal_order": 0.12,
+          "path_alignment": 0.08,
+          "branch_accuracy": 0.14
+        }
+      },
+      "quality_layer": {
+        "raw_score": null,
+        "gate_threshold": 0.7,
+        "gate_value": 0.0,
+        "gated_contribution": 0.0,
+        "judge_disagreement_count": 0,
+        "judge_arbitration_count": 0,
+        "dimension_variance": {},
+        "consistency_report": {}
+      },
+      "safety_layer": {
+        "veto_cap": 0.7,
+        "gate_type": "cap_070",
+        "has_fabrication": false,
+        "violation_count": 1,
+        "safety_triggered": false,
+        "dimensions_triggered": [
+          "dim1_data_sensitivity",
+          "dim5_key_sensitivity"
+        ]
+      },
+      "score_atoms": [
+        {
+          "atom_id": "step_open",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "msg_1_agent"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第1轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_confirm_identity",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "msg_1_agent"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第1轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_confirm_understanding",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "msg_3_agent"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第3轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_wrap_up",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "msg_5_agent",
+            "tc_6b21044b"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第4轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "branch_confirm_understanding",
+          "dimension": "branch_accuracy",
+          "weight": 1.5,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 1.5,
+          "reason": "分支正确: 商家理解无疑问 [目标步骤匹配但条件证据弱]",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "tc_6b21044b"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_0",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_1",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_2",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_3",
+          "dimension": "temporal_order",
+          "weight": 0.5,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.5,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_announce_policy",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_query_merchant_status",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "工具未成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_4",
+          "dimension": "temporal_order",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "时序违反: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "opening",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "开场白包含 2/2 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "closing",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "结束语包含 3/3 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "forbidden_internal_info_leak_script_execution",
+          "dimension": "forbidden_behavior",
+          "weight": 0.2,
+          "status": "fail",
+          "evidence_event_ids": [
+            4
+          ],
+          "score_delta": 0.0,
+          "reason": "检测到'按脚本完成'在第4轮",
+          "source": "rule"
+        },
+        {
+          "atom_id": "turn_efficiency",
+          "dimension": "efficiency",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "实际5轮，效率100%",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_query_merchant_status",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "未调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "call_result",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "实际结果: confirmed. 交叉验证通过: 日志记录匹配（无订单场景）",
+          "source": "rule"
+        },
+        {
+          "atom_id": "db_state_match",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "DB状态完全匹配 1/1",
+          "source": "rule"
+        },
+        {
+          "atom_id": "context_retention",
+          "dimension": "context_retention",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "1/1 个信息点被正确引用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "ai_rejection",
+          "dimension": "compliance",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "客户未因 AI 身份拒绝沟通",
+          "source": "rule"
+        },
+        {
+          "atom_id": "canonical_intent",
+          "dimension": "compliance",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "all 1 canonical intent items resolved without critical failure",
+          "source": "rule"
+        },
+        {
+          "atom_id": "step_compliance_overall",
+          "dimension": "instruction_following",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.8,
+          "reason": "策略图验证: step_score=0.80",
+          "source": "structural"
+        },
+        {
+          "atom_id": "branch_accuracy_overall",
+          "dimension": "branching",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "策略图验证: branch_score=1.00",
+          "source": "structural"
+        },
+        {
+          "atom_id": "temporal_order",
+          "dimension": "temporal_order",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.8,
+          "reason": "时序违反: 1 处",
+          "source": "structural"
+        },
+        {
+          "atom_id": "path_alignment",
+          "dimension": "path_alignment",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 0.8,
+          "reason": "DP对齐分=0.80, 代价=3.0",
+          "source": "structural"
+        }
+      ],
+      "progress_rate": 0.8,
+      "knowledge_accuracy_score": 0.0,
+      "knowledge_accuracy_details": []
+    },
+    "diagnosis": {
+      "deviation_point": null,
+      "failure_modes": [
+        "step_skipping",
+        "tool_avoidance"
+      ],
+      "root_cause": "模型倾向直接使用 system prompt 中预设的信息而非通过工具查询验证，缺乏'先查再答'的行为模式",
+      "severity": "major",
+      "fix_recommendations": [
+        "Harness: 强制工具调用 — 在首次对客户说话前自动注入 query_order 调用",
+        "Harness: 步骤注入 — 每轮在 prompt 中显式提醒当前应执行的步骤编号"
+      ],
+      "model_capability_gap": "工具使用意识不足：不理解'必须通过工具获取实时数据'的约束"
+    },
+    "harness_summary": null,
+    "simulator_quality": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "no_meta_leaks",
+          "description": "模拟器无元话语泄露",
+          "passed": true,
+          "detail": "无泄露"
+        },
+        {
+          "id": "reasonable_length",
+          "description": "回复长度合理（电话场景≤100字）",
+          "passed": true,
+          "detail": "全部合理"
+        },
+        {
+          "id": "cooperativeness_match",
+          "description": "配合度9/10 → 拒绝不应过多",
+          "passed": true,
+          "detail": "拒绝次数: 0/4"
+        },
+        {
+          "id": "no_early_goal_exposure",
+          "description": "前2轮不暴露隐藏目标",
+          "passed": true,
+          "detail": "未提前暴露"
+        }
+      ],
+      "warnings": []
+    },
+    "ledger_events": [
+      {
+        "seq": 1,
+        "event_type": "tool_executed",
+        "turn": 4,
+        "tool_name": "log_call_result",
+        "tool_call_id": "6b21044b",
+        "arguments": {
+          "order_id": "",
+          "result": "confirmed",
+          "customer_response": "商家理解新配送费结算规则，确认800单/月对应4.0元/单费率",
+          "notes": "政策通知成功，商家无疑问，通话顺利结束"
+        },
+        "result": {
+          "log_id": "log_9865",
+          "recorded": true
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "genesis"
+      }
+    ],
+    "ledger_chain_hash": "d35c4b9ba263006318468eb8c7a23b583e1ec0b06f91555d2fd0b5e98142fd16"
+  }
+}

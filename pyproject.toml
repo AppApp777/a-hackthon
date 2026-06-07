@@ -1,0 +1,50 @@
+[project]
+name = "hackathon-eval"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = ["02-wenke-song"]
+
+[tool.ruff.lint]
+select = [
+  "E",    # pycodestyle errors
+  "F",    # pyflakes
+  "I",    # import sorting
+  "B",    # bugbear
+  "UP",   # pyupgrade
+  "SIM",  # simplify
+  "C4",   # comprehensions
+]
+ignore = [
+  "E501",  # let formatter handle line length
+  "E402",  # module level import not at top (load_dotenv pattern)
+  "SIM102", # nested if — readability preference, not a bug
+  "SIM105", # contextlib.suppress — style preference
+  "SIM108", # ternary — readability preference
+  "SIM110", # any() — readability preference
+  "UP038",  # X | Y in isinstance — Python 3.10+ only
+  "C401",   # set comprehension — style preference
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+  "unit: fast unit tests",
+  "integration: multi-component tests",
+  "contract: evaluator invariants",
+  "adversarial: attempts to game scorer/harness",
+  "slow: not required before every commit",
+]
+
+[tool.coverage.run]
+branch = true
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_ignores = true
+no_implicit_optional = true

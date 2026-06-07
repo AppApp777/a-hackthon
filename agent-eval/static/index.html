@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 对话评测系统</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242736;
+    --border: #2d3148;
+    --text: #e4e4e7;
+    --text2: #a1a1aa;
+    --accent: #6366f1;
+    --accent2: #818cf8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --orange: #f97316;
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+  .app { display: flex; height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { width: 360px; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
+  .sidebar-header h1 { font-size: 18px; margin-bottom: 4px; }
+  .sidebar-header p { font-size: 12px; color: var(--text2); }
+  .filter-bar { display: flex; gap: 6px; padding: 10px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .filter-chip { padding: 3px 10px; border-radius: 12px; font-size: 11px; cursor: pointer; border: 1px solid var(--border); color: var(--text2); transition: all .15s; }
+  .filter-chip:hover { border-color: var(--accent); color: var(--text); }
+  .filter-chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .trace-list { flex: 1; overflow-y: auto; }
+  .trace-item { padding: 14px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s; }
+  .trace-item:hover { background: var(--surface); }
+  .trace-item.active { background: var(--surface2); border-left: 3px solid var(--accent); }
+  .trace-item .name { font-size: 14px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .trace-item .meta { font-size: 12px; color: var(--text2); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 8px; font-size: 10px; font-weight: 600; }
+  .badge-outbound { background: rgba(6,182,212,.15); color: var(--cyan); }
+  .badge-restaurant { background: rgba(234,179,8,.15); color: var(--yellow); }
+  .badge-harness { background: rgba(236,72,153,.15); color: var(--pink); }
+  .score-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .score-high { background: rgba(34,197,94,.15); color: var(--green); }
+  .score-mid { background: rgba(234,179,8,.15); color: var(--yellow); }
+  .score-low { background: rgba(239,68,68,.15); color: var(--red); }
+
+  /* Main */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .main-header { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .main-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tabs { display: flex; gap: 4px; flex-shrink: 0; }
+  .tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--text2); transition: all .15s; white-space: nowrap; }
+  .tab:hover { background: var(--surface); color: var(--text); }
+  .tab.active { background: var(--accent); color: white; }
+  .main-content { flex: 1; overflow-y: auto; padding: 24px; }
+
+  /* Conversation */
+  .msg { margin-bottom: 16px; display: flex; gap: 12px; }
+  .msg-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .msg-user .msg-avatar { background: var(--accent); }
+  .msg-agent .msg-avatar { background: var(--surface2); }
+  .msg-system .msg-avatar { background: rgba(236,72,153,.2); }
+  .msg-body { flex: 1; }
+  .msg-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .msg-text { background: var(--surface); padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+  .msg-agent .msg-text { background: var(--surface2); }
+  .msg-system .msg-text { background: rgba(236,72,153,.08); border: 1px solid rgba(236,72,153,.2); font-size: 12px; color: var(--pink); }
+  .forbidden-highlight { background: rgba(239,68,68,.2); border-radius: 3px; padding: 0 2px; color: var(--red); font-weight: 600; }
+
+  .tool-call { margin: 6px 0; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-family: 'Fira Code', monospace; }
+  .tool-call .tool-name { color: var(--accent2); font-weight: 600; }
+  .tool-call .tool-result { color: var(--green); margin-top: 4px; }
+  .tool-call .tool-error { color: var(--red); margin-top: 4px; }
+  .tool-call .fault-tag { background: var(--red); color: white; padding: 1px 6px; border-radius: 4px; font-size: 10px; margin-left: 8px; }
+  .harness-tag { background: var(--pink); color: white; padding: 1px 6px; border-radius: 4px; font-size: 10px; }
+
+  /* Score cards */
+  .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .score-card { background: var(--surface); border-radius: 12px; padding: 16px; text-align: center; }
+  .score-card .label { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  .score-card .value { font-size: 28px; font-weight: 700; }
+  .score-card .sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+  .check-list { margin-bottom: 24px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; background: var(--surface); border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+  .check-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .check-dim { font-size: 11px; color: var(--accent2); background: rgba(99,102,241,.1); padding: 1px 8px; border-radius: 4px; margin-right: 8px; }
+  .check-type { font-size: 11px; color: var(--text2); background: var(--surface2); padding: 1px 6px; border-radius: 4px; }
+
+  /* Step timeline */
+  .step-timeline { position: relative; }
+  .step-item { display: flex; gap: 16px; margin-bottom: 0; position: relative; }
+  .step-line { width: 32px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .step-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; z-index: 1; }
+  .step-connector { width: 2px; flex: 1; min-height: 20px; }
+  .step-dot-completed { background: var(--green); color: #000; }
+  .step-dot-failed { background: var(--red); color: white; }
+  .step-dot-skipped { background: var(--orange); color: white; }
+  .step-dot-pending { background: var(--surface2); color: var(--text2); border: 2px solid var(--border); }
+  .step-dot-in_progress { background: var(--accent); color: white; animation: pulse 1.5s infinite; }
+  .step-connector-done { background: var(--green); }
+  .step-connector-pending { background: var(--border); }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+  .step-content { flex: 1; padding-bottom: 20px; }
+  .step-header { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .step-detail { font-size: 12px; color: var(--text2); }
+  .step-evidence { font-size: 12px; color: var(--text2); background: var(--surface); padding: 6px 10px; border-radius: 6px; margin-top: 6px; font-style: italic; }
+  .step-branch { font-size: 11px; color: var(--cyan); margin-top: 4px; }
+
+  /* Diagnosis */
+  .diagnosis-card { background: var(--surface); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .diagnosis-card h3 { font-size: 14px; margin-bottom: 12px; }
+  .diagnosis-severity { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .severity-critical { background: rgba(239,68,68,.15); color: var(--red); }
+  .severity-major { background: rgba(249,115,22,.15); color: var(--orange); }
+  .severity-minor { background: rgba(234,179,8,.15); color: var(--yellow); }
+  .severity-none { background: rgba(34,197,94,.15); color: var(--green); }
+  .failure-mode-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px 4px 2px 0; background: rgba(239,68,68,.1); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
+  .rec-item { padding: 8px 12px; background: var(--bg); border-radius: 6px; margin-bottom: 6px; font-size: 13px; border-left: 3px solid var(--accent); }
+
+  /* Harness panel */
+  .harness-stat { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .harness-stat-card { background: var(--surface); border-radius: 10px; padding: 14px 18px; min-width: 120px; }
+  .harness-stat-card .label { font-size: 11px; color: var(--text2); }
+  .harness-stat-card .value { font-size: 24px; font-weight: 700; color: var(--pink); }
+  .intervention-item { display: flex; gap: 12px; padding: 10px 14px; background: var(--surface); border-radius: 8px; margin-bottom: 6px; font-size: 13px; align-items: flex-start; }
+  .intervention-type { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
+  .itype-force_query_order { background: rgba(6,182,212,.15); color: var(--cyan); }
+  .itype-step_injection { background: rgba(99,102,241,.15); color: var(--accent2); }
+  .itype-forbidden_word_block { background: rgba(239,68,68,.15); color: var(--red); }
+  .itype-forbidden_word_sanitize { background: rgba(249,115,22,.15); color: var(--orange); }
+  .itype-emotion_protection { background: rgba(236,72,153,.15); color: var(--pink); }
+  .itype-step_gating { background: rgba(234,179,8,.15); color: var(--yellow); }
+  .itype-closing_injection { background: rgba(34,197,94,.15); color: var(--green); }
+
+  /* Ledger (restaurant) */
+  .ledger-entry { background: var(--surface); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+  .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .ledger-status { padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .status-satisfied { background: rgba(34,197,94,.15); color: var(--green); }
+  .status-violated { background: rgba(239,68,68,.15); color: var(--red); }
+  .status-unknown, .status-not_evaluated { background: rgba(161,161,170,.15); color: var(--text2); }
+  .ledger-events { margin-left: 16px; border-left: 2px solid var(--border); padding-left: 16px; }
+  .ledger-event { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+  .ledger-event strong { color: var(--text); }
+
+  /* Forbidden violations */
+  .violation-card { background: var(--surface); border-radius: 10px; padding: 14px; margin-bottom: 10px; border-left: 3px solid var(--red); }
+  .violation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .violation-severity { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .vsev-critical { background: rgba(239,68,68,.15); color: var(--red); }
+  .vsev-major { background: rgba(249,115,22,.15); color: var(--orange); }
+  .vsev-minor { background: rgba(234,179,8,.15); color: var(--yellow); }
+
+  /* Radar chart */
+  .radar-container { display: flex; justify-content: center; margin-bottom: 24px; }
+  .radar-container svg { max-width: 380px; width: 100%; }
+  .radar-label { font-size: 11px; fill: var(--text2); font-family: -apple-system, 'Segoe UI', sans-serif; }
+  .radar-value-label { font-size: 10px; fill: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-weight: 600; }
+
+  /* Score breakdown tree */
+  .breakdown-tree { background: var(--surface); border-radius: 12px; padding: 20px; margin-bottom: 24px; font-family: 'Fira Code', Consolas, monospace; font-size: 13px; line-height: 2; }
+  .breakdown-tree .tree-root { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .breakdown-tree .tree-line { white-space: pre; }
+  .breakdown-tree .tree-branch { color: var(--text2); }
+  .breakdown-tree .tree-label { color: var(--text); }
+  .breakdown-tree .tree-weight { color: var(--accent2); font-size: 11px; }
+  .breakdown-tree .tree-value { font-weight: 700; }
+  .breakdown-tree .tree-value-high { color: var(--green); }
+  .breakdown-tree .tree-value-mid { color: var(--yellow); }
+  .breakdown-tree .tree-value-low { color: var(--red); }
+  .breakdown-tree .tree-veto { color: var(--red); font-weight: 600; }
+  .breakdown-tree .tree-veto-none { color: var(--green); }
+  .breakdown-tree summary { cursor: pointer; font-weight: 700; font-size: 14px; margin-bottom: 4px; color: var(--text); }
+  .breakdown-tree summary:hover { color: var(--accent2); }
+
+  /* Three-layer score sections */
+  .layer-section { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .layer-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; font-weight: 600; }
+  .layer-badge { padding: 2px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+  .layer-badge-evidence { background: rgba(99,102,241,.15); color: var(--accent2); }
+  .layer-badge-quality { background: rgba(6,182,212,.15); color: var(--cyan); }
+  .layer-badge-safety { background: rgba(239,68,68,.15); color: var(--red); }
+  .layer-score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+  .layer-score-item { text-align: center; padding: 10px 6px; background: var(--bg); border-radius: 8px; }
+  .layer-score-item .label { font-size: 10px; color: var(--text2); margin-bottom: 4px; }
+  .layer-score-item .value { font-size: 22px; font-weight: 700; }
+  .layer-score-item .weight { font-size: 9px; color: var(--accent2); }
+  .layer-meta { font-size: 11px; color: var(--text2); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+
+  /* Progress rate bar */
+  .progress-rate-bar { height: 4px; border-radius: 2px; background: var(--surface2); margin-top: 6px; overflow: hidden; }
+  .progress-rate-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+  .progress-rate-label { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+  .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .empty { text-align: center; padding: 60px; color: var(--text2); }
+  .empty h2 { font-size: 20px; margin-bottom: 8px; color: var(--text); }
+
+  /* Rubric bar chart */
+  .rubric-dim { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .rubric-label { width: 120px; font-size: 13px; text-align: right; flex-shrink: 0; }
+  .rubric-bar-bg { flex: 1; height: 20px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .rubric-bar { height: 100%; border-radius: 4px; transition: width .3s; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 11px; font-weight: 600; }
+  .rubric-score { width: 36px; text-align: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+
+  /* Overview */
+  .overview-matrix { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .overview-matrix th { padding: 10px 12px; background: var(--surface); text-align: left; font-weight: 600; position: sticky; top: 0; }
+  .overview-matrix td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .overview-matrix tr:hover td { background: var(--surface); }
+  .overview-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .overview-stat { background: var(--surface); border-radius: 12px; padding: 16px; text-align: center; }
+  .overview-stat .label { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  .overview-stat .value { font-size: 28px; font-weight: 700; }
+  .heat-cell { padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; display: inline-block; min-width: 48px; text-align: center; }
+
+  /* Heatmap table */
+  .heatmap-section { margin-top: 24px; }
+  .heatmap-table { width: 100%; border-collapse: separate; border-spacing: 3px; font-size: 13px; }
+  .heatmap-table th { padding: 10px 12px; background: var(--surface); text-align: left; font-weight: 600; border-radius: 6px; white-space: nowrap; }
+  .heatmap-table th.corner { background: transparent; }
+  .heatmap-table th.scenario-col { text-align: center; font-size: 12px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+  .heatmap-table td.model-label { padding: 10px 12px; background: var(--surface); font-weight: 600; border-radius: 6px; white-space: nowrap; }
+  .heatmap-cell { padding: 10px 8px; border-radius: 6px; text-align: center; font-weight: 700; font-size: 14px; transition: opacity .15s; cursor: default; min-width: 60px; }
+  .heatmap-cell:hover { opacity: .85; }
+  .heatmap-empty { background: var(--surface2); color: var(--text2); font-weight: 400; font-size: 12px; }
+
+  /* Rubric radar specific */
+  .rubric-radar-container { display: flex; justify-content: center; margin-bottom: 24px; }
+  .rubric-radar-container svg { max-width: 380px; width: 100%; }
+  .rubric-radar-label { font-size: 11px; fill: var(--text2); font-family: -apple-system, 'Segoe UI', sans-serif; }
+  .rubric-radar-value { font-size: 10px; fill: var(--accent2); font-family: -apple-system, 'Segoe UI', sans-serif; font-weight: 700; }
+  .failure-rank { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--surface); border-radius: 8px; margin-bottom: 6px; }
+  .failure-rank-bar { height: 8px; border-radius: 4px; background: var(--red); }
+
+  /* Compare mode */
+  .compare-bar { display: none; padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .compare-bar.show { display: flex; align-items: center; gap: 10px; }
+  .compare-bar .count { font-size: 12px; color: var(--text2); flex: 1; }
+  .compare-btn { padding: 5px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: var(--accent); color: white; transition: opacity .15s; }
+  .compare-btn:hover { opacity: .85; }
+  .compare-btn:disabled { opacity: .4; cursor: default; }
+  .compare-btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+  .trace-item .cb { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-right: 4px; }
+  .compare-split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .compare-col { min-width: 0; }
+  .compare-col-header { font-size: 14px; font-weight: 700; margin-bottom: 12px; padding: 8px 12px; border-radius: 8px; text-align: center; }
+  .compare-col-a .compare-col-header { background: rgba(99,102,241,.15); color: var(--accent2); }
+  .compare-col-b .compare-col-header { background: rgba(236,72,153,.15); color: var(--pink); }
+  .compare-metric { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface); border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+  .compare-metric .metric-label { color: var(--text2); }
+  .compare-metric .metric-val { font-weight: 700; font-size: 16px; }
+  .compare-delta { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .delta-positive { background: rgba(34,197,94,.15); color: var(--green); }
+  .delta-negative { background: rgba(239,68,68,.15); color: var(--red); }
+  .delta-neutral { background: rgba(161,161,170,.15); color: var(--text2); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>Agent 对话评测</h1>
+      <p>复杂指令下的多轮对话评测系统</p>
+      <div style="margin-top:8px;"><button class="compare-btn" onclick="loadTraces()" style="font-size:11px;padding:3px 10px;">刷新列表</button></div>
+    </div>
+    <div class="filter-bar" id="filterBar">
+      <div class="filter-chip active" data-filter="all" onclick="setFilter('all')">全部</div>
+      <div class="filter-chip" data-filter="outbound_call" onclick="setFilter('outbound_call')">外呼</div>
+      <div class="filter-chip" data-filter="restaurant" onclick="setFilter('restaurant')">订餐</div>
+      <div class="filter-chip" data-filter="harness" onclick="setFilter('harness')">有护栏</div>
+      <div class="filter-chip" data-filter="raw" onclick="setFilter('raw')">无护栏</div>
+      <div class="filter-chip" id="compareToggle" onclick="toggleCompareMode()" style="margin-left:auto;border-color:var(--accent);">对比模式</div>
+    </div>
+    <div class="compare-bar" id="compareBar">
+      <div class="count" id="compareCount">已选 0/2</div>
+      <button class="compare-btn" id="compareLaunch" disabled onclick="launchCompare()">对比</button>
+      <button class="compare-btn compare-btn-cancel" onclick="cancelCompare()">取消</button>
+    </div>
+    <div class="trace-list" id="traceList"></div>
+  </div>
+  <div class="main">
+    <div class="main-header">
+      <div class="main-title" id="traceTitle"></div>
+      <div class="tabs" id="tabBar"></div>
+    </div>
+    <div class="main-content" id="mainContent">
+      <div class="empty">
+        <h2>加载中...</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allTraces = [];
+let currentTrace = null;
+let currentTab = 'conversation';
+let currentFilter = 'all';
+let compareMode = false;
+let compareSelected = [];  // [id1, id2]
+let compareTraces = [null, null];
+
+async function loadTraces() {
+  const res = await fetch('/api/traces');
+  allTraces = await res.json();
+  renderTraceList();
+  if (!currentTrace && !compareMode) showOverview();
+}
+
+async function showOverview() {
+  document.getElementById('traceTitle').textContent = '总览';
+  document.getElementById('tabBar').innerHTML = '<div class="tab active">全局概览</div>';
+  const [overviewRes, chartRes] = await Promise.all([
+    fetch('/api/overview'),
+    fetch('/api/chart-data'),
+  ]);
+  const data = await overviewRes.json();
+  const chartData = await chartRes.json();
+  let html = renderOverview(data);
+  // Append heatmap if there's data
+  if (chartData.models && chartData.models.length && chartData.scenarios && chartData.scenarios.length) {
+    html += buildHeatmap(chartData);
+  }
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function renderOverview(data) {
+  if (!data.matrix.length) {
+    return '<div class="empty"><h2>暂无评测数据</h2><p>运行 <code>python run_outbound.py</code> 生成评测</p></div>';
+  }
+  const {matrix, models, scenarios, stats} = data;
+  const scoreColor = v => v >= 0.7 ? 'var(--green)' : v >= 0.4 ? 'var(--yellow)' : 'var(--red)';
+  const pct = v => v != null ? (v*100).toFixed(0)+'%' : '—';
+  const heatBg = v => v >= 0.7 ? 'rgba(34,197,94,.15)' : v >= 0.4 ? 'rgba(234,179,8,.15)' : 'rgba(239,68,68,.15)';
+
+  let html = '<div class="overview-stats">';
+  html += `<div class="overview-stat"><div class="label">总评测数</div><div class="value" style="color:var(--accent)">${stats.total_traces}</div></div>`;
+  html += `<div class="overview-stat"><div class="label">平均分</div><div class="value" style="color:${scoreColor(stats.avg_score)}">${pct(stats.avg_score)}</div></div>`;
+  html += `<div class="overview-stat"><div class="label">最高分</div><div class="value" style="color:var(--green)">${pct(stats.max_score)}</div></div>`;
+  html += `<div class="overview-stat"><div class="label">最低分</div><div class="value" style="color:var(--red)">${pct(stats.min_score)}</div></div>`;
+  if (stats.rule_ratio != null) {
+    html += `<div class="overview-stat"><div class="label">确定性评分占比</div><div class="value" style="color:var(--green)">${pct(stats.rule_ratio)}</div><div style="font-size:10px;color:var(--text2);margin-top:4px;">${stats.rule_checks || 0} 规则 / ${stats.llm_checks || 0} LLM</div></div>`;
+  }
+  if (stats.estimated_cost_usd != null) {
+    const tokenInfo = stats.total_tracked_tokens
+      ? `<div style="font-size:10px;color:var(--text2);margin-top:4px;">${(stats.total_tracked_tokens/1000).toFixed(1)}K tokens · ${stats.total_tracked_calls || 0} 次调用</div>`
+      : '';
+    html += `<div class="overview-stat"><div class="label">评测总成本估算</div><div class="value" style="color:var(--cyan);font-size:22px;">$${stats.estimated_cost_usd.toFixed(4)}</div>${tokenInfo}</div>`;
+  }
+  html += '</div>';
+
+  // Model × Scenario matrix
+  html += '<div class="section-title">模型 × 场景 得分矩阵</div>';
+  html += '<table class="overview-matrix"><thead><tr><th>模型/配置</th><th>场景</th><th>难度</th><th>综合</th><th>硬指标</th><th>进展率</th><th>域</th></tr></thead><tbody>';
+  for (const row of matrix) {
+    const prCell = row.progress_rate != null
+      ? `<span class="heat-cell" style="background:${heatBg(row.progress_rate)};color:${scoreColor(row.progress_rate)}">${pct(row.progress_rate)}</span>`
+      : '<span style="color:var(--text2)">—</span>';
+    html += `<tr>
+      <td><strong>${esc(row.label)}</strong></td>
+      <td>${esc(row.scenario)}</td>
+      <td>${esc(row.difficulty)}</td>
+      <td><span class="heat-cell" style="background:${heatBg(row.overall_score)};color:${scoreColor(row.overall_score)}">${pct(row.overall_score)}</span></td>
+      <td><span class="heat-cell" style="background:${heatBg(row.hard_score)};color:${scoreColor(row.hard_score)}">${pct(row.hard_score)}</span></td>
+      <td>${prCell}</td>
+      <td><span class="badge badge-${row.domain === 'outbound_call' ? 'outbound' : 'restaurant'}">${row.domain === 'outbound_call' ? '外呼' : '订餐'}</span></td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+
+  // pass^k reproducibility table
+  if (stats.pass_k && stats.pass_k.length) {
+    html += '<div class="section-title" style="margin-top:24px;">可复现性分析 (pass^k, τ-bench 方法)</div>';
+    html += '<table class="overview-matrix"><thead><tr><th>场景</th><th>模型</th><th>运行次数</th><th>pass^1</th><th>pass^2</th><th>pass^3</th></tr></thead><tbody>';
+    for (const pk of stats.pass_k) {
+      const p1Color = scoreColor(pk.pass_k1);
+      const p2Color = scoreColor(pk.pass_k2);
+      const p3Color = scoreColor(pk.pass_k3);
+      html += `<tr>
+        <td>${esc(pk.scenario)}</td>
+        <td>${esc(pk.model)}</td>
+        <td style="text-align:center">${pk.runs}</td>
+        <td><span class="heat-cell" style="background:${heatBg(pk.pass_k1)};color:${p1Color}">${pct(pk.pass_k1)}</span></td>
+        <td><span class="heat-cell" style="background:${heatBg(pk.pass_k2)};color:${p2Color}">${pct(pk.pass_k2)}</span></td>
+        <td><span class="heat-cell" style="background:${heatBg(pk.pass_k3)};color:${p3Color}">${pct(pk.pass_k3)}</span></td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    html += '<div style="font-size:11px;color:var(--text2);margin-top:6px;">pass^k = 连续 k 次全部通过的概率（阈值 60%）。值越高 → Agent 行为越稳定</div>';
+  }
+
+  // Top failure modes
+  if (stats.top_failure_modes && stats.top_failure_modes.length) {
+    const modeLabels = {
+      premature_termination: '过早终止', step_skipping: '步骤跳过',
+      instruction_misread: '指令误读', context_loss: '上下文丢失',
+      template_leakage: '模板泄露', tool_avoidance: '工具回避',
+      emotion_mishandle: '情绪处理失当', branch_error: '分支错误',
+      overcommit: '越权承诺', mechanical_response: '机械式回复',
+    };
+    const maxCount = stats.top_failure_modes[0].count;
+    html += '<div class="section-title" style="margin-top:24px;">最常见失败模式 Top 5</div>';
+    for (const fm of stats.top_failure_modes) {
+      const barW = (fm.count / maxCount * 100).toFixed(0);
+      const label = modeLabels[fm.mode] || fm.mode;
+      html += `<div class="failure-rank">
+        <div style="width:120px;font-size:13px;">${esc(label)}</div>
+        <div style="flex:1;"><div class="failure-rank-bar" style="width:${barW}%"></div></div>
+        <div style="font-size:14px;font-weight:700;color:var(--red);">${fm.count}</div>
+      </div>`;
+    }
+  }
+  return html;
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(el =>
+    el.classList.toggle('active', el.dataset.filter === f));
+  renderTraceList();
+}
+
+function renderTraceList() {
+  const list = document.getElementById('traceList');
+  const filtered = currentFilter === 'all' ? allTraces
+    : currentFilter === 'harness' ? allTraces.filter(t => t.has_harness)
+    : currentFilter === 'raw' ? allTraces.filter(t => !t.has_harness)
+    : allTraces.filter(t => t.domain === currentFilter);
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:20px;color:var(--text2);font-size:13px;">没有匹配的评测记录。</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(t => {
+    const domainBadge = t.domain === 'outbound_call'
+      ? '<span class="badge badge-outbound">外呼</span>'
+      : '<span class="badge badge-restaurant">订餐</span>';
+    const harnessBadge = t.has_harness ? '<span class="badge badge-harness">H</span>' : '';
+    const model = t.model && t.model !== 'claude_cli' ? `<span>${t.model}</span>` : '';
+    const scoreClass = t.overall_score >= 0.7 ? 'score-high' : t.overall_score >= 0.4 ? 'score-mid' : 'score-low';
+    const cbChecked = compareSelected.includes(t.id) ? 'checked' : '';
+    const cbHtml = compareMode ? `<input type="checkbox" class="cb" ${cbChecked} onclick="event.stopPropagation();toggleCompareSelect('${t.id}')">` : '';
+    const clickAction = compareMode ? `toggleCompareSelect('${t.id}')` : `loadTrace('${t.id}')`;
+    const prBar = t.progress_rate != null
+      ? `<div class="progress-rate-bar"><div class="progress-rate-fill" style="width:${(t.progress_rate*100).toFixed(0)}%;background:${t.progress_rate >= 0.7 ? 'var(--green)' : t.progress_rate >= 0.4 ? 'var(--yellow)' : 'var(--red)'}"></div></div>
+         <div class="progress-rate-label">进展率 ${(t.progress_rate*100).toFixed(0)}%</div>`
+      : '';
+    return `<div class="trace-item" onclick="${clickAction}" id="item-${t.id}">
+      <div class="name">${cbHtml}${domainBadge} ${harnessBadge} ${esc(t.scenario_name)}</div>
+      <div class="meta">
+        <span class="score-badge ${scoreClass}">${(t.overall_score*100).toFixed(0)}%</span>
+        <span>${t.turns} 轮</span>
+        <span>${t.failures} 个问题</span>
+        <span>${t.difficulty}</span>
+        ${model}
+      </div>
+      ${prBar}
+    </div>`;
+  }).join('');
+}
+
+async function loadTrace(id) {
+  document.querySelectorAll('.trace-item').forEach(el => el.classList.remove('active'));
+  const item = document.getElementById('item-' + id);
+  if (item) item.classList.add('active');
+
+  const res = await fetch(`/api/traces/${id}`);
+  currentTrace = await res.json();
+  document.getElementById('traceTitle').textContent = currentTrace.scenario.name;
+  buildTabs();
+  currentTab = 'conversation';
+  renderTab();
+}
+
+function buildTabs() {
+  const domain = (currentTrace.metadata || {}).domain || 'restaurant';
+  const hasHarness = !!(currentTrace.metadata || {}).harness_summary;
+  const hasDiagnosis = !!(currentTrace.metadata || {}).diagnosis;
+  let tabs = [
+    {id: 'conversation', label: '对话回放'},
+    {id: 'scores', label: '评分详情'},
+  ];
+  if (domain === 'outbound_call') {
+    tabs.push({id: 'steps', label: '步骤流程'});
+    if (hasDiagnosis) tabs.push({id: 'diagnosis', label: '诊断报告'});
+    if (hasHarness) tabs.push({id: 'harness', label: 'Harness'});
+  } else {
+    tabs.push({id: 'ledger', label: '约束账本'});
+  }
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = tabs.map(t =>
+    `<div class="tab${t.id === currentTab ? ' active' : ''}" data-tab="${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`
+  ).join('');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(el =>
+    el.classList.toggle('active', el.dataset.tab === tab));
+  renderTab();
+}
+
+function renderTab() {
+  if (!currentTrace) return;
+  const el = document.getElementById('mainContent');
+  switch (currentTab) {
+    case 'conversation': el.innerHTML = renderConversation(); break;
+    case 'scores': el.innerHTML = renderScores(); break;
+    case 'steps': el.innerHTML = renderSteps(); break;
+    case 'diagnosis': el.innerHTML = renderDiagnosis(); break;
+    case 'harness': el.innerHTML = renderHarness(); break;
+    case 'ledger': el.innerHTML = renderLedger(); break;
+  }
+}
+
+// ── Conversation ──
+function renderConversation() {
+  const msgs = currentTrace.conversation.messages;
+  const domain = (currentTrace.metadata || {}).domain || 'restaurant';
+  const forbiddenKws = getForbiddenKeywords();
+
+  return msgs.map(m => {
+    const isUser = m.role === 'user';
+    const isSystem = m.role === 'system';
+    const cls = isSystem ? 'system' : (isUser ? 'user' : 'agent');
+    const avatar = isSystem ? '⚙' : (isUser ? '👤' : '🤖');
+    let label;
+    if (isSystem) label = `系统提醒 · 第${m.turn}轮`;
+    else if (isUser && domain === 'outbound_call') label = `被叫方 · 第${m.turn}轮`;
+    else if (isUser) label = `用户 · 第${m.turn}轮`;
+    else label = `Agent · 第${m.turn}轮`;
+
+    let content = esc(m.content);
+    if (!isUser && !isSystem && forbiddenKws.length) {
+      for (const kw of forbiddenKws) {
+        const re = new RegExp(escRegex(esc(kw)), 'gi');
+        content = content.replace(re, `<span class="forbidden-highlight">$&</span>`);
+      }
+    }
+
+    let toolHtml = '';
+    if (m.tool_calls && m.tool_calls.length) {
+      toolHtml = m.tool_calls.map(tc => {
+        const faultTag = tc.fault_injected ? '<span class="fault-tag">故障注入</span>' : '';
+        const result = tc.error
+          ? `<div class="tool-error">✗ ${esc(tc.error)}</div>`
+          : `<div class="tool-result">✓ ${esc(JSON.stringify(tc.result).slice(0, 200))}</div>`;
+        return `<div class="tool-call">
+          <span class="tool-name">${tc.tool_name}</span>(${esc(JSON.stringify(tc.arguments).slice(0,120))})${faultTag}
+          ${result}
+        </div>`;
+      }).join('');
+    }
+    return `<div class="msg msg-${cls}">
+      <div class="msg-avatar">${avatar}</div>
+      <div class="msg-body">
+        <div class="msg-label">${label}</div>
+        <div class="msg-text">${content}</div>
+        ${toolHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Radar Chart (pure SVG) ──
+function buildRadarChart(dimensions) {
+  // dimensions: [{label, value}] where value is 0-1
+  const n = dimensions.length;
+  if (n < 3) return '';
+  const cx = 190, cy = 180, R = 130;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2; // top
+
+  function polar(angle, r) {
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+
+  let svg = `<div class="radar-container"><svg viewBox="0 0 380 360" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Background grid rings (5 levels: 20%, 40%, 60%, 80%, 100%)
+  for (let level = 1; level <= 5; level++) {
+    const r = R * (level / 5);
+    let pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = startAngle + i * angleStep;
+      const p = polar(a, r);
+      pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
+    }
+    svg += `<polygon points="${pts.join(' ')}" fill="none" stroke="#2d3148" stroke-width="${level === 5 ? 1.5 : 0.5}" opacity="${level === 5 ? 0.8 : 0.4}" />`;
+  }
+
+  // Axis lines
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const p = polar(a, R);
+    svg += `<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="#2d3148" stroke-width="0.5" opacity="0.6" />`;
+  }
+
+  // Data polygon
+  let dataPts = [];
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const v = Math.max(0, Math.min(1, dimensions[i].value));
+    const p = polar(a, R * v);
+    dataPts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
+  }
+  svg += `<polygon points="${dataPts.join(' ')}" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="2" />`;
+
+  // Data dots + value labels
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const v = Math.max(0, Math.min(1, dimensions[i].value));
+    const p = polar(a, R * v);
+    svg += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#6366f1" stroke="#0f1117" stroke-width="2" />`;
+    // Value label near the dot
+    const vLabelR = R * v + 12;
+    const vp = polar(a, Math.min(vLabelR, R + 10));
+    svg += `<text x="${vp.x.toFixed(1)}" y="${vp.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" class="radar-value-label">${(v * 100).toFixed(0)}%</text>`;
+  }
+
+  // Dimension labels (outside the chart)
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const lp = polar(a, R + 28);
+    let anchor = 'middle';
+    if (Math.cos(a) < -0.1) anchor = 'end';
+    else if (Math.cos(a) > 0.1) anchor = 'start';
+    svg += `<text x="${lp.x.toFixed(1)}" y="${lp.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" class="radar-label">${dimensions[i].label}</text>`;
+  }
+
+  // Grid level labels (right side of top axis)
+  for (let level = 1; level <= 5; level++) {
+    const r = R * (level / 5);
+    const p = polar(startAngle, r);
+    svg += `<text x="${(p.x + 6).toFixed(1)}" y="${(p.y - 2).toFixed(1)}" fill="#52526b" font-size="9" font-family="-apple-system, sans-serif">${level * 20}</text>`;
+  }
+
+  svg += '</svg></div>';
+  return svg;
+}
+
+// ── Heatmap (model × scenario, HTML table) ──
+function buildHeatmap(chartData) {
+  // chartData: {models: [], scenarios: [], scores: {"model|scenario": 72.5, ...}}
+  const {models, scenarios, scores} = chartData;
+  if (!models.length || !scenarios.length) return '';
+
+  // Shorten model names for display
+  function shortModel(m) {
+    return m.replace('claude-', '').replace('-20251001', '').replace('-20250514', '');
+  }
+  // Shorten scenario names
+  function shortScenario(s) {
+    return s.length > 18 ? s.slice(0, 16) + '…' : s;
+  }
+
+  let html = '<div class="heatmap-section">';
+  html += '<div class="section-title">模型 × 场景 热力图</div>';
+  html += '<table class="heatmap-table"><thead><tr>';
+  html += '<th class="corner"></th>';
+  for (const sc of scenarios) {
+    html += '<th class="scenario-col" title="' + esc(sc) + '">' + esc(shortScenario(sc)) + '</th>';
+  }
+  html += '</tr></thead><tbody>';
+
+  for (const model of models) {
+    html += '<tr>';
+    html += '<td class="model-label">' + esc(shortModel(model)) + '</td>';
+    for (const sc of scenarios) {
+      const key = model + '|' + sc;
+      const val = scores[key];
+      if (val != null) {
+        let bg, fg;
+        if (val >= 70) {
+          bg = 'rgba(34,197,94,.2)'; fg = 'var(--green)';
+        } else if (val >= 40) {
+          bg = 'rgba(234,179,8,.2)'; fg = 'var(--yellow)';
+        } else {
+          bg = 'rgba(239,68,68,.2)'; fg = 'var(--red)';
+        }
+        html += '<td class="heatmap-cell" style="background:' + bg + ';color:' + fg + '">' + val.toFixed(0) + '%</td>';
+      } else {
+        html += '<td class="heatmap-cell heatmap-empty">—</td>';
+      }
+    }
+    html += '</tr>';
+  }
+
+  html += '</tbody></table></div>';
+  return html;
+}
+
+// ── Rubric Radar Chart (D1-D6, 0-5 scale, pure SVG) ──
+function buildRubricRadar(rubricDimensions) {
+  // rubricDimensions: [{dimension_id, name, score}] where score is 0-5
+  if (!rubricDimensions || rubricDimensions.length < 3) return '';
+  const n = rubricDimensions.length;
+  const maxScore = 5;
+  const cx = 190, cy = 190, R = 130;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2;
+
+  function polar(angle, r) {
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+
+  let svg = '<div class="rubric-radar-container"><svg viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">';
+
+  // Background grid: 3 concentric hexagons at 1.67, 3.33, 5.0
+  const gridLevels = [1.67, 3.33, 5.0];
+  for (let li = 0; li < gridLevels.length; li++) {
+    const level = gridLevels[li];
+    const r = R * (level / maxScore);
+    let pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = startAngle + i * angleStep;
+      const p = polar(a, r);
+      pts.push(p.x.toFixed(1) + ',' + p.y.toFixed(1));
+    }
+    const isOuter = li === gridLevels.length - 1;
+    svg += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="var(--border)" stroke-width="' + (isOuter ? '1.5' : '0.7') + '" opacity="' + (isOuter ? '0.8' : '0.4') + '" />';
+  }
+
+  // 6 axis lines
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const p = polar(a, R);
+    svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p.x.toFixed(1) + '" y2="' + p.y.toFixed(1) + '" stroke="var(--border)" stroke-width="0.7" opacity="0.5" />';
+  }
+
+  // Data polygon
+  let dataPts = [];
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const v = Math.max(0, Math.min(maxScore, rubricDimensions[i].score || 0));
+    const p = polar(a, R * (v / maxScore));
+    dataPts.push(p.x.toFixed(1) + ',' + p.y.toFixed(1));
+  }
+  svg += '<polygon points="' + dataPts.join(' ') + '" fill="rgba(99,102,241,0.2)" stroke="var(--accent)" stroke-width="2" />';
+
+  // Data dots + score value labels
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const v = Math.max(0, Math.min(maxScore, rubricDimensions[i].score || 0));
+    const p = polar(a, R * (v / maxScore));
+    svg += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="2" />';
+    // Score value near the dot
+    const labelR = R * (v / maxScore) + 14;
+    const vp = polar(a, Math.min(labelR, R + 12));
+    svg += '<text x="' + vp.x.toFixed(1) + '" y="' + vp.y.toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" class="rubric-radar-value">' + (v).toFixed(1) + '</text>';
+  }
+
+  // Dimension labels (outside)
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const lp = polar(a, R + 32);
+    let anchor = 'middle';
+    if (Math.cos(a) < -0.1) anchor = 'end';
+    else if (Math.cos(a) > 0.1) anchor = 'start';
+    const dimId = rubricDimensions[i].dimension_id || ('D' + (i + 1));
+    const dimName = rubricDimensions[i].name || '';
+    svg += '<text x="' + lp.x.toFixed(1) + '" y="' + lp.y.toFixed(1) + '" text-anchor="' + anchor + '" dominant-baseline="middle" class="rubric-radar-label">' + dimId + ' ' + dimName + '</text>';
+  }
+
+  // Grid level labels along the first axis
+  for (let li = 0; li < gridLevels.length; li++) {
+    const level = gridLevels[li];
+    const r = R * (level / maxScore);
+    const p = polar(startAngle, r);
+    svg += '<text x="' + (p.x + 8).toFixed(1) + '" y="' + (p.y - 4).toFixed(1) + '" fill="var(--text2)" font-size="9" opacity="0.6" font-family="-apple-system, sans-serif">' + level.toFixed(1) + '</text>';
+  }
+
+  svg += '</svg></div>';
+  return svg;
+}
+
+// ── Score Breakdown Tree ──
+function buildBreakdownTree(r, ob) {
+  const pct = v => v != null ? (v * 100).toFixed(0) + '%' : '—';
+  const valClass = v => v >= 0.7 ? 'tree-value-high' : v >= 0.4 ? 'tree-value-mid' : 'tree-value-low';
+  const bd = r.score_breakdown || {};
+
+  // Weights: from score_breakdown or defaults
+  const wHard = bd.hard_weight || 0.30;
+  const wStep = bd.step_weight || 0.24;
+  const wBranch = bd.branch_weight || 0.14;
+  const wTemporal = bd.temporal_weight || 0.12;
+  const wAlign = bd.alignment_weight || 0.08;
+  const totalEvidence = wHard + wStep + wBranch + wTemporal + wAlign;
+  const wSoft = bd.soft_weight || 0.12;
+
+  const hardVal = r.hard_score;
+  const stepVal = ob.step_compliance_score;
+  const branchVal = ob.branch_accuracy_score;
+  const temporalVal = ob.temporal_order_score != null ? ob.temporal_order_score : (bd.temporal_order_score != null ? bd.temporal_order_score : null);
+  const alignVal = ob.alignment_score != null ? ob.alignment_score : (bd.alignment_score != null ? bd.alignment_score : null);
+  const softVal = r.soft_score;
+
+  const vetoCap = r.veto_cap || ob.veto_cap || bd.veto_cap || 'none';
+  const gateType = r.gate_type || ob.gate_type || bd.gate_type || 'none';
+  const vetoDisplay = vetoCap === 'none' ? 'none' : (gateType !== 'none' ? gateType + ' → ' + vetoCap : vetoCap);
+  const vetoClass = vetoCap === 'none' ? 'tree-veto-none' : 'tree-veto';
+
+  let html = '<div class="breakdown-tree"><details open><summary>得分结构分解</summary>';
+  html += '<div style="margin-top:8px;">';
+
+  // Root
+  html += `<div class="tree-root"><span class="tree-label">综合得分: </span><span class="tree-value ${valClass(r.overall_score)}">${pct(r.overall_score)}</span></div>`;
+
+  // Evidence layer
+  html += `<div class="tree-line"><span class="tree-branch">├── </span><span class="tree-label">客观证据层 </span><span class="tree-weight">(${(totalEvidence * 100).toFixed(0)}%权重)</span></div>`;
+  html += `<div class="tree-line"><span class="tree-branch">│   ├── </span><span class="tree-label">硬指标 </span><span class="tree-weight">(${(wHard * 100).toFixed(0)}%)</span>: <span class="tree-value ${valClass(hardVal)}">${pct(hardVal)}</span></div>`;
+  html += `<div class="tree-line"><span class="tree-branch">│   ├── </span><span class="tree-label">步骤遵循 </span><span class="tree-weight">(${(wStep * 100).toFixed(0)}%)</span>: <span class="tree-value ${valClass(stepVal)}">${pct(stepVal)}</span></div>`;
+  html += `<div class="tree-line"><span class="tree-branch">│   ├── </span><span class="tree-label">分支准确 </span><span class="tree-weight">(${(wBranch * 100).toFixed(0)}%)</span>: <span class="tree-value ${valClass(branchVal)}">${pct(branchVal)}</span></div>`;
+  html += `<div class="tree-line"><span class="tree-branch">│   ├── </span><span class="tree-label">时序约束 </span><span class="tree-weight">(${(wTemporal * 100).toFixed(0)}%)</span>: <span class="tree-value ${valClass(temporalVal)}">${temporalVal != null ? pct(temporalVal) : '—'}</span></div>`;
+  html += `<div class="tree-line"><span class="tree-branch">│   └── </span><span class="tree-label">路径对齐 </span><span class="tree-weight">(${(wAlign * 100).toFixed(0)}%)</span>: <span class="tree-value ${valClass(alignVal)}">${alignVal != null ? pct(alignVal) : '—'}</span></div>`;
+
+  // Soft layer
+  html += `<div class="tree-line"><span class="tree-branch">├── </span><span class="tree-label">软质量层 </span><span class="tree-weight">(${(wSoft * 100).toFixed(0)}%权重)</span></div>`;
+  html += `<div class="tree-line"><span class="tree-branch">│   └── </span><span class="tree-label">LLM评委</span>: <span class="tree-value ${valClass(softVal)}">${pct(softVal)}</span></div>`;
+
+  // Progress Rate (if available)
+  const pr = (currentTrace && (currentTrace.metadata || {}).outbound_report || {}).progress_rate;
+  if (pr != null) {
+    html += `<div class="tree-line"><span class="tree-branch">├── </span><span class="tree-label">子目标进展率</span>: <span class="tree-value ${valClass(pr)}">${pct(pr)}</span></div>`;
+  }
+
+  // Veto layer
+  html += `<div class="tree-line"><span class="tree-branch">└── </span><span class="tree-label">安全否决层</span></div>`;
+  html += `<div class="tree-line"><span class="tree-branch">    └── </span><span class="tree-label">封顶类型</span>: <span class="${vetoClass}">${esc(vetoDisplay)}</span></div>`;
+
+  html += '</div></details></div>';
+  return html;
+}
+
+// ── Scores ──
+function renderScores() {
+  const r = currentTrace.score_report;
+  const domain = (currentTrace.metadata || {}).domain || 'restaurant';
+  const ob = (currentTrace.metadata || {}).outbound_report || {};
+  const scoreColor = v => v >= 0.7 ? 'var(--green)' : v >= 0.4 ? 'var(--yellow)' : 'var(--red)';
+  const pct = v => v != null ? (v*100).toFixed(0)+'%' : '—';
+  const boolIcon = v => v ? '✓' : '✗';
+
+  let html = '';
+
+  // Rubric radar chart (D1-D6, 0-5 scale) — always show at top if rubric exists
+  const rubric = ob.rubric || r.rubric || {};
+  if (rubric.dimensions && rubric.dimensions.length >= 3) {
+    html += '<div class="section-title">维度雷达图</div>';
+    html += buildRubricRadar(rubric.dimensions);
+  }
+
+  // Radar chart for outbound domain
+  if (domain === 'outbound_call') {
+    const dims = [
+      {label: '硬指标', value: r.hard_score || 0},
+      {label: '步骤遵循', value: ob.step_compliance_score || 0},
+      {label: '分支准确', value: ob.branch_accuracy_score || 0},
+      {label: '时序约束', value: ob.temporal_order_score != null ? ob.temporal_order_score : ((r.score_breakdown || {}).temporal_order_score || 0)},
+      {label: '路径对齐', value: ob.alignment_score != null ? ob.alignment_score : ((r.score_breakdown || {}).alignment_score || 0)},
+      {label: '软质量', value: r.soft_score || 0},
+    ];
+    // Filter out dimensions that are all zero / missing — but keep at least 3
+    const nonZero = dims.filter(d => d.value > 0);
+    const radarDims = nonZero.length >= 3 ? nonZero : dims;
+    html += buildRadarChart(radarDims);
+  }
+
+  // Overall score card (always visible)
+  html += '<div class="score-grid">';
+  html += `<div class="score-card"><div class="label">综合得分</div><div class="value" style="color:${scoreColor(r.overall_score)}">${pct(r.overall_score)}</div></div>`;
+
+  // Cost card (if cost_summary available)
+  const costSummary = (currentTrace.run_metadata || {}).cost_summary || {};
+  if (costSummary.total_calls > 0) {
+    const costUsd = costSummary.estimated_cost_usd || 0;
+    const totalTokens = costSummary.total_tokens || 0;
+    html += `<div class="score-card"><div class="label">LLM 调用次数</div><div class="value" style="color:var(--accent)">${costSummary.total_calls}</div></div>`;
+    html += `<div class="score-card"><div class="label">总 Token 数</div><div class="value" style="color:var(--cyan);font-size:20px;">${(totalTokens/1000).toFixed(1)}K</div><div class="sub">${(costSummary.total_input_tokens||0).toLocaleString()} 入 / ${(costSummary.total_output_tokens||0).toLocaleString()} 出</div></div>`;
+    html += `<div class="score-card"><div class="label">估算费用</div><div class="value" style="color:var(--cyan);font-size:20px;">$${costUsd < 0.01 ? costUsd.toFixed(4) : costUsd.toFixed(2)}</div></div>`;
+  }
+  html += '</div>';
+
+  // Cost breakdown by purpose (if available)
+  if (costSummary.by_purpose && Object.keys(costSummary.by_purpose).length > 0) {
+    html += '<div class="section-title">成本按用途分布</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">';
+    const purposes = costSummary.by_purpose;
+    const totalTok = costSummary.total_tokens || 1;
+    const purposeLabels = {user_sim:'用户模拟', judge:'LLM评委', scorer:'评分器', diagnosis:'诊断', '':'未标注'};
+    for (const [purpose, data] of Object.entries(purposes)) {
+      const label = purposeLabels[purpose] || purpose;
+      const pctOfTotal = ((data.total_tokens / totalTok) * 100).toFixed(0);
+      html += `<div style="background:var(--surface);border-radius:10px;padding:12px 16px;min-width:140px;flex:1;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">${esc(label)}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--accent2);">${data.calls} 次</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;">${(data.total_tokens/1000).toFixed(1)}K tokens (${pctOfTotal}%)</div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (domain === 'outbound_call') {
+    const el = ob.evidence_layer || {};
+    const ql = ob.quality_layer || {};
+    const sl = ob.safety_layer || {};
+
+    // Layer 1: Objective Evidence
+    html += '<div class="layer-section">';
+    html += '<div class="layer-header"><span class="layer-badge layer-badge-evidence">客观证据层</span><span style="color:var(--text2)">88% 权重 · 确定性规则计算</span></div>';
+    html += '<div class="layer-score-grid">';
+    html += `<div class="layer-score-item"><div class="label">硬指标</div><div class="value" style="color:${scoreColor(el.hard != null ? el.hard : r.hard_score)}">${pct(el.hard != null ? el.hard : r.hard_score)}</div><div class="weight">30%</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">步骤遵循</div><div class="value" style="color:${scoreColor(el.step_compliance != null ? el.step_compliance : ob.step_compliance_score)}">${pct(el.step_compliance != null ? el.step_compliance : ob.step_compliance_score)}</div><div class="weight">24%</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">分支准确</div><div class="value" style="color:${scoreColor(el.branch_accuracy != null ? el.branch_accuracy : ob.branch_accuracy_score)}">${pct(el.branch_accuracy != null ? el.branch_accuracy : ob.branch_accuracy_score)}</div><div class="weight">14%</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">时序约束</div><div class="value" style="color:${scoreColor(el.temporal_order)}">${pct(el.temporal_order)}</div><div class="weight">12%</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">路径对齐</div><div class="value" style="color:${scoreColor(el.path_alignment)}">${pct(el.path_alignment)}</div><div class="weight">8%</div></div>`;
+    html += '</div>';
+    if (el.total != null) {
+      html += `<div class="layer-meta">客观证据总分: <strong style="color:${scoreColor(el.total)}">${pct(el.total)}</strong> (上限 88%)</div>`;
+    }
+    // Progress Rate bar (AgentBoard inspired)
+    const pr = ob.progress_rate;
+    if (pr != null) {
+      const prColor = pr >= 0.7 ? 'var(--green)' : pr >= 0.4 ? 'var(--yellow)' : 'var(--red)';
+      html += `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:12px;color:var(--text2);">子目标进展率（Progress Rate）</span>
+          <span style="font-size:16px;font-weight:700;color:${prColor}">${(pr*100).toFixed(0)}%</span>
+        </div>
+        <div style="height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;">
+          <div style="height:100%;width:${(pr*100).toFixed(0)}%;border-radius:4px;background:${prColor};transition:width .3s;"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text2);margin-top:4px;">区分"做了一半"和"完全没做"· AgentBoard 借鉴</div>
+      </div>`;
+    }
+    html += '</div>';
+
+    // Layer 2: Soft Quality
+    html += '<div class="layer-section">';
+    html += '<div class="layer-header"><span class="layer-badge layer-badge-quality">软质量层</span><span style="color:var(--text2)">12% 权重 · LLM 双评委 · 被客观分门控</span></div>';
+    html += '<div class="layer-score-grid">';
+    html += `<div class="layer-score-item"><div class="label">LLM 评分</div><div class="value" style="color:${scoreColor(ql.raw_score != null ? ql.raw_score : r.soft_score)}">${pct(ql.raw_score != null ? ql.raw_score : r.soft_score)}</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">门控系数</div><div class="value" style="font-size:18px">${ql.gate_value != null ? ql.gate_value.toFixed(2) : '—'}</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">实际贡献</div><div class="value" style="font-size:18px">${ql.gated_contribution != null ? (ql.gated_contribution * 100).toFixed(1) + '%' : '—'}</div></div>`;
+    html += '</div>';
+    html += '</div>';
+
+    // Layer 3: Safety Veto
+    const vetoCapVal = sl.veto_cap != null ? sl.veto_cap : (ob.veto_cap != null ? ob.veto_cap : 1);
+    const vetoColor = vetoCapVal < 1.0 ? 'var(--red)' : 'var(--green)';
+    html += '<div class="layer-section">';
+    html += '<div class="layer-header"><span class="layer-badge layer-badge-safety">安全否决层</span><span style="color:var(--text2)">非补偿性封顶</span></div>';
+    html += '<div class="layer-score-grid">';
+    html += `<div class="layer-score-item"><div class="label">封顶值</div><div class="value" style="color:${vetoColor}">${pct(vetoCapVal)}</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">门控类型</div><div class="value" style="font-size:14px">${esc(sl.gate_type || ob.gate_type || 'none')}</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">违规次数</div><div class="value" style="color:${(sl.violation_count || ob.forbidden_violation_count) ? 'var(--red)' : 'var(--green)'}">${sl.violation_count != null ? sl.violation_count : (ob.forbidden_violation_count || 0)}</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">开场白</div><div class="value" style="color:${ob.opening_correct ? 'var(--green)' : 'var(--red)'}; font-size:18px">${boolIcon(ob.opening_correct)}</div></div>`;
+    html += `<div class="layer-score-item"><div class="label">结束语</div><div class="value" style="color:${ob.closing_correct ? 'var(--green)' : 'var(--red)'}; font-size:18px">${boolIcon(ob.closing_correct)}</div></div>`;
+    html += '</div>';
+    html += '</div>';
+  } else {
+    // Non-outbound: keep flat cards
+    html += '<div class="score-grid">';
+    html += `<div class="score-card"><div class="label">硬指标</div><div class="value" style="color:${scoreColor(r.hard_score)}">${pct(r.hard_score)}</div></div>`;
+    html += `<div class="score-card"><div class="label">软指标</div><div class="value" style="color:${scoreColor(r.soft_score)}">${pct(r.soft_score)}</div></div>`;
+    html += '</div>';
+  }
+
+  // Score breakdown tree (outbound only)
+  if (domain === 'outbound_call') {
+    html += buildBreakdownTree(r, ob);
+  }
+
+  // Rubric bar chart (reuses rubric declared at top of renderScores)
+  if (rubric.dimensions && rubric.dimensions.length) {
+    html += '<div class="section-title">Rubric 维度评分</div>';
+    for (const d of rubric.dimensions) {
+      const pctVal = d.score / 5 * 100;
+      const color = d.score >= 4 ? 'var(--green)' : d.score >= 3 ? 'var(--yellow)' : 'var(--red)';
+      const ut = d.undertested ? ' <span style="color:var(--orange);font-size:10px">⚠未充分测试</span>' : '';
+      html += `<div class="rubric-dim">
+        <div class="rubric-label">${d.dimension_id} ${esc(d.name)}${ut}</div>
+        <div class="rubric-bar-bg"><div class="rubric-bar" style="width:${pctVal}%;background:${color}">${d.score}</div></div>
+        <div class="rubric-score">${d.score}/5</div>
+      </div>`;
+    }
+    if (rubric.grade) {
+      html += `<div style="text-align:right;font-size:14px;margin:8px 0 20px;">总分: <strong>${rubric.rubric_total}/${rubric.rubric_max || 34}</strong> &nbsp; 等级: <strong>${esc(rubric.grade)}</strong></div>`;
+    }
+  }
+
+  // Forbidden violations detail
+  const violations = ob.forbidden_violations || [];
+  if (violations.length) {
+    html += '<div class="section-title" style="color:var(--red)">禁止行为违规</div>';
+    for (const v of violations) {
+      html += `<div class="violation-card">
+        <div class="violation-header">
+          <strong>${esc(v.description)}</strong>
+          <span class="violation-severity vsev-${v.severity}">${v.severity}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);">第${v.turn}轮 · 关键词: <span style="color:var(--red)">${esc(v.keyword)}</span></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px;font-style:italic;">${esc(v.evidence)}</div>
+      </div>`;
+    }
+  }
+
+  // Check items
+  html += '<div class="section-title">检查项</div><div class="check-list">';
+  for (const c of r.checks) {
+    const icon = c.passed ? '✅' : '❌';
+    const typeLabel = c.check_type === 'rule' ? '规则' : 'LLM';
+    html += `<div class="check-item">
+      <span class="check-icon">${icon}</span>
+      <div>
+        <span class="check-type">${typeLabel}</span>
+        <span class="check-dim">${esc(c.dimension)}</span>
+        <strong>${esc(c.description)}</strong>: ${c.score.toFixed(1)}
+        <div style="color:var(--text2);margin-top:2px;font-size:12px;">${esc(c.explanation)}</div>
+        ${c.evidence_turn ? `<div style="color:var(--accent2);font-size:11px;">证据: 第${c.evidence_turn}轮</div>` : ''}
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+
+  if (r.failure_summary.length) {
+    html += '<div class="section-title" style="color:var(--red)">失败清单</div>';
+    for (const f of r.failure_summary) {
+      html += `<div style="padding:8px 12px;background:rgba(239,68,68,.08);border-radius:6px;margin-bottom:6px;font-size:13px;">✗ ${esc(f)}</div>`;
+    }
+  }
+  return html;
+}
+
+// ── Steps (outbound) ──
+function renderSteps() {
+  const ob = (currentTrace.metadata || {}).outbound_report || {};
+  const compliance = ob.step_compliance || [];
+  if (!compliance.length) {
+    return '<div class="empty"><p>无步骤执行数据（需启用 LLM 评委）</p></div>';
+  }
+
+  let html = '<div class="section-title">指令步骤执行流程</div>';
+  html += `<div style="margin-bottom:16px;font-size:13px;color:var(--text2);">
+    步骤遵循率: <strong style="color:var(--text)">${(ob.step_compliance_score*100).toFixed(0)}%</strong> &nbsp;|&nbsp;
+    分支准确率: <strong style="color:var(--text)">${(ob.branch_accuracy_score*100).toFixed(0)}%</strong>
+  </div>`;
+
+  html += '<div class="step-timeline">';
+  for (let i = 0; i < compliance.length; i++) {
+    const s = compliance[i];
+    const isLast = i === compliance.length - 1;
+    const dotClass = `step-dot-${s.status}`;
+    const connClass = s.status === 'completed' ? 'step-connector-done' : 'step-connector-pending';
+    const statusLabel = {completed:'已完成', skipped:'被跳过', failed:'执行失败', not_reached:'未到达'}[s.status] || s.status;
+    const statusColor = {completed:'var(--green)', skipped:'var(--orange)', failed:'var(--red)', not_reached:'var(--text2)'}[s.status] || 'var(--text2)';
+    const turnInfo = s.turn ? ` · 第${s.turn}轮` : '';
+
+    html += `<div class="step-item">
+      <div class="step-line">
+        <div class="step-dot ${dotClass}">${i+1}</div>
+        ${!isLast ? `<div class="step-connector ${connClass}"></div>` : ''}
+      </div>
+      <div class="step-content">
+        <div class="step-header">[${esc(s.step_id)}] ${esc(s.instruction.slice(0, 60))}</div>
+        <div class="step-detail">
+          <span style="color:${statusColor}">${statusLabel}</span>${turnInfo}
+        </div>
+        ${s.evidence ? `<div class="step-evidence">"${esc(s.evidence.slice(0, 150))}"</div>` : ''}
+        ${s.branch_taken ? `<div class="step-branch">分支: ${esc(s.branch_taken)}</div>` : ''}
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+// ── Diagnosis (outbound) ──
+function renderDiagnosis() {
+  const diag = (currentTrace.metadata || {}).diagnosis;
+  if (!diag) return '<div class="empty"><p>无诊断数据</p></div>';
+
+  let html = '<div class="section-title">失败根因分析</div>';
+
+  html += `<div class="diagnosis-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3>严重度</h3>
+      <span class="diagnosis-severity severity-${diag.severity}">${diag.severity}</span>
+    </div>`;
+
+  if (diag.deviation_point) {
+    const dp = diag.deviation_point;
+    html += `<div style="margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">偏离点: 第${dp.turn}轮</div>
+      <div style="font-size:13px;margin-bottom:4px;">预期: <span style="color:var(--green)">[${esc(dp.expected_step)}] ${esc(dp.expected_behavior)}</span></div>
+      <div style="font-size:13px;">实际: <span style="color:var(--red)">${esc(dp.actual_behavior)}</span></div>
+    </div>`;
+  }
+  html += '</div>';
+
+  if (diag.failure_modes && diag.failure_modes.length) {
+    html += '<div class="diagnosis-card"><h3>失败模式</h3><div style="margin-top:8px;">';
+    const modeLabels = {
+      premature_termination: '过早终止',
+      step_skipping: '步骤跳过',
+      instruction_misread: '指令误读',
+      context_loss: '上下文丢失',
+      template_leakage: '模板泄露',
+      tool_avoidance: '工具回避',
+      emotion_mishandle: '情绪处理失当',
+      branch_error: '分支错误',
+      overcommit: '越权承诺',
+      mechanical_response: '机械式回复',
+    };
+    for (const m of diag.failure_modes) {
+      html += `<span class="failure-mode-tag">${modeLabels[m] || m}</span>`;
+    }
+    html += '</div></div>';
+  }
+
+  if (diag.root_cause) {
+    html += `<div class="diagnosis-card"><h3>根因</h3><p style="margin-top:8px;font-size:14px;line-height:1.6;">${esc(diag.root_cause)}</p></div>`;
+  }
+  if (diag.model_capability_gap) {
+    html += `<div class="diagnosis-card"><h3>能力缺口</h3><p style="margin-top:8px;font-size:14px;line-height:1.6;color:var(--orange);">${esc(diag.model_capability_gap)}</p></div>`;
+  }
+
+  if (diag.fix_recommendations && diag.fix_recommendations.length) {
+    html += '<div class="section-title">修复建议</div>';
+    for (const rec of diag.fix_recommendations) {
+      html += `<div class="rec-item">${esc(rec)}</div>`;
+    }
+  }
+  return html;
+}
+
+// ── Harness ──
+function renderHarness() {
+  const hs = (currentTrace.metadata || {}).harness_summary;
+  if (!hs) return '<div class="empty"><p>无 Harness 数据</p></div>';
+
+  let html = '<div class="section-title">Harness 干预摘要</div>';
+  html += '<div class="harness-stat">';
+  html += `<div class="harness-stat-card"><div class="label">总干预</div><div class="value">${hs.total_interventions}</div></div>`;
+  html += `<div class="harness-stat-card"><div class="label">拦截重生成</div><div class="value">${hs.blocked_outputs}</div></div>`;
+  html += `<div class="harness-stat-card"><div class="label">注入工具</div><div class="value">${hs.injected_tools}</div></div>`;
+  html += `<div class="harness-stat-card"><div class="label">步骤提醒</div><div class="value">${hs.injected_reminders || 0}</div></div>`;
+  html += `<div class="harness-stat-card"><div class="label">禁止词清洗</div><div class="value">${hs.sanitized_outputs || 0}</div></div>`;
+  html += '</div>';
+
+  // Step progress from harness
+  if (hs.step_progress && hs.step_progress.length) {
+    html += '<div class="section-title">Harness 步骤追踪</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">';
+    for (const sp of hs.step_progress) {
+      const colors = {completed:'var(--green)', pending:'var(--text2)', in_progress:'var(--accent)', skipped:'var(--orange)'};
+      const icons = {completed:'✓', pending:'○', in_progress:'→', skipped:'⊘'};
+      const c = colors[sp.status] || 'var(--text2)';
+      html += `<div style="padding:6px 12px;border-radius:8px;background:var(--surface);font-size:12px;border:1px solid ${c}40;">
+        <span style="color:${c}">${icons[sp.status] || '?'}</span> 步骤${sp.order}
+        ${sp.completed_at_turn ? `<span style="color:var(--text2);font-size:10px;"> T${sp.completed_at_turn}</span>` : ''}
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  // Intervention timeline
+  if (hs.interventions && hs.interventions.length) {
+    html += '<div class="section-title">干预时间线</div>';
+    for (const iv of hs.interventions) {
+      html += `<div class="intervention-item">
+        <span class="intervention-type itype-${iv.type}">${iv.type}</span>
+        <div>
+          <strong>第${iv.turn}轮</strong>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">${esc(iv.detail)}</div>
+        </div>
+      </div>`;
+    }
+  }
+  return html;
+}
+
+// ── Ledger (restaurant) ──
+function renderLedger() {
+  const entries = currentTrace.score_report.constraint_ledger;
+  if (!entries || !entries.length) return '<div class="empty"><p>没有约束追踪数据</p></div>';
+
+  return entries.map(entry => {
+    const c = entry.constraint;
+    const statusCls = `status-${entry.final_status}`;
+    const statusLabel = {satisfied:'已满足', violated:'已违反', not_evaluated:'未评估', unknown:'未知', partially_satisfied:'部分满足'}[entry.final_status] || entry.final_status;
+    const hidden = c.hidden ? `<span style="color:var(--orange);font-size:11px;">隐藏·第${c.reveal_turn || '?'}轮透露</span>` : '';
+    let eventsHtml = entry.events.map(ev =>
+      `<div class="ledger-event"><strong>第${ev.turn}轮</strong> ${ev.event_type} ${ev.evidence ? '— ' + esc(ev.evidence.slice(0,80)) : ''}</div>`
+    ).join('');
+    return `<div class="ledger-entry">
+      <div class="ledger-header">
+        <div><strong>${esc(c.description)}</strong> <span style="color:var(--text2);font-size:12px;">(${c.type})</span> ${hidden}</div>
+        <span class="ledger-status ${statusCls}">${statusLabel}</span>
+      </div>
+      <div class="ledger-events">${eventsHtml || '<div class="ledger-event">无事件记录</div>'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Helpers ──
+function getForbiddenKeywords() {
+  const ob = (currentTrace.metadata || {}).outbound_report || {};
+  const violations = ob.forbidden_violations || [];
+  return violations.map(v => v.keyword).filter(Boolean);
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+function escRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ── Compare mode ──
+function toggleCompareMode() {
+  compareMode = !compareMode;
+  compareSelected = [];
+  compareTraces = [null, null];
+  document.getElementById('compareToggle').classList.toggle('active', compareMode);
+  document.getElementById('compareBar').classList.toggle('show', compareMode);
+  updateCompareUI();
+  renderTraceList();
+  if (!compareMode) {
+    document.getElementById('mainContent').innerHTML = '<div class="empty"><h2>选择一个评测记录</h2><p>对比模式已关闭</p></div>';
+    document.getElementById('tabBar').innerHTML = '';
+  }
+}
+
+function toggleCompareSelect(id) {
+  const idx = compareSelected.indexOf(id);
+  if (idx >= 0) compareSelected.splice(idx, 1);
+  else if (compareSelected.length < 2) compareSelected.push(id);
+  updateCompareUI();
+  renderTraceList();
+}
+
+function updateCompareUI() {
+  document.getElementById('compareCount').textContent = `已选 ${compareSelected.length}/2`;
+  document.getElementById('compareLaunch').disabled = compareSelected.length !== 2;
+}
+
+function cancelCompare() {
+  compareMode = false;
+  compareSelected = [];
+  compareTraces = [null, null];
+  document.getElementById('compareToggle').classList.remove('active');
+  document.getElementById('compareBar').classList.remove('show');
+  renderTraceList();
+  document.getElementById('mainContent').innerHTML = '<div class="empty"><h2>选择一个评测记录</h2></div>';
+}
+
+async function launchCompare() {
+  if (compareSelected.length !== 2) return;
+  const [idA, idB] = compareSelected;
+  const [resA, resB] = await Promise.all([
+    fetch(`/api/traces/${idA}`).then(r => r.json()),
+    fetch(`/api/traces/${idB}`).then(r => r.json()),
+  ]);
+  compareTraces = [resA, resB];
+  document.getElementById('traceTitle').textContent = '模型对比';
+  document.getElementById('tabBar').innerHTML = [
+    {id:'compare_scores', label:'分数对比'},
+    {id:'compare_checks', label:'检查项对比'},
+    {id:'compare_conv', label:'对话对比'},
+  ].map(t => `<div class="tab${t.id==='compare_scores'?' active':''}" data-tab="${t.id}" onclick="switchCompareTab('${t.id}')">${t.label}</div>`).join('');
+  renderCompareScores();
+}
+
+function switchCompareTab(tab) {
+  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+  if (tab === 'compare_scores') renderCompareScores();
+  else if (tab === 'compare_checks') renderCompareChecks();
+  else if (tab === 'compare_conv') renderCompareConv();
+}
+
+function renderCompareScores() {
+  const [a, b] = compareTraces;
+  if (!a || !b) return;
+  const el = document.getElementById('mainContent');
+  const scoreColor = v => v >= 0.7 ? 'var(--green)' : v >= 0.4 ? 'var(--yellow)' : 'var(--red)';
+  const pct = v => v != null ? (v*100).toFixed(0)+'%' : '—';
+  const modelA = a.run_metadata?.model_backend || '?';
+  const modelB = b.run_metadata?.model_backend || '?';
+  const harnA = !!(a.metadata||{}).harness_summary;
+  const harnB = !!(b.metadata||{}).harness_summary;
+  const labelA = (harnA ? 'Harness + ' : '') + modelA.replace('claude-','').replace('-20251001','');
+  const labelB = (harnB ? 'Harness + ' : '') + modelB.replace('claude-','').replace('-20251001','');
+
+  const metrics = [
+    {label:'综合得分', ka:'overall_score', kb:'overall_score'},
+    {label:'硬指标', ka:'hard_score', kb:'hard_score'},
+    {label:'软指标', ka:'soft_score', kb:'soft_score'},
+    {label:'通话轮次', ka:'conversation_length', kb:'conversation_length', raw:true},
+    {label:'失败项', ka:'_failures', kb:'_failures', raw:true, invert:true},
+  ];
+
+  let html = '<div class="compare-split"><div class="compare-col compare-col-a">';
+  html += `<div class="compare-col-header">A: ${esc(labelA)}<br><span style="font-size:11px;font-weight:400;color:var(--text2)">${esc(a.scenario.name)}</span></div>`;
+  html += '</div><div class="compare-col compare-col-b">';
+  html += `<div class="compare-col-header">B: ${esc(labelB)}<br><span style="font-size:11px;font-weight:400;color:var(--text2)">${esc(b.scenario.name)}</span></div>`;
+  html += '</div></div>';
+
+  html += '<div class="section-title" style="margin-top:20px;">核心指标对比</div>';
+  for (const m of metrics) {
+    let va, vb;
+    if (m.ka === '_failures') { va = a.score_report.failure_summary.length; vb = b.score_report.failure_summary.length; }
+    else { va = a.score_report[m.ka]; vb = b.score_report[m.kb]; }
+    const fmtA = m.raw ? String(va ?? '—') : pct(va);
+    const fmtB = m.raw ? String(vb ?? '—') : pct(vb);
+    const colorA = m.raw ? 'var(--text)' : scoreColor(va);
+    const colorB = m.raw ? 'var(--text)' : scoreColor(vb);
+    let deltaHtml = '';
+    if (va != null && vb != null) {
+      const diff = vb - va;
+      const better = m.invert ? diff < 0 : diff > 0;
+      const worse = m.invert ? diff > 0 : diff < 0;
+      const cls = better ? 'delta-positive' : (worse ? 'delta-negative' : 'delta-neutral');
+      const sign = diff > 0 ? '+' : '';
+      const fmtD = m.raw ? `${sign}${diff}` : `${sign}${(diff*100).toFixed(0)}%`;
+      if (diff !== 0) deltaHtml = `<span class="compare-delta ${cls}">${fmtD}</span>`;
+    }
+    html += `<div class="compare-metric">
+      <span class="metric-val" style="color:${colorA};width:80px;text-align:center">${fmtA}</span>
+      <span class="metric-label" style="flex:1;text-align:center">${m.label} ${deltaHtml}</span>
+      <span class="metric-val" style="color:${colorB};width:80px;text-align:center">${fmtB}</span>
+    </div>`;
+  }
+
+  // Outbound-specific
+  const obA = (a.metadata||{}).outbound_report || {};
+  const obB = (b.metadata||{}).outbound_report || {};
+  if (obA.step_compliance_score != null || obB.step_compliance_score != null) {
+    const obMetrics = [
+      {label:'步骤遵循', a:obA.step_compliance_score, b:obB.step_compliance_score},
+      {label:'分支准确', a:obA.branch_accuracy_score, b:obB.branch_accuracy_score},
+      {label:'禁止行为违规', a:obA.forbidden_violation_count, b:obB.forbidden_violation_count, raw:true, invert:true},
+      {label:'子目标进展率', a:obA.progress_rate, b:obB.progress_rate},
+    ];
+    html += '<div class="section-title" style="margin-top:20px;">外呼专项</div>';
+    for (const m of obMetrics) {
+      const fmtA = m.raw ? String(m.a ?? '—') : pct(m.a);
+      const fmtB = m.raw ? String(m.b ?? '—') : pct(m.b);
+      const colorA = m.raw ? 'var(--text)' : scoreColor(m.a);
+      const colorB = m.raw ? 'var(--text)' : scoreColor(m.b);
+      let deltaHtml = '';
+      if (m.a != null && m.b != null) {
+        const diff = m.b - m.a;
+        const better = m.invert ? diff < 0 : diff > 0;
+        const worse = m.invert ? diff > 0 : diff < 0;
+        const cls = better ? 'delta-positive' : (worse ? 'delta-negative' : 'delta-neutral');
+        const sign = diff > 0 ? '+' : '';
+        const fmtD = m.raw ? `${sign}${diff}` : `${sign}${(diff*100).toFixed(0)}%`;
+        if (diff !== 0) deltaHtml = `<span class="compare-delta ${cls}">${fmtD}</span>`;
+      }
+      html += `<div class="compare-metric">
+        <span class="metric-val" style="color:${colorA};width:80px;text-align:center">${fmtA}</span>
+        <span class="metric-label" style="flex:1;text-align:center">${m.label} ${deltaHtml}</span>
+        <span class="metric-val" style="color:${colorB};width:80px;text-align:center">${fmtB}</span>
+      </div>`;
+    }
+  }
+
+  // Harness comparison callout
+  const hsA = (a.metadata||{}).harness_summary;
+  const hsB = (b.metadata||{}).harness_summary;
+  if (hsA || hsB) {
+    html += '<div class="section-title" style="margin-top:20px;">Harness 干预</div>';
+    const intA = hsA ? hsA.total_interventions : 0;
+    const intB = hsB ? hsB.total_interventions : 0;
+    html += `<div class="compare-metric">
+      <span class="metric-val" style="width:80px;text-align:center;color:var(--pink)">${hsA ? intA : '无'}</span>
+      <span class="metric-label" style="flex:1;text-align:center">干预次数</span>
+      <span class="metric-val" style="width:80px;text-align:center;color:var(--pink)">${hsB ? intB : '无'}</span>
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function renderCompareChecks() {
+  const [a, b] = compareTraces;
+  if (!a || !b) return;
+  const el = document.getElementById('mainContent');
+  const checksA = a.score_report.checks;
+  const checksB = b.score_report.checks;
+  const allIds = [...new Set([...checksA.map(c=>c.check_id), ...checksB.map(c=>c.check_id)])];
+  const mapA = Object.fromEntries(checksA.map(c=>[c.check_id, c]));
+  const mapB = Object.fromEntries(checksB.map(c=>[c.check_id, c]));
+
+  let html = '<div class="section-title">检查项逐项对比</div>';
+  html += `<div style="display:grid;grid-template-columns:40px 1fr 60px 60px;gap:6px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--text2);">
+    <div></div><div>检查项</div><div style="text-align:center">A</div><div style="text-align:center">B</div>
+  </div>`;
+  for (const id of allIds) {
+    const ca = mapA[id]; const cb = mapB[id];
+    const passedA = ca ? ca.passed : null;
+    const passedB = cb ? cb.passed : null;
+    const iconA = passedA == null ? '—' : (passedA ? '✅' : '❌');
+    const iconB = passedB == null ? '—' : (passedB ? '✅' : '❌');
+    const changed = passedA !== passedB;
+    const bg = changed ? 'rgba(234,179,8,.06)' : '';
+    const desc = (ca || cb).description;
+    html += `<div style="display:grid;grid-template-columns:40px 1fr 60px 60px;gap:6px;padding:8px 0;font-size:13px;border-bottom:1px solid var(--border);background:${bg};align-items:center;">
+      <div style="text-align:center">${changed ? '⚡' : ''}</div>
+      <div>${esc(desc)}</div>
+      <div style="text-align:center">${iconA}</div>
+      <div style="text-align:center">${iconB}</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderCompareConv() {
+  const [a, b] = compareTraces;
+  if (!a || !b) return;
+  const el = document.getElementById('mainContent');
+  const maxTurns = Math.max(
+    ...a.conversation.messages.map(m=>m.turn),
+    ...b.conversation.messages.map(m=>m.turn)
+  );
+
+  let html = '<div class="section-title">对话对比（按轮次）</div>';
+  html += '<div class="compare-split">';
+
+  for (const [trace, cls] of [[a,'compare-col-a'],[b,'compare-col-b']]) {
+    const model = trace.run_metadata?.model_backend || '?';
+    const hasH = !!(trace.metadata||{}).harness_summary;
+    const label = (hasH ? 'H+' : '') + model.replace('claude-','').replace('-20251001','');
+    html += `<div class="compare-col ${cls}"><div class="compare-col-header">${esc(label)}</div>`;
+    for (const m of trace.conversation.messages) {
+      if (m.role === 'system') continue;
+      const isUser = m.role === 'user';
+      const avatar = isUser ? '👤' : '🤖';
+      const role = isUser ? '被叫方' : 'Agent';
+      html += `<div style="margin-bottom:8px;">
+        <div style="font-size:11px;color:var(--text2);">${avatar} ${role} · 第${m.turn}轮</div>
+        <div style="background:var(--surface);padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.5;white-space:pre-wrap;margin-top:2px;">${esc(m.content.slice(0,300))}</div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+loadTraces();
+</script>
+</body>
+</html>

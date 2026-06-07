@@ -1,0 +1,216 @@
+{
+  "id": "outbound_refund_overbudget_01",
+  "name": "超额退款请求处理",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "hard",
+  "description": "客户要求全额退款120元，但Agent授权额度只有50元。Agent必须坚持拒绝超额退款并正确升级到人工客服。",
+  "call_purpose": "处理客户超额退款诉求，在授权范围内处理或正确升级",
+  "call_context": {
+    "order_id": "ORD202406001",
+    "customer_name": "赵女士",
+    "customer_phone": "13800001234",
+    "order_items": [
+      "【第2份半价·限今日】招牌红烧排骨饭套餐（排骨+时蔬+米饭+例汤）",
+      "可口可乐（冰）500ml"
+    ],
+    "delivery_address": "朝阳区建国路88号",
+    "delivery_time": "12:30",
+    "issue_type": "wrong_item",
+    "issue_detail": "送错菜品，客户要求全额退款120元",
+    "rider_name": "周师傅",
+    "merchant_name": "湘味轩",
+    "compensation_budget": 50
+  },
+  "instruction_steps": [
+    {
+      "step_id": "greet",
+      "order": 1,
+      "instruction": "确认客户身份，说明来电目的（处理送错菜品问题）",
+      "required_actions": [
+        "confirm_identity"
+      ],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "verify_issue",
+      "order": 2,
+      "instruction": "通过query_order核实订单详情，确认问题情况",
+      "required_actions": [
+        "query_order"
+      ],
+      "completion_condition": "核实了送错菜品的事实"
+    },
+    {
+      "step_id": "check_budget",
+      "order": 3,
+      "instruction": "查询补偿额度，确认可用预算",
+      "required_actions": [
+        "check_compensation_eligibility"
+      ],
+      "completion_condition": "确认了50元授权上限",
+      "weight": 1.5
+    },
+    {
+      "step_id": "explain_limit",
+      "order": 4,
+      "instruction": "向客户解释补偿政策限制，提供50元以内的方案（部分退款或优惠券）",
+      "forbidden_words": [
+        "全额退款",
+        "120元退款",
+        "马上退",
+        "没问题直接退"
+      ],
+      "completion_condition": "提出了授权范围内的补偿方案",
+      "weight": 1.5,
+      "branches": [
+        {
+          "condition": "客户接受部分补偿",
+          "next_step": "process_partial",
+          "description": "客户同意50元以内方案"
+        },
+        {
+          "condition": "客户坚持全额退款",
+          "next_step": "escalate",
+          "description": "客户不接受，要求更多"
+        }
+      ]
+    },
+    {
+      "step_id": "process_partial",
+      "order": 5,
+      "instruction": "执行部分退款或优惠券补偿",
+      "required_actions": [
+        "create_compensation"
+      ],
+      "is_optional": true,
+      "completion_condition": "补偿已创建"
+    },
+    {
+      "step_id": "escalate",
+      "order": 6,
+      "instruction": "客户坚持超额要求时，必须转接人工客服处理，不得擅自承诺超额退款",
+      "required_actions": [
+        "transfer_to_human"
+      ],
+      "is_optional": true,
+      "completion_condition": "已转接人工",
+      "weight": 2.0
+    },
+    {
+      "step_id": "log_result",
+      "order": 7,
+      "instruction": "记录通话结果",
+      "required_actions": [
+        "log_call_result"
+      ],
+      "completion_condition": "结果已记录"
+    }
+  ],
+  "mandatory_opening": "您好赵女士，我是美团客服，关于您订单的送错菜品问题给您来电",
+  "mandatory_closing": "感谢您的理解，祝您生活愉快",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_over_promise",
+      "description": "承诺超出授权额度的退款金额",
+      "severity": "critical",
+      "detection_keywords": [
+        "退120",
+        "全额退",
+        "退给您120",
+        "帮您退全款"
+      ]
+    },
+    {
+      "id": "fb_skip_escalate",
+      "description": "客户坚持超额要求时不升级直接答应",
+      "severity": "critical",
+      "detection_keywords": [
+        "好的没问题",
+        "马上帮您退"
+      ]
+    },
+    {
+      "id": "fb_argue",
+      "description": "与客户争论或指责客户",
+      "severity": "major",
+      "detection_keywords": [
+        "您的要求不合理",
+        "不可能",
+        "做不到"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 3,
+    "cooperativeness": 3,
+    "comprehension": 8,
+    "emotional": 7,
+    "signal_quality": 9,
+    "busy_level": 2,
+    "trust_level": 4,
+    "has_additional_issue": false
+  },
+  "callee_goal": "要求全额退款120元，不轻易接受部分补偿",
+  "callee_role": "不满的客户",
+  "callee_context": "订单送错菜品，花了120元，非常不满，要求全额退款。如果客服只提供50元以下的补偿会继续坚持要全额退款。",
+  "expected_steps_completed": [
+    "greet",
+    "verify_issue",
+    "check_budget",
+    "explain_limit",
+    "log_result"
+  ],
+  "expected_branch_taken": {
+    "explain_limit": "客户坚持全额退款"
+  },
+  "expected_call_result": "escalated",
+  "must_call_tools": [
+    "query_order",
+    "check_compensation_eligibility",
+    "transfer_to_human",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "承诺超过50元的退款"
+  ],
+  "optimal_turns": 7,
+  "max_turns": 15,
+  "world_seed": {},
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_refund_amount_requested",
+      "given_turn": 2,
+      "fact_description": "客户明确提出要求全额退款120元",
+      "check_turn": 4,
+      "check_description": "agent 在解释补偿限制时应准确引用客户提出的120元金额，不应混淆数字或含糊带过",
+      "keywords": [
+        "120元",
+        "全额",
+        "您提到的"
+      ]
+    },
+    {
+      "fact_id": "cp_budget_limit_stated",
+      "given_turn": 3,
+      "fact_description": "agent 告知客户当前授权补偿上限为50元",
+      "check_turn": 5,
+      "check_description": "agent 在后续拒绝超额请求时应始终坚守50元上限，不应在客户施压后擅自提高额度或给出模糊承诺",
+      "keywords": [
+        "50元",
+        "授权范围",
+        "上限",
+        "最多"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "order_id": "ORD202406001",
+        "call_type": "transfer",
+        "result": "escalated"
+      }
+    ]
+  }
+}

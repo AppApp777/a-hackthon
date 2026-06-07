@@ -1,0 +1,718 @@
+{
+  "id": "6263ff62-9329-4bb9-8ed7-71156ce7cc14",
+  "scenario": {
+    "id": "dinner_basic_01",
+    "name": "团建聚餐-基础版",
+    "domain": "dinner_booking",
+    "difficulty": "medium",
+    "description": "10人团建聚餐，预算有限，有人坚果过敏，用户会中途改时间",
+    "user_goal": "为10人团建订一个人均不超过70元的餐厅，需要包间，有人坚果过敏。原定周二改到周三同一时间。最终要完成预订。",
+    "initial_message": "帮我订个团建聚餐，大概10个人，下周二晚上。",
+    "constraints": [
+      {
+        "id": "c_budget",
+        "type": "budget",
+        "description": "人均不超过70元",
+        "hidden": false,
+        "reveal_turn": null,
+        "check_rule": "restaurant.price_per_person <= 70",
+        "value": 70
+      },
+      {
+        "id": "c_headcount",
+        "type": "headcount",
+        "description": "10人用餐",
+        "hidden": false,
+        "reveal_turn": null,
+        "check_rule": null,
+        "value": 10
+      },
+      {
+        "id": "c_private_room",
+        "type": "preference",
+        "description": "需要包间",
+        "hidden": true,
+        "reveal_turn": 3,
+        "check_rule": "restaurant.has_private_room == 1",
+        "value": null
+      },
+      {
+        "id": "c_allergy",
+        "type": "dietary",
+        "description": "有同事坚果过敏",
+        "hidden": true,
+        "reveal_turn": 4,
+        "check_rule": "restaurant.allergen_free_options contains 'nut_free'",
+        "value": null
+      },
+      {
+        "id": "c_time_change",
+        "type": "time",
+        "description": "原定周二改到周三",
+        "hidden": true,
+        "reveal_turn": 6,
+        "check_rule": null,
+        "value": "2026-05-20"
+      },
+      {
+        "id": "c_coupon",
+        "type": "coupon",
+        "description": "用户有一张TEAM50优惠券想用",
+        "hidden": true,
+        "reveal_turn": 8,
+        "check_rule": null,
+        "value": "TEAM50"
+      }
+    ],
+    "tool_faults": [
+      {
+        "tool_name": "check_availability",
+        "trigger_turn": 5,
+        "fault_type": "timeout",
+        "description": "查询可用性时超时"
+      }
+    ],
+    "user_persona": {
+      "patience": 6,
+      "clarity": 4,
+      "emotional": 3,
+      "pickiness": 6,
+      "change_mind_probability": 0.3
+    },
+    "expected_outcome": {
+      "must_satisfy": [
+        "c_budget",
+        "c_headcount",
+        "c_private_room",
+        "c_allergy"
+      ],
+      "must_call_tools": [
+        "search_restaurants",
+        "check_availability",
+        "make_reservation"
+      ],
+      "must_not_do": [
+        "recommend_restaurant_over_budget",
+        "ignore_allergy",
+        "book_without_confirming_change"
+      ],
+      "final_state_checks": {
+        "reservations": {
+          "count_gte": 1,
+          "latest_status": "confirmed",
+          "latest_party_size": 10
+        }
+      }
+    },
+    "max_turns": 20,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "dinner_basic_01",
+    "messages": [
+      {
+        "turn": 0,
+        "role": "user",
+        "content": "帮我订个团建聚餐，大概10个人，下周二晚上。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:11.191087",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:11.712682",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:11.771351",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:12.277300",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:12.361252",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:12.879318",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:12.981328",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:13.511090",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:13.627500",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:14.193189",
+        "metadata": {}
+      },
+      {
+        "turn": 6,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:14.326305",
+        "metadata": {}
+      },
+      {
+        "turn": 6,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:14.899835",
+        "metadata": {}
+      },
+      {
+        "turn": 7,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:15.040698",
+        "metadata": {}
+      },
+      {
+        "turn": 7,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:15.639273",
+        "metadata": {}
+      },
+      {
+        "turn": 8,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:15.801393",
+        "metadata": {}
+      },
+      {
+        "turn": 8,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:16.432245",
+        "metadata": {}
+      },
+      {
+        "turn": 9,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:16.610526",
+        "metadata": {}
+      },
+      {
+        "turn": 9,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:17.279784",
+        "metadata": {}
+      },
+      {
+        "turn": 10,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:17.477220",
+        "metadata": {}
+      },
+      {
+        "turn": 10,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:18.161951",
+        "metadata": {}
+      },
+      {
+        "turn": 11,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:18.379781",
+        "metadata": {}
+      },
+      {
+        "turn": 11,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:19.052956",
+        "metadata": {}
+      },
+      {
+        "turn": 12,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:19.293813",
+        "metadata": {}
+      },
+      {
+        "turn": 12,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:19.983115",
+        "metadata": {}
+      },
+      {
+        "turn": 13,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:20.236070",
+        "metadata": {}
+      },
+      {
+        "turn": 13,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:20.965792",
+        "metadata": {}
+      },
+      {
+        "turn": 14,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:21.228155",
+        "metadata": {}
+      },
+      {
+        "turn": 14,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:21.986393",
+        "metadata": {}
+      },
+      {
+        "turn": 15,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:22.281855",
+        "metadata": {}
+      },
+      {
+        "turn": 15,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:23.040704",
+        "metadata": {}
+      },
+      {
+        "turn": 16,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:23.354398",
+        "metadata": {}
+      },
+      {
+        "turn": 16,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:24.137065",
+        "metadata": {}
+      },
+      {
+        "turn": 17,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:24.472680",
+        "metadata": {}
+      },
+      {
+        "turn": 17,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:25.291224",
+        "metadata": {}
+      },
+      {
+        "turn": 18,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:25.652648",
+        "metadata": {}
+      },
+      {
+        "turn": 18,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:26.503504",
+        "metadata": {}
+      },
+      {
+        "turn": 19,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:26.898162",
+        "metadata": {}
+      },
+      {
+        "turn": 19,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:27.828709",
+        "metadata": {}
+      },
+      {
+        "turn": 20,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:28.282831",
+        "metadata": {}
+      },
+      {
+        "turn": 20,
+        "role": "agent",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:29.278499",
+        "metadata": {}
+      },
+      {
+        "turn": 21,
+        "role": "user",
+        "content": "[CLI Error] [WinError 2] 系统找不到指定的文件。",
+        "tool_calls": [],
+        "timestamp": "2026-05-16T23:05:29.759407",
+        "metadata": {}
+      }
+    ],
+    "started_at": "2026-05-16T23:05:11.190952",
+    "ended_at": "2026-05-16T23:05:29.759556",
+    "termination_reason": "max_turns_reached"
+  },
+  "score_report": {
+    "scenario_id": "dinner_basic_01",
+    "conversation_length": 41,
+    "hard_score": 0.0,
+    "soft_score": 0.0,
+    "overall_score": 0.0,
+    "checks": [
+      {
+        "check_id": "budget_c_budget",
+        "check_type": "rule",
+        "dimension": "constraint_satisfaction",
+        "description": "预算约束: 人均不超过70元",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "没有已确认的预订，无法验证预算"
+      },
+      {
+        "check_id": "tool_used_check_availability",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用工具: check_availability",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未调用 check_availability"
+      },
+      {
+        "check_id": "tool_used_search_restaurants",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用工具: search_restaurants",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未调用 search_restaurants"
+      },
+      {
+        "check_id": "tool_used_make_reservation",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用工具: make_reservation",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未调用 make_reservation"
+      },
+      {
+        "check_id": "final_state_reservations_count",
+        "check_type": "rule",
+        "dimension": "constraint_satisfaction",
+        "description": "最终状态: reservations 至少 1 条记录",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际 0 条"
+      },
+      {
+        "check_id": "ack_c_private_room",
+        "check_type": "rule",
+        "dimension": "information_gathering",
+        "description": "Agent 是否回应了约束: 需要包间",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未回应 (约束在第3轮透露)"
+      },
+      {
+        "check_id": "ack_c_allergy",
+        "check_type": "rule",
+        "dimension": "information_gathering",
+        "description": "Agent 是否回应了约束: 有同事坚果过敏",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未回应 (约束在第4轮透露)"
+      }
+    ],
+    "constraint_ledger": [
+      {
+        "constraint": {
+          "id": "c_budget",
+          "type": "budget",
+          "description": "人均不超过70元",
+          "hidden": false,
+          "reveal_turn": null,
+          "check_rule": "restaurant.price_per_person <= 70",
+          "value": 70
+        },
+        "events": [
+          {
+            "constraint_id": "c_budget",
+            "event_type": "introduced",
+            "turn": 0,
+            "evidence": "In initial scenario / user's first message"
+          },
+          {
+            "constraint_id": "c_budget",
+            "event_type": "not_evaluated",
+            "turn": 21,
+            "evidence": "No confirmed reservation"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_headcount",
+          "type": "headcount",
+          "description": "10人用餐",
+          "hidden": false,
+          "reveal_turn": null,
+          "check_rule": null,
+          "value": 10
+        },
+        "events": [
+          {
+            "constraint_id": "c_headcount",
+            "event_type": "introduced",
+            "turn": 0,
+            "evidence": "In initial scenario / user's first message"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_private_room",
+          "type": "preference",
+          "description": "需要包间",
+          "hidden": true,
+          "reveal_turn": 3,
+          "check_rule": "restaurant.has_private_room == 1",
+          "value": null
+        },
+        "events": [
+          {
+            "constraint_id": "c_private_room",
+            "event_type": "revealed",
+            "turn": 3,
+            "evidence": "[CLI Error] [WinError 2] 系统找不到指定的文件。"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_allergy",
+          "type": "dietary",
+          "description": "有同事坚果过敏",
+          "hidden": true,
+          "reveal_turn": 4,
+          "check_rule": "restaurant.allergen_free_options contains 'nut_free'",
+          "value": null
+        },
+        "events": [
+          {
+            "constraint_id": "c_allergy",
+            "event_type": "revealed",
+            "turn": 4,
+            "evidence": "[CLI Error] [WinError 2] 系统找不到指定的文件。"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_time_change",
+          "type": "time",
+          "description": "原定周二改到周三",
+          "hidden": true,
+          "reveal_turn": 6,
+          "check_rule": null,
+          "value": "2026-05-20"
+        },
+        "events": [
+          {
+            "constraint_id": "c_time_change",
+            "event_type": "revealed",
+            "turn": 6,
+            "evidence": "[CLI Error] [WinError 2] 系统找不到指定的文件。"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_coupon",
+          "type": "coupon",
+          "description": "用户有一张TEAM50优惠券想用",
+          "hidden": true,
+          "reveal_turn": 8,
+          "check_rule": null,
+          "value": "TEAM50"
+        },
+        "events": [
+          {
+            "constraint_id": "c_coupon",
+            "event_type": "revealed",
+            "turn": 8,
+            "evidence": "[CLI Error] [WinError 2] 系统找不到指定的文件。"
+          }
+        ],
+        "final_status": "not_evaluated"
+      }
+    ],
+    "failure_summary": [
+      "[constraint_satisfaction] 预算约束: 人均不超过70元: 没有已确认的预订，无法验证预算",
+      "[tool_usage] 必须调用工具: check_availability: 未调用 check_availability",
+      "[tool_usage] 必须调用工具: search_restaurants: 未调用 search_restaurants",
+      "[tool_usage] 必须调用工具: make_reservation: 未调用 make_reservation",
+      "[constraint_satisfaction] 最终状态: reservations 至少 1 条记录: 实际 0 条",
+      "[information_gathering] Agent 是否回应了约束: 需要包间: 未回应 (约束在第3轮透露)",
+      "[information_gathering] Agent 是否回应了约束: 有同事坚果过敏: 未回应 (约束在第4轮透露)"
+    ],
+    "generated_at": "2026-05-16T23:05:29.761085"
+  },
+  "metadata": {
+    "db_state": {
+      "reservations": [],
+      "orders": [],
+      "coupons": [
+        {
+          "code": "TEAM50",
+          "discount_type": "fixed",
+          "discount_value": 50.0,
+          "min_order": 200.0,
+          "max_discount": 50.0,
+          "valid_until": "2026-06-01",
+          "used": 0,
+          "applicable_restaurants": "[]"
+        },
+        {
+          "code": "NEWUSER20",
+          "discount_type": "percent",
+          "discount_value": 20.0,
+          "min_order": 100.0,
+          "max_discount": 80.0,
+          "valid_until": "2026-05-25",
+          "used": 0,
+          "applicable_restaurants": "[]"
+        },
+        {
+          "code": "HOTPOT30",
+          "discount_type": "fixed",
+          "discount_value": 30.0,
+          "min_order": 150.0,
+          "max_discount": 30.0,
+          "valid_until": "2026-05-22",
+          "used": 0,
+          "applicable_restaurants": "[\"r1\",\"r5\"]"
+        },
+        {
+          "code": "EXPIRED01",
+          "discount_type": "fixed",
+          "discount_value": 100.0,
+          "min_order": 0.0,
+          "max_discount": 100.0,
+          "valid_until": "2026-05-01",
+          "used": 0,
+          "applicable_restaurants": "[]"
+        }
+      ]
+    }
+  }
+}

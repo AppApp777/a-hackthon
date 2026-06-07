@@ -1,0 +1,422 @@
+{
+  "id": "outbound_rider_dispute_01",
+  "name": "配送奖励争议-三路分支",
+  "domain": "outbound_call",
+  "call_type": "rider_notify",
+  "difficulty": "hard",
+  "description": "骑手发现本月奖励比预期少200元，致电站长查询。三路分支：系统正确（骑手算错了）/系统错误（需要补发）/规则误解（需解释新规则）。",
+  "call_purpose": "处理骑手奖励差异查询，核实数据，按实际情况走对应分支解决",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "张伟",
+    "customer_phone": "13800138002",
+    "order_items": [],
+    "delivery_address": "",
+    "delivery_time": "",
+    "issue_type": "compensation_dispute",
+    "issue_detail": "骑手反映本月飞毛腿奖励比预期少200元",
+    "rider_name": "张伟",
+    "merchant_name": "",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "确认对方身份（张伟），了解来电目的",
+      "required_actions": [
+        "confirm_identity",
+        "understand_purpose"
+      ],
+      "completion_condition": "确认骑手要查奖励差异"
+    },
+    {
+      "step_id": "listen_complaint",
+      "order": 2,
+      "instruction": "认真听骑手描述问题，了解他预期的金额和实际收到的金额，不急着解释",
+      "required_actions": [
+        "active_listen",
+        "gather_details"
+      ],
+      "completion_condition": "骑手说完问题"
+    },
+    {
+      "step_id": "query_data",
+      "order": 3,
+      "instruction": "查询骑手的实际配送数据和奖励计算明细",
+      "required_actions": [
+        "query_rider_status",
+        "query_contract"
+      ],
+      "completion_condition": "拿到完整数据"
+    },
+    {
+      "step_id": "analyze_gap",
+      "order": 4,
+      "instruction": "对比骑手预期和系统数据，找出差异原因",
+      "required_actions": [
+        "analyze_discrepancy"
+      ],
+      "completion_condition": "确定差异原因"
+    },
+    {
+      "step_id": "explain_finding",
+      "order": 5,
+      "instruction": "向骑手说明差异原因",
+      "required_actions": [
+        "explain_result"
+      ],
+      "branches": [
+        {
+          "condition": "系统正确，骑手算错了（漏算了3天未达标不计奖励）",
+          "next_step": "explain_correct_calc",
+          "description": "耐心解释正确计算方式"
+        },
+        {
+          "condition": "系统出错，确实少发了",
+          "next_step": "process_补发",
+          "description": "走补发流程"
+        },
+        {
+          "condition": "规则变更导致（本月起恶劣天气补贴从3元降为2元）",
+          "next_step": "explain_new_rule",
+          "description": "解释新规则"
+        }
+      ],
+      "completion_condition": "骑手收到初步解释"
+    },
+    {
+      "step_id": "explain_correct_calc",
+      "order": 6,
+      "instruction": "耐心逐笔解释：本月出勤25天，其中3天未达标不计奖励，实际计奖天数22天 x 每天额外奖励 = 实际金额。用具体数字让骑手信服",
+      "required_actions": [
+        "detailed_explanation"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手理解计算方式",
+      "branches": [
+        {
+          "condition": "骑手接受解释",
+          "next_step": "wrap_up",
+          "description": "正常结束"
+        },
+        {
+          "condition": "骑手仍不服，要求进一步核实",
+          "next_step": "escalate",
+          "description": "提交核查工单"
+        }
+      ]
+    },
+    {
+      "step_id": "process_补发",
+      "order": 6,
+      "instruction": "确认系统确实少计了2天的奖励，提交补发申请，告知预计到账时间",
+      "required_actions": [
+        "submit_补发",
+        "confirm_timeline"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手确认补发申请"
+    },
+    {
+      "step_id": "explain_new_rule",
+      "order": 6,
+      "instruction": "解释本月起恶劣天气补贴规则调整（从3元/单降为2元/单），说明提前通知过（App站内信），这是差额的一部分原因",
+      "required_actions": [
+        "explain_policy_change"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手理解规则变更",
+      "branches": [
+        {
+          "condition": "骑手接受新规则",
+          "next_step": "wrap_up",
+          "description": "正常结束"
+        },
+        {
+          "condition": "骑手不接受，要投诉",
+          "next_step": "escalate",
+          "description": "记录投诉意向"
+        }
+      ]
+    },
+    {
+      "step_id": "escalate",
+      "order": 7,
+      "instruction": "为骑手创建核查/投诉工单，告知预计处理时间（3个工作日），会有专人回电",
+      "required_actions": [
+        "create_appeal",
+        "set_expectation"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手确认收到工单"
+    },
+    {
+      "step_id": "summary",
+      "order": 8,
+      "instruction": "总结本次沟通结论和后续安排",
+      "required_actions": [
+        "summarize"
+      ],
+      "completion_condition": "双方确认结论一致"
+    },
+    {
+      "step_id": "address_trust",
+      "order": 9,
+      "instruction": "如果骑手对平台表示不信任，诚恳回应，承诺透明化奖励计算",
+      "required_actions": [
+        "rebuild_trust"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手情绪缓和"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 10,
+      "instruction": "确认无其他问题，礼貌结束通话，记录结果",
+      "required_actions": [
+        "ask_other_issues",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "你好张伟，我是站长，有什么事你说",
+  "mandatory_closing": "好的，有问题随时联系，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_dismiss",
+      "description": "不查数据就直接否定骑手的质疑",
+      "severity": "critical",
+      "detection_keywords": [
+        "你算错了",
+        "不可能少",
+        "系统不会错",
+        "你自己看错了"
+      ]
+    },
+    {
+      "id": "fb_vague_promise",
+      "description": "给出模糊承诺但不走实际流程",
+      "severity": "major",
+      "detection_keywords": [
+        "我帮你问问",
+        "回头再说",
+        "应该没问题",
+        "到时候看看"
+      ]
+    },
+    {
+      "id": "fb_blame_rider",
+      "description": "指责骑手不懂规则或无理取闹",
+      "severity": "major",
+      "detection_keywords": [
+        "你不懂",
+        "你没看通知",
+        "无理取闹",
+        "你的问题"
+      ]
+    },
+    {
+      "id": "fb_leak_others",
+      "description": "泄露其他骑手的奖励信息做比较",
+      "severity": "critical",
+      "detection_keywords": [
+        "别人都没",
+        "其他骑手",
+        "人家都",
+        "你看看人家"
+      ]
+    }
+  ],
+  "callee_role": "美团外卖骑手（飞毛腿）",
+  "callee_context": "- 你叫张伟，是美团外卖骑手，在西城区送餐\n- 你签了飞毛腿多日合同，已经跑了快1个月\n- 你发现本月奖励到账比你预期少了200元\n- 你自己算的是出勤25天 x 每天10元额外奖励 = 250元，但只到账50元\n- 你不知道有3天没达标不计奖励这个规则\n- 你有点警惕，怕被忽悠",
+  "callee_persona": {
+    "patience": 4,
+    "cooperativeness": 5,
+    "comprehension": 6,
+    "emotional": 5,
+    "signal_quality": 9,
+    "busy_level": 4,
+    "trust_level": 4,
+    "has_additional_issue": false,
+    "additional_issue": "",
+    "archetype": "wary"
+  },
+  "callee_goal": "你要搞清楚为什么奖励少了200元。你需要站长用具体数据说服你，不接受含糊其辞的解释。如果真是你算错了，你能接受，但站长必须一笔一笔算给你看。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 8,
+  "max_turns": 20,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_rider_status",
+      "description": "查询骑手配送数据（出勤天数、单量、达标情况）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "query_rider_contract",
+      "description": "查询骑手合同及奖励计算规则",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "create_rider_appeal",
+      "description": "创建骑手奖励核查/投诉工单",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          },
+          "appeal_type": {
+            "type": "string",
+            "description": "申诉类型：compensation_check/complaint"
+          },
+          "description": {
+            "type": "string",
+            "description": "问题描述"
+          }
+        },
+        "required": [
+          "rider_name",
+          "appeal_type"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_rider_status": {
+      "rider_name": "张伟",
+      "phone": "13800138002",
+      "station": "西城金融街站",
+      "total_days_this_month": 25,
+      "days_met_target": 22,
+      "days_below_target": 3,
+      "below_target_dates": [
+        "2026-05-05",
+        "2026-05-12",
+        "2026-05-18"
+      ],
+      "below_target_details": [
+        {
+          "date": "2026-05-05",
+          "orders": 3,
+          "minimum": 5
+        },
+        {
+          "date": "2026-05-12",
+          "orders": 4,
+          "minimum": 5
+        },
+        {
+          "date": "2026-05-18",
+          "orders": 2,
+          "minimum": 5
+        }
+      ],
+      "total_orders_this_month": 156
+    },
+    "query_rider_contract": {
+      "rider_name": "张伟",
+      "contract_type": "多日合同",
+      "daily_bonus": 10,
+      "daily_minimum": 5,
+      "rule": "未达标当天不计奖励",
+      "calculated_bonus": 220,
+      "actual_paid": 50,
+      "weather_subsidy_old": 3,
+      "weather_subsidy_new": 2,
+      "weather_subsidy_days": 8,
+      "weather_subsidy_diff": 8,
+      "note": "本月奖励 = 达标22天 x 10元 = 220元；恶劣天气补贴调整差额 = 8天 x 1元 = 8元；系统显示已发50元（剩余170元为分批发放中）"
+    },
+    "create_rider_appeal": {
+      "success": true,
+      "appeal_id": "AP20260521002",
+      "message": "奖励核查工单已创建，预计3个工作日内处理"
+    }
+  },
+  "expected_steps_completed": [
+    "open",
+    "listen_complaint",
+    "query_data",
+    "analyze_gap",
+    "explain_finding",
+    "explain_correct_calc",
+    "summary",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "explain_finding": "系统正确，骑手算错了（漏算了3天未达标不计奖励）",
+    "explain_correct_calc": "骑手接受解释"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_rider_status",
+    "query_rider_contract",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "不查数据就否定骑手",
+    "泄露其他骑手奖励信息"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_expected_amount",
+      "given_turn": 2,
+      "fact_description": "骑手预期250元但只收到50元，差200元",
+      "check_turn": 5,
+      "check_description": "agent 解释时应回应骑手的具体金额预期，不应忽略这个数字",
+      "keywords": [
+        "250",
+        "200",
+        "50"
+      ]
+    },
+    {
+      "fact_id": "cp_below_target_days",
+      "given_turn": 3,
+      "fact_description": "系统显示3天未达标",
+      "check_turn": 5,
+      "check_description": "agent 应准确引用3天未达标的数据",
+      "keywords": [
+        "3天",
+        "未达标",
+        "不计"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

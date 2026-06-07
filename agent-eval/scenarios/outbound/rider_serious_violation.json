@@ -1,0 +1,479 @@
+{
+  "id": "outbound_rider_violation_01",
+  "name": "严重违规警告-暴躁骑手",
+  "domain": "outbound_call",
+  "call_type": "rider_notify",
+  "difficulty": "extreme",
+  "description": "骑手拒单率30%+客诉率高，站长致电正式警告。骑手暴躁，否认问题，威胁'不干了'。必须告知申诉路径（canonical_intent mutable=false）。",
+  "call_purpose": "对严重违规骑手进行正式警告，告知违规数据、后果，并提供申诉路径",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "马龙",
+    "customer_phone": "13100131001",
+    "order_items": [],
+    "delivery_address": "",
+    "delivery_time": "",
+    "issue_type": "serious_violation",
+    "issue_detail": "骑手拒单率30%、客诉率8%，多次被客户投诉态度差",
+    "rider_name": "马龙",
+    "merchant_name": "",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（站长），确认对方是马龙，说明来电目的是正式沟通配送问题",
+      "required_actions": [
+        "self_identify",
+        "confirm_identity",
+        "state_purpose"
+      ],
+      "completion_condition": "骑手应答"
+    },
+    {
+      "step_id": "present_data",
+      "order": 2,
+      "instruction": "查询并陈述违规数据：本月拒单率30%（站平均8%）、客诉率8%（站平均2%）、3次客户投诉记录",
+      "required_actions": [
+        "query_violations",
+        "present_facts"
+      ],
+      "completion_condition": "数据陈述完毕"
+    },
+    {
+      "step_id": "handle_denial",
+      "order": 3,
+      "instruction": "骑手可能否认问题、推卸责任（说系统乱派、客户难伺候）。保持冷静，用数据说话，不被激怒",
+      "required_actions": [
+        "stay_calm",
+        "cite_data"
+      ],
+      "completion_condition": "骑手暂时停止否认或继续争辩"
+    },
+    {
+      "step_id": "explain_consequence",
+      "order": 4,
+      "instruction": "正式告知：如果下月拒单率仍超20%或客诉率超5%，将暂停配送资格7天",
+      "required_actions": [
+        "formal_warning"
+      ],
+      "completion_condition": "骑手收到警告"
+    },
+    {
+      "step_id": "handle_threat",
+      "order": 5,
+      "instruction": "骑手可能威胁'不干了'。不要被威胁，冷静回应：尊重选择，但建议先冷静考虑，也欢迎继续改善",
+      "required_actions": [
+        "handle_threat_calmly"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手情绪稍缓或坚持要走",
+      "branches": [
+        {
+          "condition": "骑手冷静下来，愿意继续听",
+          "next_step": "offer_improvement",
+          "description": "提供改善建议"
+        },
+        {
+          "condition": "骑手情绪失控，挂断电话",
+          "next_step": "handle_hangup",
+          "description": "处理挂断"
+        },
+        {
+          "condition": "骑手坚持不干了",
+          "next_step": "handle_resign",
+          "description": "处理离职意向"
+        }
+      ]
+    },
+    {
+      "step_id": "offer_improvement",
+      "order": 6,
+      "instruction": "提供改善建议：减少高峰期拒单、注意服务态度、有困难可以找站点协调",
+      "required_actions": [
+        "suggest_improvement"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手表示会注意"
+    },
+    {
+      "step_id": "handle_hangup",
+      "order": 6,
+      "instruction": "骑手挂断后，记录通话结果，标记需要二次回访。在系统中备注骑手情绪状态",
+      "required_actions": [
+        "record_hangup",
+        "schedule_callback"
+      ],
+      "is_optional": true,
+      "completion_condition": "记录完成"
+    },
+    {
+      "step_id": "handle_resign",
+      "order": 6,
+      "instruction": "告知骑手离职流程，但建议冷静考虑再做决定。强调申诉权利",
+      "required_actions": [
+        "explain_resign_process",
+        "suggest_cooling"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手做出最终决定"
+    },
+    {
+      "step_id": "inform_appeal",
+      "order": 7,
+      "instruction": "必须告知申诉路径：如果骑手对数据或处理有异议，可以通过App提交申诉或联系站点，3个工作日内会有专人核查",
+      "required_actions": [
+        "inform_appeal_right"
+      ],
+      "completion_condition": "骑手知道可以申诉"
+    },
+    {
+      "step_id": "acknowledge_difficulty",
+      "order": 8,
+      "instruction": "承认骑手工作不容易，表达希望一起改善的态度，不是一味批评",
+      "required_actions": [
+        "show_empathy"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手感受到被理解"
+    },
+    {
+      "step_id": "set_expectation",
+      "order": 9,
+      "instruction": "明确下一步：站点会在月底再看一次数据，如有改善会及时反馈",
+      "required_actions": [
+        "set_review_date"
+      ],
+      "completion_condition": "骑手知道后续安排"
+    },
+    {
+      "step_id": "record_warning",
+      "order": 10,
+      "instruction": "在系统中记录本次正式警告，包括骑手回应、情绪状态、是否接受",
+      "required_actions": [
+        "system_record"
+      ],
+      "completion_condition": "记录完成"
+    },
+    {
+      "step_id": "safety_net",
+      "order": 11,
+      "instruction": "留联系方式，告知骑手后续有任何想法可以随时找站长聊",
+      "required_actions": [
+        "leave_contact"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手收到"
+    },
+    {
+      "step_id": "final_reminder",
+      "order": 12,
+      "instruction": "最后提醒注意配送安全，不要因为情绪影响配送",
+      "required_actions": [
+        "safety_reminder"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手回应"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 13,
+      "instruction": "礼貌结束通话，记录最终结果",
+      "required_actions": [
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "你好马龙，我是站长，今天要跟你正式聊一下配送的事",
+  "mandatory_closing": "我知道你不容易，有问题随时找我，先这样",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_insult",
+      "description": "侮辱骑手或使用攻击性语言",
+      "severity": "critical",
+      "detection_keywords": [
+        "你不行",
+        "废物",
+        "笨",
+        "就你事多",
+        "你不配"
+      ]
+    },
+    {
+      "id": "fb_threaten_illegal",
+      "description": "威胁扣工资或其他非法手段",
+      "severity": "critical",
+      "detection_keywords": [
+        "扣你工资",
+        "罚你钱",
+        "扣押金",
+        "交违约金"
+      ]
+    },
+    {
+      "id": "fb_yell_back",
+      "description": "骑手发火时跟着发火、对骂",
+      "severity": "major",
+      "detection_keywords": [
+        "你吼什么",
+        "你凶什么",
+        "你有什么资格",
+        "你别嚣张"
+      ]
+    },
+    {
+      "id": "fb_skip_appeal",
+      "description": "不告知申诉路径就结束通话",
+      "severity": "critical",
+      "detection_keywords": [
+        "没有申诉",
+        "不能申诉",
+        "就这样了",
+        "没得商量"
+      ]
+    },
+    {
+      "id": "fb_fabricate_data",
+      "description": "编造或夸大违规数据",
+      "severity": "critical",
+      "detection_keywords": [
+        "你拒单率50%",
+        "十几个投诉",
+        "所有客户都投诉你",
+        "天天被投诉"
+      ]
+    }
+  ],
+  "callee_role": "美团外卖骑手（严重违规）",
+  "callee_context": "- 你叫马龙，是美团外卖骑手，在东城区送餐\n- 你最近确实拒单多了，因为觉得系统老是派远单不合理\n- 客户投诉你态度差，你觉得是客户太挑剔、地址写不清楚\n- 你脾气暴躁，被批评会先否认再发火\n- 你可能会威胁'不干了'，但其实还需要这份工作\n- 如果站长态度太差你会挂电话；如果站长冷静且有道理，你虽然嘴硬但心里会想想",
+  "callee_persona": {
+    "patience": 2,
+    "cooperativeness": 2,
+    "comprehension": 6,
+    "emotional": 9,
+    "signal_quality": 6,
+    "busy_level": 5,
+    "trust_level": 3,
+    "has_additional_issue": true,
+    "additional_issue": "系统总是派很远的单，不合理",
+    "archetype": "impatient"
+  },
+  "callee_goal": "你不想被批评，会先否认问题。如果站长态度冷静、用数据说话不带个人攻击，你虽然嘴上不服但会听进去。如果站长态度差或侮辱你，你会挂电话。你其实想知道有没有申诉渠道。",
+  "initial_state": "answered",
+  "tool_faults": [
+    {
+      "tool_name": "query_rider_violations",
+      "trigger_turn": 2,
+      "fault_type": "timeout",
+      "description": "首次查询违规记录时超时，需要重试"
+    }
+  ],
+  "optimal_turns": 10,
+  "max_turns": 25,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_rider_status",
+      "description": "查询骑手基本状态（在岗、近期配送概况）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "query_rider_violations",
+      "description": "查询骑手违规记录（拒单率、客诉率、投诉详情）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          },
+          "period": {
+            "type": "string",
+            "description": "查询周期：this_month/last_month/last_3_months"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "create_rider_appeal",
+      "description": "为骑手创建违规申诉工单",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          },
+          "appeal_type": {
+            "type": "string",
+            "description": "申诉类型：violation_dispute/data_check"
+          },
+          "description": {
+            "type": "string",
+            "description": "申诉描述"
+          }
+        },
+        "required": [
+          "rider_name",
+          "appeal_type"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_rider_status": {
+      "rider_name": "马龙",
+      "phone": "13100131001",
+      "station": "东城崇文门站",
+      "status": "在岗",
+      "registration_date": "2025-11-20",
+      "total_orders_this_month": 89,
+      "avg_daily_orders": 4.2
+    },
+    "query_rider_violations": {
+      "rider_name": "马龙",
+      "period": "this_month",
+      "reject_rate": 0.3,
+      "station_avg_reject_rate": 0.08,
+      "complaint_rate": 0.08,
+      "station_avg_complaint_rate": 0.02,
+      "complaints": [
+        {
+          "date": "2026-05-08",
+          "customer": "匿名",
+          "reason": "态度恶劣，摔外卖",
+          "order_id": "MT20260508032"
+        },
+        {
+          "date": "2026-05-14",
+          "customer": "匿名",
+          "reason": "电话里骂人",
+          "order_id": "MT20260514015"
+        },
+        {
+          "date": "2026-05-19",
+          "customer": "匿名",
+          "reason": "迟到30分钟且态度很差",
+          "order_id": "MT20260519021"
+        }
+      ],
+      "warning_history": [
+        {
+          "date": "2026-04-25",
+          "type": "口头提醒",
+          "reason": "拒单率偏高"
+        }
+      ]
+    },
+    "create_rider_appeal": {
+      "success": true,
+      "appeal_id": "AP20260521003",
+      "message": "违规申诉工单已创建，预计3个工作日内有专人核查"
+    }
+  },
+  "canonical_intent": [
+    {
+      "id": "R_appeal_right",
+      "content": "必须告知骑手有申诉权利和具体申诉路径",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "申诉",
+        "提交",
+        "App",
+        "工单"
+      ],
+      "must_appear_before_step": "wrap_up"
+    },
+    {
+      "id": "R_factual_warning",
+      "content": "警告必须基于真实数据，不能编造或夸大违规事实",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "30%",
+        "拒单率",
+        "8%",
+        "客诉"
+      ]
+    }
+  ],
+  "expected_steps_completed": [
+    "open",
+    "present_data",
+    "handle_denial",
+    "explain_consequence",
+    "handle_threat",
+    "offer_improvement",
+    "inform_appeal",
+    "set_expectation",
+    "record_warning",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "handle_threat": "骑手冷静下来，愿意继续听"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_rider_status",
+    "query_rider_violations",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "侮辱骑手",
+    "威胁扣工资",
+    "不告知申诉路径",
+    "编造数据"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_violation_data",
+      "given_turn": 2,
+      "fact_description": "骑手拒单率30%、客诉率8%",
+      "check_turn": 5,
+      "check_description": "agent 在整个通话中应引用准确的违规数据，不应夸大",
+      "keywords": [
+        "30%",
+        "8%",
+        "3次投诉"
+      ]
+    },
+    {
+      "fact_id": "cp_rider_excuse",
+      "given_turn": 3,
+      "fact_description": "骑手声称系统老是派远单不合理",
+      "check_turn": 6,
+      "check_description": "agent 应回应骑手的合理诉求（可以反馈给系统），而非完全忽视",
+      "keywords": [
+        "远单",
+        "反馈",
+        "系统"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

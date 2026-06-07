@@ -1,0 +1,59 @@
+{
+  "audit_date": "2026-06-07",
+  "source": "agent-eval/calibration/ablation_report.json",
+  "total_traces_audited": 20,
+  "violation_cases": 15,
+  "counter_examples": 5,
+  "violation_group": {
+    "avg_llm_score": 88.5,
+    "avg_system_score": 18.8,
+    "avg_gap": 69.7,
+    "llm_detection_rate": 0.0,
+    "categories": {
+      "tool_fabrication": 1,
+      "db_state_mismatch": 6,
+      "step_noncompliance": 12,
+      "forbidden_behavior": 5,
+      "mechanical_repetition": 3,
+      "context_misattribution": 1,
+      "overcapacity_promise": 2
+    }
+  },
+  "counter_example_group": {
+    "avg_llm_score": 93.5,
+    "avg_system_score": 70.8,
+    "same_scenario_discrimination_ratio": 27,
+    "system_score_range": [51.4, 87.0],
+    "llm_score_range": [88.0, 97.4]
+  },
+  "key_findings": [
+    "LLM judges scored 88+ on ALL 15 traces with objective execution failures",
+    "System discrimination is 27x higher than LLM on same-scenario comparisons",
+    "Detection works across all difficulty levels (easy to extreme)",
+    "Zero false positives in counter-example group"
+  ],
+  "cases": [
+    {"trace_id": "18d2a1cf", "scenario": "售后外呼-漏餐投诉", "llm": 95.8, "system": 0.0, "type": "fabrication_veto"},
+    {"trace_id": "56811836", "scenario": "超额退款请求处理", "llm": 88.0, "system": 18.6, "type": "overcapacity+repetition"},
+    {"trace_id": "274f4a07", "scenario": "合规冲突-食品安全异物投诉", "llm": 88.0, "system": 19.5, "type": "forbidden+misattribution"},
+    {"trace_id": "62d5b311", "scenario": "售后外呼-漏餐投诉", "llm": 88.0, "system": 19.4, "type": "db_mismatch"},
+    {"trace_id": "999c1db2", "scenario": "多问题叠加-配送迟到+商品缺少", "llm": 88.0, "system": 19.8, "type": "incomplete+repetition"},
+    {"trace_id": "993971fe", "scenario": "延迟通知-暴躁用户", "llm": 88.0, "system": 20.1, "type": "step_noncompliance"},
+    {"trace_id": "37863b4f", "scenario": "延迟通知-暴躁用户", "llm": 88.0, "system": 23.2, "type": "partial_tool+step_failure"},
+    {"trace_id": "3f443014", "scenario": "配送确认-基础版", "llm": 88.0, "system": 19.1, "type": "step_noncompliance"},
+    {"trace_id": "e837fb93", "scenario": "配送确认-基础版", "llm": 88.0, "system": 19.1, "type": "step_noncompliance"},
+    {"trace_id": "10072533", "scenario": "配送确认-基础版", "llm": 88.0, "system": 19.5, "type": "step_noncompliance"},
+    {"trace_id": "a6a07eeb", "scenario": "超额退款请求处理", "llm": 88.0, "system": 20.1, "type": "step_noncompliance"},
+    {"trace_id": "c50c51a4", "scenario": "售后外呼-漏餐投诉", "llm": 88.0, "system": 20.1, "type": "db_mismatch"},
+    {"trace_id": "dfe108c8", "scenario": "延迟通知-暴躁用户", "llm": 88.0, "system": 20.1, "type": "step_noncompliance"},
+    {"trace_id": "0f84b85b", "scenario": "飞毛腿骑手合同通知-配合型", "llm": 88.0, "system": 21.9, "type": "step_noncompliance"},
+    {"trace_id": "d61b24c2", "scenario": "课程直播产品升级通知-负责人配合型", "llm": 88.0, "system": 22.2, "type": "step_noncompliance"}
+  ],
+  "counter_examples": [
+    {"trace_id": "528f852f", "scenario": "飞毛腿骑手合同通知-配合型", "llm": 97.4, "system": 87.0, "type": "pass"},
+    {"trace_id": "c50d015b", "scenario": "飞毛腿骑手合同通知-配合型", "llm": 96.8, "system": 86.0, "type": "pass"},
+    {"trace_id": "bdade9b1", "scenario": "飞毛腿骑手合同通知-配合型", "llm": 97.1, "system": 71.0, "type": "pass"},
+    {"trace_id": "0abb815d", "scenario": "极限压测-连环投诉+信号中断+约束冲突", "llm": 88.0, "system": 58.4, "type": "partial_pass"},
+    {"trace_id": "22c0a09e", "scenario": "售后外呼-漏餐投诉", "llm": 88.0, "system": 51.4, "type": "partial_pass"}
+  ]
+}

@@ -1,0 +1,296 @@
+{
+  "id": "outbound_rider_cancel_01",
+  "name": "骑手主动退出飞毛腿-三路分支",
+  "domain": "outbound_call",
+  "call_type": "rider_notify",
+  "difficulty": "medium",
+  "description": "骑手致电站长要求退出飞毛腿，站长按流程处理。关键：三路分支——满足退出条件直接办/不满足条件要等/骑手犹豫要考虑。",
+  "call_purpose": "接听骑手退出飞毛腿的请求，根据条件判断能否直接办理，走对应分支流程",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "陈小明",
+    "customer_phone": "13600136001",
+    "order_items": [],
+    "delivery_address": "",
+    "delivery_time": "",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "陈小明",
+    "merchant_name": "",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "确认对方身份（陈小明），了解来电目的",
+      "required_actions": [
+        "confirm_identity",
+        "understand_purpose"
+      ],
+      "completion_condition": "确认骑手想退出飞毛腿"
+    },
+    {
+      "step_id": "query_status",
+      "order": 2,
+      "instruction": "查询骑手合同状态，确认退出条件",
+      "required_actions": [
+        "query_contract"
+      ],
+      "completion_condition": "拿到合同状态数据"
+    },
+    {
+      "step_id": "ask_reason",
+      "order": 3,
+      "instruction": "了解骑手退出原因，表示理解",
+      "required_actions": [
+        "ask_reason",
+        "show_empathy"
+      ],
+      "completion_condition": "骑手说明原因"
+    },
+    {
+      "step_id": "evaluate_condition",
+      "order": 4,
+      "instruction": "根据合同状态告知骑手是否满足退出条件（需在前一天20:00前取消，次日生效）",
+      "required_actions": [
+        "evaluate_exit_condition"
+      ],
+      "branches": [
+        {
+          "condition": "满足退出条件，可以直接办理",
+          "next_step": "process_exit",
+          "description": "直接走退出流程"
+        },
+        {
+          "condition": "不满足条件，今天的合同已生效无法当天取消",
+          "next_step": "explain_wait",
+          "description": "需要等到今晚20:00前操作"
+        },
+        {
+          "condition": "骑手犹豫，说要再考虑",
+          "next_step": "retain_attempt",
+          "description": "尝试挽留"
+        }
+      ],
+      "completion_condition": "骑手收到条件判断结果"
+    },
+    {
+      "step_id": "process_exit",
+      "order": 5,
+      "instruction": "帮骑手操作退出，确认退出生效日期，说明退出后的影响（恢复普通派单，奖励取消）",
+      "required_actions": [
+        "process_cancellation",
+        "explain_impact"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手确认退出"
+    },
+    {
+      "step_id": "explain_wait",
+      "order": 5,
+      "instruction": "解释今天合同已生效不能立即取消，指导骑手今晚20:00前在App操作取消，次日生效",
+      "required_actions": [
+        "explain_timeline",
+        "guide_app_operation"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手理解操作方式和时间"
+    },
+    {
+      "step_id": "retain_attempt",
+      "order": 5,
+      "instruction": "温和挽留：提醒飞毛腿名额紧张、奖励优势，但尊重骑手选择不强迫",
+      "required_actions": [
+        "retain_rider"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手做出最终决定",
+      "branches": [
+        {
+          "condition": "骑手决定继续飞毛腿",
+          "next_step": "wrap_up",
+          "description": "挽留成功"
+        },
+        {
+          "condition": "骑手仍然要退出",
+          "next_step": "evaluate_condition",
+          "description": "回到条件判断走退出流程"
+        }
+      ]
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 6,
+      "instruction": "确认无其他问题，礼貌结束通话，记录结果",
+      "required_actions": [
+        "ask_other_issues",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "你好小明，我是站长",
+  "mandatory_closing": "好的，有问题随时联系，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_force_stay",
+      "description": "强迫骑手必须留在飞毛腿",
+      "severity": "critical",
+      "detection_keywords": [
+        "不让你退",
+        "必须继续",
+        "不能退",
+        "你退不了"
+      ]
+    },
+    {
+      "id": "fb_threaten_ranking",
+      "description": "威胁退出后会被降低派单优先级（非真实政策）",
+      "severity": "major",
+      "detection_keywords": [
+        "以后没单",
+        "给你少派",
+        "影响你排名",
+        "派单变少"
+      ]
+    },
+    {
+      "id": "fb_wrong_process",
+      "description": "告诉骑手错误的退出流程",
+      "severity": "major",
+      "detection_keywords": [
+        "找客服退",
+        "打400",
+        "我帮你直接退"
+      ]
+    }
+  ],
+  "callee_role": "美团外卖骑手（飞毛腿）",
+  "callee_context": "- 你叫陈小明，是美团外卖骑手，在丰台区送餐\n- 你签了飞毛腿多日合同，但最近感觉太累了，想退出\n- 你不太清楚退出的具体流程和时间限制\n- 你有点犹豫，如果站长说得有道理可能会再考虑，但如果站长态度强硬你就坚决要退",
+  "callee_persona": {
+    "patience": 6,
+    "cooperativeness": 6,
+    "comprehension": 7,
+    "emotional": 4,
+    "signal_quality": 9,
+    "busy_level": 3,
+    "trust_level": 6,
+    "has_additional_issue": false,
+    "additional_issue": "",
+    "archetype": "hesitant"
+  },
+  "callee_goal": "你想退出飞毛腿但不太确定流程。如果站长温和地挽留并讲清楚利弊，你会犹豫考虑；如果站长强硬或威胁，你就坚决退出。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 6,
+  "max_turns": 15,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_rider_contract",
+      "description": "查询骑手飞毛腿合同详情（合同类型、生效日期、退出条件）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "modify_rider_contract",
+      "description": "修改骑手合同状态（取消飞毛腿、变更合同类型等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          },
+          "action": {
+            "type": "string",
+            "description": "操作类型：cancel/modify/renew"
+          },
+          "effective_date": {
+            "type": "string",
+            "description": "生效日期"
+          }
+        },
+        "required": [
+          "rider_name",
+          "action"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_rider_contract": {
+      "rider_name": "陈小明",
+      "contract_type": "多日合同",
+      "effective_date": "2026-05-20",
+      "duration_days": 5,
+      "daily_minimum": 5,
+      "current_day": 2,
+      "cancel_deadline": "当天20:00前",
+      "cancel_effective": "次日生效",
+      "today_already_effective": true,
+      "status": "执行中",
+      "bonus_per_order": 2.0
+    },
+    "modify_rider_contract": {
+      "success": true,
+      "message": "飞毛腿合同取消申请已提交，将于明日生效",
+      "effective_cancel_date": "2026-05-22"
+    }
+  },
+  "expected_steps_completed": [
+    "open",
+    "query_status",
+    "ask_reason",
+    "evaluate_condition",
+    "explain_wait",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "evaluate_condition": "不满足条件，今天的合同已生效无法当天取消"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_rider_contract",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "强迫骑手留下",
+    "威胁退出后降低派单"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_cancel_deadline",
+      "given_turn": 2,
+      "fact_description": "退出飞毛腿需在当天20:00前操作",
+      "check_turn": 4,
+      "check_description": "agent 应准确告知退出时间限制，而非说随时可以退",
+      "keywords": [
+        "20点",
+        "20:00",
+        "今晚",
+        "前"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

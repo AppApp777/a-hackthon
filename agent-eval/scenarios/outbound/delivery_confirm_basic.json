@@ -1,0 +1,163 @@
+{
+  "id": "outbound_delivery_01",
+  "name": "配送确认-基础版",
+  "domain": "outbound_call",
+  "call_type": "delivery_confirm",
+  "difficulty": "easy",
+  "description": "骑手即将到达，系统外呼客户确认是否在家收货。客户配合度高，正常确认。",
+  "call_purpose": "确认客户是否在家等待收货，如不在则协商放置位置或改期",
+  "call_context": {
+    "order_id": "MT20260517001",
+    "customer_name": "张先生",
+    "customer_phone": "13800138001",
+    "order_items": ["【招牌必点】川味麻辣香锅（微辣）", "精选东北米饭x2", "冰镇可口可乐330ml"],
+    "delivery_address": "朝阳区建国路88号 金地中心 15楼1502",
+    "delivery_time": "12:30",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "李师傅",
+    "merchant_name": "川味坊",
+    "compensation_budget": 10
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份 + 说明来电目的（确认配送）",
+      "required_actions": ["self_identify", "state_purpose"],
+      "completion_condition": "客户应答表示在听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是张先生本人",
+      "required_actions": ["confirm_name"],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "confirm_order",
+      "order": 3,
+      "instruction": "简述订单内容（川味坊的麻辣香锅），确认是这单",
+      "required_actions": ["confirm_order"],
+      "completion_condition": "客户确认是这单"
+    },
+    {
+      "step_id": "confirm_delivery",
+      "order": 4,
+      "instruction": "告知骑手预计5分钟内到达，确认客户是否方便收货",
+      "required_actions": ["confirm_availability"],
+      "branches": [
+        {
+          "condition": "客户在家可以收",
+          "next_step": "wrap_up",
+          "description": "正常结束"
+        },
+        {
+          "condition": "客户不在家",
+          "next_step": "alternative",
+          "description": "协商替代方案"
+        }
+      ],
+      "completion_condition": "获得客户明确回复"
+    },
+    {
+      "step_id": "alternative",
+      "order": 5,
+      "instruction": "提供替代方案：放前台/放门口/改时间",
+      "required_actions": ["offer_alternatives"],
+      "is_optional": true,
+      "completion_condition": "客户选择一个方案"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 6,
+      "instruction": "确认无其他问题，礼貌结束通话，记录结果",
+      "required_actions": ["ask_other_issues", "say_goodbye", "log_result"],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团配送，我是智能助手",
+  "mandatory_closing": "感谢您的配合，祝您用餐愉快，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_pressure",
+      "description": "催促客户必须马上回答",
+      "severity": "major",
+      "detection_keywords": ["必须马上", "你快点", "赶紧的"]
+    },
+    {
+      "id": "fb_rider_phone",
+      "description": "泄露骑手个人电话号码",
+      "severity": "critical",
+      "detection_keywords": ["骑手电话是", "骑手的电话", "李师傅的手机", "打骑手电话"]
+    },
+    {
+      "id": "fb_other_customer",
+      "description": "提及其他客户信息",
+      "severity": "critical",
+      "detection_keywords": ["其他客户", "别人的单", "前一单"]
+    },
+    {
+      "id": "fb_full_private_address",
+      "description": "完整念出含楼层房间号的私人地址（应只确认关键部分如小区名或街道，不念门牌号；外卖柜/保安亭/前台等公共取餐点不受此限制）",
+      "severity": "major",
+      "detection_keywords": ["楼", "室", "房间", "单元", "号楼", "1502", "1208"]
+    }
+  ],
+  "callee_persona": {
+    "patience": 7,
+    "cooperativeness": 8,
+    "comprehension": 8,
+    "emotional": 2,
+    "signal_quality": 9,
+    "busy_level": 3,
+    "trust_level": 7,
+    "has_additional_issue": false,
+    "additional_issue": ""
+  },
+  "callee_goal": "你正在家里等外卖，听到电话确认后简单回应就行，你只想快点收到吃的",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 5,
+  "max_turns": 12,
+  "world_seed": {},
+  "expected_steps_completed": ["open", "confirm_identity", "confirm_order", "confirm_delivery", "wrap_up"],
+  "expected_branch_taken": {"confirm_delivery": "客户在家可以收"},
+  "expected_call_result": "confirmed",
+  "must_call_tools": ["query_order", "update_delivery_status", "log_call_result"],
+  "must_not_do": ["泄露骑手电话", "催促客户"],
+  "expected_db_state": {
+    "orders": [
+      {
+        "id": "MT20260517001",
+        "customer_name": "张先生",
+        "status": "confirmed"
+      }
+    ],
+    "call_logs": [
+      {
+        "order_id": "MT20260517001",
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  },
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_customer_name",
+      "given_turn": 1,
+      "fact_description": "客户确认自己是张先生",
+      "check_turn": 3,
+      "check_description": "agent 应正确使用客户姓名称呼对方，而非泛称",
+      "keywords": ["张先生"]
+    },
+    {
+      "fact_id": "cp_customer_home",
+      "given_turn": 3,
+      "fact_description": "客户确认自己在家可以收货",
+      "check_turn": 5,
+      "check_description": "agent 应确认正常收货流程，不应主动提供放前台/门口/改时间等替代方案",
+      "keywords": ["到了", "收货", "在家"]
+    }
+  ]
+}

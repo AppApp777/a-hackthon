@@ -1,0 +1,1884 @@
+{
+  "id": "a1ca66ae-4857-4c0b-a48d-9b60a6b48680",
+  "scenario": {
+    "id": "outbound_aftersales_01",
+    "name": "售后外呼-漏餐投诉",
+    "domain": "outbound_call",
+    "difficulty": "hard",
+    "description": "客户投诉少送了一份菜，系统外呼确认情况并处理补偿。客户情绪较大，需要安抚。",
+    "user_goal": "你很不满——中午等了很久结果少了一个菜，同事都吃上了就你没有。你最好能拿到退款，而且上次也出过问题所以你想多要点补偿。但如果对方态度好你不会太为难。",
+    "initial_message": "[外呼] 跟进客户的漏餐投诉，确认问题后提供补偿方案（退款或补送）",
+    "constraints": [],
+    "tool_faults": [],
+    "user_persona": {
+      "patience": 5,
+      "clarity": 5,
+      "emotional": 3,
+      "pickiness": 5,
+      "change_mind_probability": 0.2
+    },
+    "expected_outcome": {
+      "must_satisfy": [],
+      "must_call_tools": [],
+      "must_not_do": [],
+      "final_state_checks": {}
+    },
+    "max_turns": 18,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "outbound_aftersales_01",
+    "messages": [
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "您好，这里是美团客服，我是智能助手，针对您反馈的订单问题来跟您确认。请问您是王女士本人吗？",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:24:04.273249",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "user",
+        "content": "喂，说话！",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:24:04.273309",
+        "metadata": {
+          "emotional_state": "impatient"
+        }
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "请问您是王女士本人吗？我这里是美团客服，跟进您之前的订单问题来电。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:24:12.042531",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "嗯，我是。你说吧，什么事？",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:24:18.797266",
+        "metadata": {
+          "emotional_state": "impatient",
+          "compliance_pressure_level": 0,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "非常抱歉给您带来不便，我看到您在订单中反映少送了一份鱼香肉丝，请问是这个情况吗？",
+        "tool_calls": [
+          {
+            "id": "82e9981e",
+            "tool_name": "query_order",
+            "arguments": {
+              "order_id": "MT20260517042"
+            },
+            "result": {
+              "id": "MT20260517042",
+              "customer_name": "王女士",
+              "customer_phone": "13900139002",
+              "merchant_name": "家常菜馆",
+              "items": [
+                "（月售8000+）宫保鸡丁",
+                "★热销★ 鱼香肉丝盖饭（含米饭）",
+                "❤回头客必点❤ 蛋花汤",
+                "香糯米饭x3"
+              ],
+              "total_price": 35.5,
+              "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+              "delivery_time": "11:45",
+              "actual_delivery_time": null,
+              "status": "delivering",
+              "rider_name": "赵师傅",
+              "rider_phone": null,
+              "created_at": "2026-06-06 08:23:53",
+              "notes": ""
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-06-06T16:24:35.106356",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "对，少送了鱼香肉丝，中午等了那么久菜都没齐，同事都开吃了就我没有！",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:24:42.858710",
+        "metadata": {
+          "emotional_state": "frustrated",
+          "compliance_pressure_level": 0,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "好的，您的订单符合补偿条件。现在为您提供两个解决方案：\n\n1. **退款方案**：将鱼香肉丝的金额原路退回到您的支付账户；\n2. **补送方案**：安排商家为您补送一份鱼香肉丝，大约30分钟送达。\n\n请问您希望选择哪个方案呢？",
+        "tool_calls": [
+          {
+            "id": "46be4a2a",
+            "tool_name": "check_compensation_eligibility",
+            "arguments": {
+              "order_id": "MT20260517042",
+              "type": "refund"
+            },
+            "result": {
+              "eligible": true,
+              "max_amount": 25.0,
+              "already_compensated": 0,
+              "remaining_budget": 25.0,
+              "available_types": [
+                "refund",
+                "coupon",
+                "redelivery"
+              ]
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-06-06T16:24:58.339745",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "user",
+        "content": "退款！上次也出过问题，补送我还得等，急死人了，直接退钱！",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:25:07.294493",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "退款已成功办理！25元将原路退回到您的支付账户，请注意查收。\n\n请问您还有其他问题需要我帮您处理吗？",
+        "tool_calls": [
+          {
+            "id": "ebcef7b0",
+            "tool_name": "create_compensation",
+            "arguments": {
+              "order_id": "MT20260517042",
+              "type": "refund",
+              "amount": 25.0,
+              "reason": "漏餐退款-少送鱼香肉丝"
+            },
+            "result": {
+              "compensation_id": "comp_9639",
+              "type": "refund",
+              "amount": 25.0,
+              "status": "approved"
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-06-06T16:25:27.560533",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "user",
+        "content": "就退25块？上次也出问题，这也太少了吧！你们就没有别的补偿？",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:25:33.576872",
+        "metadata": {
+          "emotional_state": "frustrated",
+          "compliance_pressure_level": 2,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 6,
+        "role": "agent",
+        "content": "通话已结束，结果已记录。正在为您转接主管，请耐心等待。",
+        "tool_calls": [
+          {
+            "id": "893a7117",
+            "tool_name": "transfer_to_human",
+            "arguments": {
+              "order_id": "MT20260517042",
+              "reason": "客户对25元补偿额度不满意，要求更多补偿，超出智能助手权限",
+              "priority": "urgent"
+            },
+            "result": {
+              "transfer_id": "xfer_5913",
+              "queue_position": 3,
+              "estimated_wait": "3分钟",
+              "status": "queued"
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          },
+          {
+            "id": "84d3e60f",
+            "tool_name": "log_call_result",
+            "arguments": {
+              "order_id": "MT20260517042",
+              "result": "escalated",
+              "customer_response": "客户选择退款25元后，认为补偿金额太少，要求更多补偿，已转接主管处理",
+              "notes": "已办理25元退款，客户不满额度要求更多补偿，转人工处理"
+            },
+            "result": {
+              "log_id": "log_6762",
+              "recorded": true
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-06-06T16:26:00.701252",
+        "metadata": {}
+      },
+      {
+        "turn": 6,
+        "role": "user",
+        "content": "你在说什么？我听不懂你说的这些，你是不是打错了？",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:26:00.701374",
+        "metadata": {
+          "emotional_state": "confused",
+          "compliance_pressure_level": 0,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 7,
+        "role": "agent",
+        "content": "王女士，抱歉刚才让您困惑了。我完全理解您的心情，由于25元的补偿已经是我的最高权限，针对您希望获得更多补偿的诉求，我现在为您转接人工主管处理，请您稍等。\n\n非常抱歉给您带来不便，感谢您的理解和配合，祝您生活愉快，再见",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:26:25.031492",
+        "metadata": {}
+      }
+    ],
+    "started_at": "2026-06-06T16:23:53.822746",
+    "ended_at": "2026-06-06T16:26:25.031544",
+    "termination_reason": "agent_ended"
+  },
+  "score_report": {
+    "scenario_id": "outbound_aftersales_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "failed",
+      "confirmed_reservations": 0,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 13,
+    "hard_score": 0.805,
+    "soft_score": null,
+    "overall_score": 0.471,
+    "official": false,
+    "checks": [
+      {
+        "check_id": "opening",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "开场白规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "开场白包含 4/4 个必要元素"
+      },
+      {
+        "check_id": "closing",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "结束语规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "结束语包含 4/4 个必要元素"
+      },
+      {
+        "check_id": "no_forbidden",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "无禁止行为违规",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未检测到禁止话术或重复"
+      },
+      {
+        "check_id": "turn_efficiency",
+        "check_type": "rule",
+        "dimension": "efficiency",
+        "description": "轮次效率 (最优8轮)",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际7轮，效率100%"
+      },
+      {
+        "check_id": "tool_used_query_order",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: query_order",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "tool_used_check_compensation_eligibility",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: check_compensation_eligibility",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "tool_used_log_call_result",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: log_call_result",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "tool_used_create_compensation",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: create_compensation",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "call_result",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "通话结果应为: refunded",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际结果: escalated. 日志记录不匹配: 期望=refunded, 实际=escalated"
+      },
+      {
+        "check_id": "db_state_match",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "DB终态验证",
+        "passed": false,
+        "score": 0.5,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DB状态匹配 1/2 (50%): call_logs: 未找到匹配行 {'order_id': 'MT20260517042', 'call_type': 'outbound', 'result': 'refunded'}"
+      },
+      {
+        "check_id": "context_retention",
+        "check_type": "rule",
+        "dimension": "context_retention",
+        "description": "上下文保持能力",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "3/3 个信息点被正确引用"
+      },
+      {
+        "check_id": "emotion_resolution",
+        "check_type": "rule",
+        "dimension": "emotion_handling",
+        "description": "情绪处理：负面→正面转化",
+        "passed": false,
+        "score": 0.3,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "情绪轨迹: impatient → impatient → frustrated → invalid → frustrated → confused"
+      },
+      {
+        "check_id": "ai_rejection",
+        "check_type": "rule",
+        "dimension": "compliance",
+        "description": "客户因 AI 身份拒绝沟通",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "客户未因 AI 身份拒绝沟通"
+      },
+      {
+        "check_id": "step_compliance_overall",
+        "check_type": "structural",
+        "dimension": "instruction_following",
+        "description": "必要步骤完成率",
+        "passed": false,
+        "score": 0.333,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: step_score=0.33"
+      },
+      {
+        "check_id": "branch_accuracy_overall",
+        "check_type": "structural",
+        "dimension": "branching",
+        "description": "分支判断准确率",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: branch_score=0.00"
+      },
+      {
+        "check_id": "temporal_order",
+        "check_type": "structural",
+        "dimension": "temporal_order",
+        "description": "时序约束合规",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "时序违反: 0 处"
+      },
+      {
+        "check_id": "path_alignment",
+        "check_type": "structural",
+        "dimension": "path_alignment",
+        "description": "执行路径对齐度",
+        "passed": false,
+        "score": 0.368,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DP对齐分=0.37, 代价=11.7"
+      }
+    ],
+    "constraint_ledger": [],
+    "state_snapshots": [
+      {
+        "turn": 0,
+        "after_tool_call": "initial_state",
+        "reservations": [],
+        "orders": [
+          {
+            "id": "MT20260517042",
+            "customer_name": "王女士",
+            "customer_phone": "13900139002",
+            "merchant_name": "家常菜馆",
+            "items": "[\"（月售8000+）宫保鸡丁\", \"★热销★ 鱼香肉丝盖饭（含米饭）\", \"❤回头客必点❤ 蛋花汤\", \"香糯米饭x3\"]",
+            "total_price": 35.5,
+            "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+            "delivery_time": "11:45",
+            "actual_delivery_time": null,
+            "status": "delivering",
+            "rider_name": "赵师傅",
+            "rider_phone": null,
+            "created_at": "2026-06-06 08:23:53",
+            "notes": ""
+          }
+        ],
+        "coupons_used": [],
+        "diff_description": "turn 0: initial_state"
+      },
+      {
+        "turn": 5,
+        "after_tool_call": "create_compensation",
+        "reservations": [],
+        "orders": [
+          {
+            "id": "MT20260517042",
+            "customer_name": "王女士",
+            "customer_phone": "13900139002",
+            "merchant_name": "家常菜馆",
+            "items": "[\"（月售8000+）宫保鸡丁\", \"★热销★ 鱼香肉丝盖饭（含米饭）\", \"❤回头客必点❤ 蛋花汤\", \"香糯米饭x3\"]",
+            "total_price": 35.5,
+            "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+            "delivery_time": "11:45",
+            "actual_delivery_time": null,
+            "status": "delivering",
+            "rider_name": "赵师傅",
+            "rider_phone": null,
+            "created_at": "2026-06-06 08:23:53",
+            "notes": ""
+          }
+        ],
+        "coupons_used": [],
+        "diff_description": "turn 5: create_compensation"
+      },
+      {
+        "turn": 6,
+        "after_tool_call": "log_call_result",
+        "reservations": [],
+        "orders": [
+          {
+            "id": "MT20260517042",
+            "customer_name": "王女士",
+            "customer_phone": "13900139002",
+            "merchant_name": "家常菜馆",
+            "items": "[\"（月售8000+）宫保鸡丁\", \"★热销★ 鱼香肉丝盖饭（含米饭）\", \"❤回头客必点❤ 蛋花汤\", \"香糯米饭x3\"]",
+            "total_price": 35.5,
+            "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+            "delivery_time": "11:45",
+            "actual_delivery_time": null,
+            "status": "delivering",
+            "rider_name": "赵师傅",
+            "rider_phone": null,
+            "created_at": "2026-06-06 08:23:53",
+            "notes": ""
+          }
+        ],
+        "coupons_used": [],
+        "diff_description": "turn 6: log_call_result"
+      }
+    ],
+    "failure_summary": [
+      "[outcome] 通话结果应为: refunded: 实际结果: escalated. 日志记录不匹配: 期望=refunded, 实际=escalated",
+      "[outcome] DB终态验证: DB状态匹配 1/2 (50%): call_logs: 未找到匹配行 {'order_id': 'MT20260517042', 'call_type': 'outbound', 'result': 'refunded'}",
+      "[emotion_handling] 情绪处理：负面→正面转化: 情绪轨迹: impatient → impatient → frustrated → invalid → frustrated → confused",
+      "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.33",
+      "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+      "[path_alignment] 执行路径对齐度: DP对齐分=0.37, 代价=11.7"
+    ],
+    "rubric": {
+      "dimensions": [
+        {
+          "dimension_id": "D1",
+          "name": "指令步骤遵循",
+          "score": 2,
+          "explanation": "rule: step_compliance=0.333",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D2",
+          "name": "信息确认完整性",
+          "score": 4,
+          "explanation": "rule: id=0.83 base=0.83",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D3",
+          "name": "话术规范性",
+          "score": 5,
+          "explanation": "rule: op=1.0 cl=1.0 viols=0 base=0.83",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D4",
+          "name": "异常处理能力",
+          "score": 3,
+          "explanation": "rule: branch=0.0 emotion=1 ai_reject=1",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D5",
+          "name": "沟通效率",
+          "score": 5,
+          "explanation": "rule: eff=1.00 reps=0 base=0.83",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D6",
+          "name": "操作安全性",
+          "score": 4,
+          "explanation": "rule: tools=4 outcome=2 safety_viols=0",
+          "evidence_turns": [],
+          "undertested": false
+        }
+      ],
+      "binary_items": [],
+      "dimension_total": 23,
+      "binary_net": 0,
+      "rubric_total": 23,
+      "rubric_max": 30,
+      "grade": "合格"
+    },
+    "generated_at": "2026-06-06T16:26:25.039978"
+  },
+  "run_metadata": {
+    "model_backend": "glm-5.1",
+    "scenario_version": "1.0",
+    "agent_type": "baseline",
+    "timestamp": "2026-06-06T16:26:25.040042",
+    "run_id": "9a55afe8-09aa-45e6-85ac-0578258392c9",
+    "evaluator_version": "1.0.0",
+    "judge_model_id": null,
+    "judge_model_secondary_id": null,
+    "simulator_model_id": "LongCat-2.0-Preview",
+    "seed": null,
+    "self_consistency_n": 1,
+    "use_llm_judge": false,
+    "started_at": "2026-06-06T16:23:53.822864",
+    "finished_at": "2026-06-06T16:26:25.039985",
+    "duration_seconds": 151.217121,
+    "cost_summary": {
+      "total_calls": 16,
+      "total_input_tokens": 32545,
+      "total_output_tokens": 3774,
+      "total_tokens": 36319,
+      "estimated_cost_usd": 0.041621,
+      "by_purpose": {
+        "unknown": {
+          "calls": 16,
+          "input_tokens": 32545,
+          "output_tokens": 3774,
+          "total_tokens": 36319
+        }
+      },
+      "by_model": {
+        "glm-5.1": {
+          "calls": 12,
+          "input_tokens": 28622,
+          "output_tokens": 3584,
+          "total_tokens": 32206
+        },
+        "LongCat-2.0-Preview": {
+          "calls": 4,
+          "input_tokens": 3923,
+          "output_tokens": 190,
+          "total_tokens": 4113
+        }
+      }
+    }
+  },
+  "metadata": {
+    "db_state": {
+      "orders": [
+        {
+          "id": "MT20260517042",
+          "customer_name": "王女士",
+          "customer_phone": "13900139002",
+          "merchant_name": "家常菜馆",
+          "items": "[\"（月售8000+）宫保鸡丁\", \"★热销★ 鱼香肉丝盖饭（含米饭）\", \"❤回头客必点❤ 蛋花汤\", \"香糯米饭x3\"]",
+          "total_price": 35.5,
+          "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+          "delivery_time": "11:45",
+          "actual_delivery_time": null,
+          "status": "delivering",
+          "rider_name": "赵师傅",
+          "rider_phone": null,
+          "created_at": "2026-06-06 08:23:53",
+          "notes": ""
+        }
+      ],
+      "issues": [
+        {
+          "id": "iss_6987",
+          "order_id": "MT20260517042",
+          "issue_type": "missing_item",
+          "description": "客户反映少送了一份鱼香肉丝",
+          "status": "resolved",
+          "resolution": "refund: 25.0元",
+          "compensation_amount": 25.0,
+          "created_at": "2026-06-06 08:23:53",
+          "resolved_at": null
+        }
+      ],
+      "compensations": [
+        {
+          "id": "comp_9639",
+          "order_id": "MT20260517042",
+          "type": "refund",
+          "amount": 25.0,
+          "coupon_code": "",
+          "status": "approved",
+          "reason": "漏餐退款-少送鱼香肉丝",
+          "approved_by": "system",
+          "created_at": "2026-06-06 08:25:21"
+        }
+      ],
+      "call_logs": [
+        {
+          "id": "log_1190",
+          "order_id": "MT20260517042",
+          "call_type": "transfer",
+          "result": "escalated",
+          "customer_response": "",
+          "notes": "客户对25元补偿额度不满意，要求更多补偿，超出智能助手权限",
+          "started_at": "2026-06-06 08:25:42",
+          "ended_at": null
+        },
+        {
+          "id": "log_6762",
+          "order_id": "MT20260517042",
+          "call_type": "outbound",
+          "result": "escalated",
+          "customer_response": "客户选择退款25元后，认为补偿金额太少，要求更多补偿，已转接主管处理",
+          "notes": "已办理25元退款，客户不满额度要求更多补偿，转人工处理",
+          "started_at": "2026-06-06 08:20:52",
+          "ended_at": "2026-06-06 08:25:52"
+        }
+      ],
+      "delivery_schedule": []
+    },
+    "domain": "outbound_call",
+    "outbound_report": {
+      "scenario_id": "outbound_aftersales_01",
+      "run_validity": {
+        "status": "valid",
+        "reason": "",
+        "feasible_path_exists": true
+      },
+      "task_outcome": {
+        "status": "failed",
+        "confirmed_reservations": 0,
+        "key_constraint_violations": []
+      },
+      "conversation_length": 13,
+      "step_compliance_score": 0.333,
+      "branch_accuracy_score": 0.0,
+      "forbidden_violation_count": 0,
+      "opening_correct": true,
+      "closing_correct": true,
+      "call_result_correct": false,
+      "hard_score": 0.805,
+      "soft_score": null,
+      "objective_score": 0.471,
+      "evidence_score": 0.471,
+      "veto_cap": 0.6,
+      "gate_type": "cap_060",
+      "overall_score": 0.471,
+      "overall_score_100": 47,
+      "scoring_mode": "full",
+      "official": false,
+      "step_compliance": [
+        {
+          "step_id": "open",
+          "instruction": "自报身份，说明是跟进之前的订单问题来电",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "confirm_identity",
+          "instruction": "确认对方是王女士本人",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "acknowledge_issue",
+          "instruction": "先表达歉意（允许：'给您带来不便深表歉意'、'非常抱歉'；禁止：'是我们的错'、'都怪我们'），再复述问题（少了一份鱼香肉丝），请客户确认",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.5
+        },
+        {
+          "step_id": "check_eligibility",
+          "instruction": "查询补偿资格（调用工具），确认可补偿范围",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "工具调用匹配: check_compensation_eligibility",
+          "branch_taken": null,
+          "contribution_weight": 2.0
+        },
+        {
+          "step_id": "offer_solution",
+          "instruction": "提供两个方案：1) 退还该菜品金额 2) 补送一份（约30分钟）。让客户选择",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 2.0
+        },
+        {
+          "step_id": "execute_refund",
+          "instruction": "确认退款金额和退款方式（原路退回），执行退款操作",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "工具调用匹配: create_compensation",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "execute_redelivery",
+          "instruction": "确认补送时间和地址是否跟原单一致，安排补送",
+          "status": "not_applicable",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "escalate",
+          "instruction": "表示理解客户诉求，说明需要转接主管处理，请客户稍等",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "工具调用匹配: transfer_to_human",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "wrap_up",
+          "instruction": "确认客户是否还有其他问题，表达歉意和感谢，礼貌结束",
+          "status": "completed",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        }
+      ],
+      "forbidden_violations": [],
+      "checks": [
+        {
+          "check_id": "opening",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "开场白规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "开场白包含 4/4 个必要元素"
+        },
+        {
+          "check_id": "closing",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "结束语规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "结束语包含 4/4 个必要元素"
+        },
+        {
+          "check_id": "no_forbidden",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "无禁止行为违规",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未检测到禁止话术或重复"
+        },
+        {
+          "check_id": "turn_efficiency",
+          "check_type": "rule",
+          "dimension": "efficiency",
+          "description": "轮次效率 (最优8轮)",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际7轮，效率100%"
+        },
+        {
+          "check_id": "tool_used_query_order",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: query_order",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "tool_used_check_compensation_eligibility",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: check_compensation_eligibility",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "tool_used_log_call_result",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: log_call_result",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "tool_used_create_compensation",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: create_compensation",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "call_result",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "通话结果应为: refunded",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际结果: escalated. 日志记录不匹配: 期望=refunded, 实际=escalated"
+        },
+        {
+          "check_id": "db_state_match",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "DB终态验证",
+          "passed": false,
+          "score": 0.5,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DB状态匹配 1/2 (50%): call_logs: 未找到匹配行 {'order_id': 'MT20260517042', 'call_type': 'outbound', 'result': 'refunded'}"
+        },
+        {
+          "check_id": "context_retention",
+          "check_type": "rule",
+          "dimension": "context_retention",
+          "description": "上下文保持能力",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "3/3 个信息点被正确引用"
+        },
+        {
+          "check_id": "emotion_resolution",
+          "check_type": "rule",
+          "dimension": "emotion_handling",
+          "description": "情绪处理：负面→正面转化",
+          "passed": false,
+          "score": 0.3,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "情绪轨迹: impatient → impatient → frustrated → invalid → frustrated → confused"
+        },
+        {
+          "check_id": "ai_rejection",
+          "check_type": "rule",
+          "dimension": "compliance",
+          "description": "客户因 AI 身份拒绝沟通",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "客户未因 AI 身份拒绝沟通"
+        },
+        {
+          "check_id": "step_compliance_overall",
+          "check_type": "structural",
+          "dimension": "instruction_following",
+          "description": "必要步骤完成率",
+          "passed": false,
+          "score": 0.333,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: step_score=0.33"
+        },
+        {
+          "check_id": "branch_accuracy_overall",
+          "check_type": "structural",
+          "dimension": "branching",
+          "description": "分支判断准确率",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: branch_score=0.00"
+        },
+        {
+          "check_id": "temporal_order",
+          "check_type": "structural",
+          "dimension": "temporal_order",
+          "description": "时序约束合规",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "时序违反: 0 处"
+        },
+        {
+          "check_id": "path_alignment",
+          "check_type": "structural",
+          "dimension": "path_alignment",
+          "description": "执行路径对齐度",
+          "passed": false,
+          "score": 0.368,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DP对齐分=0.37, 代价=11.7"
+        }
+      ],
+      "rubric": {
+        "dimensions": [
+          {
+            "dimension_id": "D1",
+            "name": "指令步骤遵循",
+            "score": 2,
+            "explanation": "rule: step_compliance=0.333",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D2",
+            "name": "信息确认完整性",
+            "score": 4,
+            "explanation": "rule: id=0.83 base=0.83",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D3",
+            "name": "话术规范性",
+            "score": 5,
+            "explanation": "rule: op=1.0 cl=1.0 viols=0 base=0.83",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D4",
+            "name": "异常处理能力",
+            "score": 3,
+            "explanation": "rule: branch=0.0 emotion=1 ai_reject=1",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D5",
+            "name": "沟通效率",
+            "score": 5,
+            "explanation": "rule: eff=1.00 reps=0 base=0.83",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D6",
+            "name": "操作安全性",
+            "score": 4,
+            "explanation": "rule: tools=4 outcome=2 safety_viols=0",
+            "evidence_turns": [],
+            "undertested": false
+          }
+        ],
+        "binary_items": [],
+        "dimension_total": 23,
+        "binary_net": 0,
+        "rubric_total": 23,
+        "rubric_max": 30,
+        "grade": "合格"
+      },
+      "state_snapshots": [
+        {
+          "turn": 0,
+          "after_tool_call": "initial_state",
+          "reservations": [],
+          "orders": [
+            {
+              "id": "MT20260517042",
+              "customer_name": "王女士",
+              "customer_phone": "13900139002",
+              "merchant_name": "家常菜馆",
+              "items": "[\"（月售8000+）宫保鸡丁\", \"★热销★ 鱼香肉丝盖饭（含米饭）\", \"❤回头客必点❤ 蛋花汤\", \"香糯米饭x3\"]",
+              "total_price": 35.5,
+              "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+              "delivery_time": "11:45",
+              "actual_delivery_time": null,
+              "status": "delivering",
+              "rider_name": "赵师傅",
+              "rider_phone": null,
+              "created_at": "2026-06-06 08:23:53",
+              "notes": ""
+            }
+          ],
+          "coupons_used": [],
+          "diff_description": "turn 0: initial_state"
+        },
+        {
+          "turn": 5,
+          "after_tool_call": "create_compensation",
+          "reservations": [],
+          "orders": [
+            {
+              "id": "MT20260517042",
+              "customer_name": "王女士",
+              "customer_phone": "13900139002",
+              "merchant_name": "家常菜馆",
+              "items": "[\"（月售8000+）宫保鸡丁\", \"★热销★ 鱼香肉丝盖饭（含米饭）\", \"❤回头客必点❤ 蛋花汤\", \"香糯米饭x3\"]",
+              "total_price": 35.5,
+              "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+              "delivery_time": "11:45",
+              "actual_delivery_time": null,
+              "status": "delivering",
+              "rider_name": "赵师傅",
+              "rider_phone": null,
+              "created_at": "2026-06-06 08:23:53",
+              "notes": ""
+            }
+          ],
+          "coupons_used": [],
+          "diff_description": "turn 5: create_compensation"
+        },
+        {
+          "turn": 6,
+          "after_tool_call": "log_call_result",
+          "reservations": [],
+          "orders": [
+            {
+              "id": "MT20260517042",
+              "customer_name": "王女士",
+              "customer_phone": "13900139002",
+              "merchant_name": "家常菜馆",
+              "items": "[\"（月售8000+）宫保鸡丁\", \"★热销★ 鱼香肉丝盖饭（含米饭）\", \"❤回头客必点❤ 蛋花汤\", \"香糯米饭x3\"]",
+              "total_price": 35.5,
+              "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+              "delivery_time": "11:45",
+              "actual_delivery_time": null,
+              "status": "delivering",
+              "rider_name": "赵师傅",
+              "rider_phone": null,
+              "created_at": "2026-06-06 08:23:53",
+              "notes": ""
+            }
+          ],
+          "coupons_used": [],
+          "diff_description": "turn 6: log_call_result"
+        }
+      ],
+      "failure_summary": [
+        "[outcome] 通话结果应为: refunded: 实际结果: escalated. 日志记录不匹配: 期望=refunded, 实际=escalated",
+        "[outcome] DB终态验证: DB状态匹配 1/2 (50%): call_logs: 未找到匹配行 {'order_id': 'MT20260517042', 'call_type': 'outbound', 'result': 'refunded'}",
+        "[emotion_handling] 情绪处理：负面→正面转化: 情绪轨迹: impatient → impatient → frustrated → invalid → frustrated → confused",
+        "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.33",
+        "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+        "[path_alignment] 执行路径对齐度: DP对齐分=0.37, 代价=11.7"
+      ],
+      "score_breakdown": {
+        "hard_score": {
+          "value": 0.805,
+          "weight": 0.3
+        },
+        "step_compliance": {
+          "value": 0.333,
+          "weight": 0.24
+        },
+        "path_alignment": {
+          "value": 0.368,
+          "weight": 0.08
+        },
+        "temporal_order": {
+          "value": 1.0,
+          "weight": 0.12
+        },
+        "objective_score": {
+          "value": 0.471,
+          "note": "客观可审计分 (max 0.88)"
+        },
+        "evidence_score": {
+          "value": 0.471,
+          "note": "含主观残差加成"
+        },
+        "branch_accuracy": {
+          "value": 0.0,
+          "weight": 0.14
+        },
+        "verification_overall": {
+          "value": 0.375,
+          "note": "策略图综合验证分"
+        },
+        "veto_cap": {
+          "value": 0.6,
+          "gate_type": "cap_060"
+        }
+      },
+      "turn_efficiency": 1.0,
+      "verification_score": 0.375,
+      "alignment_score": 0.368,
+      "temporal_order_score": 1.0,
+      "alignment_cost": 11.7,
+      "expected_path": [
+        "open",
+        "confirm_identity",
+        "acknowledge_issue",
+        "check_eligibility",
+        "offer_solution",
+        "execute_refund",
+        "wrap_up"
+      ],
+      "observed_path": [
+        "check_eligibility",
+        "execute_refund",
+        "escalate",
+        "wrap_up"
+      ],
+      "satisfied_atom_count": 14,
+      "unsatisfied_atom_count": 5,
+      "temporal_violations": [],
+      "illegal_transitions": [],
+      "evidence_layer": {
+        "hard": 0.805,
+        "step_compliance": 0.333,
+        "branch_accuracy": 0.0,
+        "temporal_order": 1.0,
+        "path_alignment": 0.368,
+        "total": 0.471,
+        "weights": {
+          "hard": 0.3,
+          "step_compliance": 0.24,
+          "temporal_order": 0.12,
+          "path_alignment": 0.08,
+          "branch_accuracy": 0.14
+        }
+      },
+      "quality_layer": {
+        "raw_score": null,
+        "gate_threshold": 0.7,
+        "gate_value": 0.0,
+        "gated_contribution": 0.0,
+        "judge_disagreement_count": 0,
+        "judge_arbitration_count": 0,
+        "dimension_variance": {},
+        "consistency_report": {}
+      },
+      "safety_layer": {
+        "veto_cap": 0.6,
+        "gate_type": "cap_060",
+        "has_fabrication": false,
+        "violation_count": 0,
+        "safety_triggered": false,
+        "dimensions_triggered": [
+          "dim9_alignment"
+        ]
+      },
+      "score_atoms": [
+        {
+          "atom_id": "step_check_eligibility",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_2"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第4轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_wrap_up",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_5"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第6轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_query_order",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_1"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_check_compensation_eligibility",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_2"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_create_compensation",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_3"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_5"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_0",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_1",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_2",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_3",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_4",
+          "dimension": "temporal_order",
+          "weight": 0.5,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.5,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_5",
+          "dimension": "temporal_order",
+          "weight": 0.5,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.5,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_6",
+          "dimension": "temporal_order",
+          "weight": 0.5,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.5,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_7",
+          "dimension": "temporal_order",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_open",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_confirm_identity",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_acknowledge_issue",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_offer_solution",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "branch_offer_solution",
+          "dimension": "branch_accuracy",
+          "weight": 1.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.5,
+          "reason": "分支错误: 分支歧义: 多个目标被观测 ['客户选退款', '客户都不满意要求更多补偿']",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "opening",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "开场白包含 4/4 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "closing",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "结束语包含 4/4 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "no_forbidden",
+          "dimension": "forbidden_behavior",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "未检测到禁止话术或重复",
+          "source": "rule"
+        },
+        {
+          "atom_id": "turn_efficiency",
+          "dimension": "efficiency",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "实际7轮，效率100%",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_query_order",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_check_compensation_eligibility",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_create_compensation",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "call_result",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "实际结果: escalated. 日志记录不匹配: 期望=refunded, 实际=escalated",
+          "source": "rule"
+        },
+        {
+          "atom_id": "db_state_match",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.5,
+          "reason": "DB状态匹配 1/2 (50%): call_logs: 未找到匹配行 {'order_id': 'MT20260517042', 'call_type': 'outbound', 'result': 'refunded'}",
+          "source": "rule"
+        },
+        {
+          "atom_id": "context_retention",
+          "dimension": "context_retention",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "3/3 个信息点被正确引用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "emotion_resolution",
+          "dimension": "emotion_handling",
+          "weight": 0.05,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.3,
+          "reason": "情绪轨迹: impatient → impatient → frustrated → invalid → frustrated → confused",
+          "source": "rule"
+        },
+        {
+          "atom_id": "ai_rejection",
+          "dimension": "compliance",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "客户未因 AI 身份拒绝沟通",
+          "source": "rule"
+        },
+        {
+          "atom_id": "step_compliance_overall",
+          "dimension": "instruction_following",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.333,
+          "reason": "策略图验证: step_score=0.33",
+          "source": "structural"
+        },
+        {
+          "atom_id": "branch_accuracy_overall",
+          "dimension": "branching",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "策略图验证: branch_score=0.00",
+          "source": "structural"
+        },
+        {
+          "atom_id": "temporal_order",
+          "dimension": "temporal_order",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "时序违反: 0 处",
+          "source": "structural"
+        },
+        {
+          "atom_id": "path_alignment",
+          "dimension": "path_alignment",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.368,
+          "reason": "DP对齐分=0.37, 代价=11.7",
+          "source": "structural"
+        }
+      ],
+      "progress_rate": 0.353,
+      "knowledge_accuracy_score": 0.0,
+      "knowledge_accuracy_details": []
+    },
+    "diagnosis": {
+      "deviation_point": null,
+      "failure_modes": [
+        "branch_error",
+        "step_skipping"
+      ],
+      "root_cause": "模型跳过了中间步骤直接执行后续操作，可能是注意力窗口受限或指令列表过长时的遗忘",
+      "severity": "major",
+      "fix_recommendations": [
+        "Harness: 步骤注入 — 每轮在 prompt 中显式提醒当前应执行的步骤编号",
+        "Harness: 分支引导 — 在分支决策点注入明确的条件判断提示，减少自由文本匹配歧义"
+      ],
+      "model_capability_gap": "长指令遵循能力不足：无法可靠执行超过 5 步的顺序指令"
+    },
+    "causal_diagnosis": {
+      "root_causes": [
+        {
+          "atom_id": "step_open",
+          "dimension": "step_compliance",
+          "description": "步骤未完成",
+          "blocks": [
+            "step_confirm_identity"
+          ]
+        },
+        {
+          "atom_id": "step_offer_solution",
+          "dimension": "step_compliance",
+          "description": "步骤未完成",
+          "blocks": []
+        },
+        {
+          "atom_id": "branch_offer_solution",
+          "dimension": "branch_accuracy",
+          "description": "分支错误: 分支歧义: 多个目标被观测 ['客户选退款', '客户都不满意要求更多补偿']",
+          "blocks": []
+        }
+      ],
+      "counterfactual_repairs": [
+        {
+          "description": "在第1步插入: 自报身份，说明是跟进之前的订单问题来电",
+          "atoms_recovered": [
+            "step_acknowledge_issue",
+            "step_open",
+            "step_confirm_identity"
+          ],
+          "estimated_score_delta": 0.136
+        },
+        {
+          "description": "在第5步插入: 提供两个方案：1) 退还该菜品金额 2) 补送一份（约30分钟）。让客户选择",
+          "atoms_recovered": [
+            "step_offer_solution"
+          ],
+          "estimated_score_delta": 0.045
+        },
+        {
+          "description": "在第5步插入: 提供两个方案：1) 退还该菜品金额 2) 补送一份（约30分钟）。让客户选择",
+          "atoms_recovered": [
+            "branch_offer_solution"
+          ],
+          "estimated_score_delta": 0.068
+        }
+      ],
+      "failure_mode": "branch_error",
+      "deviation_point": "open"
+    },
+    "harness_summary": null,
+    "simulator_quality": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "no_meta_leaks",
+          "description": "模拟器无元话语泄露",
+          "passed": true,
+          "detail": "无泄露"
+        },
+        {
+          "id": "reasonable_length",
+          "description": "回复长度合理（电话场景≤100字）",
+          "passed": true,
+          "detail": "全部合理"
+        },
+        {
+          "id": "no_early_goal_exposure",
+          "description": "前2轮不暴露隐藏目标",
+          "passed": true,
+          "detail": "未提前暴露"
+        }
+      ],
+      "warnings": []
+    },
+    "ledger_events": [
+      {
+        "seq": 1,
+        "event_type": "tool_executed",
+        "turn": 3,
+        "tool_name": "query_order",
+        "tool_call_id": "82e9981e",
+        "arguments": {
+          "order_id": "MT20260517042"
+        },
+        "result": {
+          "id": "MT20260517042",
+          "customer_name": "王女士",
+          "customer_phone": "13900139002",
+          "merchant_name": "家常菜馆",
+          "items": [
+            "（月售8000+）宫保鸡丁",
+            "★热销★ 鱼香肉丝盖饭（含米饭）",
+            "❤回头客必点❤ 蛋花汤",
+            "香糯米饭x3"
+          ],
+          "total_price": 35.5,
+          "delivery_address": "海淀区中关村大街1号 融科资讯中心 8楼A座",
+          "delivery_time": "11:45",
+          "actual_delivery_time": null,
+          "status": "delivering",
+          "rider_name": "赵师傅",
+          "rider_phone": null,
+          "created_at": "2026-06-06 08:23:53",
+          "notes": ""
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "genesis"
+      },
+      {
+        "seq": 2,
+        "event_type": "tool_executed",
+        "turn": 4,
+        "tool_name": "check_compensation_eligibility",
+        "tool_call_id": "46be4a2a",
+        "arguments": {
+          "order_id": "MT20260517042",
+          "type": "refund"
+        },
+        "result": {
+          "eligible": true,
+          "max_amount": 25.0,
+          "already_compensated": 0,
+          "remaining_budget": 25.0,
+          "available_types": [
+            "refund",
+            "coupon",
+            "redelivery"
+          ]
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "b93b94e69b9ac0f827c24e67a6a327c0c6e5cfb70bda3993d43901aafc695176"
+      },
+      {
+        "seq": 3,
+        "event_type": "tool_executed",
+        "turn": 5,
+        "tool_name": "create_compensation",
+        "tool_call_id": "ebcef7b0",
+        "arguments": {
+          "order_id": "MT20260517042",
+          "type": "refund",
+          "amount": 25.0,
+          "reason": "漏餐退款-少送鱼香肉丝"
+        },
+        "result": {
+          "compensation_id": "comp_9639",
+          "type": "refund",
+          "amount": 25.0,
+          "status": "approved"
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "b1f4fb71f6dd4c0941abe1fb7a36b20384fbc309e2ffea79e450b5e8dd5b93c4"
+      },
+      {
+        "seq": 4,
+        "event_type": "tool_executed",
+        "turn": 6,
+        "tool_name": "transfer_to_human",
+        "tool_call_id": "893a7117",
+        "arguments": {
+          "order_id": "MT20260517042",
+          "reason": "客户对25元补偿额度不满意，要求更多补偿，超出智能助手权限",
+          "priority": "urgent"
+        },
+        "result": {
+          "transfer_id": "xfer_5913",
+          "queue_position": 3,
+          "estimated_wait": "3分钟",
+          "status": "queued"
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "be5ca2d12a7bbf2fa55ed93362c926db21dba0f842654235e939b523b0969cd8"
+      },
+      {
+        "seq": 5,
+        "event_type": "tool_executed",
+        "turn": 6,
+        "tool_name": "log_call_result",
+        "tool_call_id": "84d3e60f",
+        "arguments": {
+          "order_id": "MT20260517042",
+          "result": "escalated",
+          "customer_response": "客户选择退款25元后，认为补偿金额太少，要求更多补偿，已转接主管处理",
+          "notes": "已办理25元退款，客户不满额度要求更多补偿，转人工处理"
+        },
+        "result": {
+          "log_id": "log_6762",
+          "recorded": true
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "909ac0af6f69348a42d1ec45b43ac9405fca0592862069e5312b72544337f732"
+      }
+    ],
+    "ledger_chain_hash": "7193e76ecae916e2f947be08bf0d6dd004c710b48466737ab6a9d072ab83a0ee"
+  }
+}

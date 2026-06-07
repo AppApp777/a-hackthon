@@ -1,0 +1,847 @@
+## Recommendation: build a lightweight professional workflow, not a giant methodology stack
+
+For a solo 2–3 day Python hackathon, the best toolchain is:
+
+**Install now**
+1. **Deterministic Python quality gate**: `ruff`, `pytest`, `pytest-cov`, `hypothesis`, `mypy` or `pyright`, `pre-commit`, plus a Claude Code `PreToolUse` hook that blocks `git commit` when the gate fails.
+2. **Feature Dev plugin**: use it for multi-file features, scoring/harness changes, and architectural refactors.
+3. **Pyright LSP plugin**: high ROI in Claude Code because it gives Python type/code intelligence inside the agent workflow.
+4. **Optional PR Review Toolkit or Code Review plugin**: useful before major commits, but not needed on every small change.
+5. **Context7 only if you rely on fast-moving third-party APIs**. For mostly pure Python evaluator logic, it is optional.
+
+**Skip or defer**
+1. **Superpowers full enforcement** for this hackathon. Borrow its discipline, especially TDD for critical evaluator logic, but do not introduce strict global “tests-first-or-delete” behavior right before a deadline.
+2. **Skill-based pre-commit quality guard** as an enforcement mechanism. Use deterministic hooks instead.
+3. **Large lifecycle suites** like `claude-code-skills` unless this becomes a longer-term project.
+4. **Full semantic-release machinery**. Use Conventional Commits plus a manually curated `CHANGELOG.md`/`ITERATIONS.md` for the presentation story.
+
+The key principle: **Claude skills/plugins guide behavior; hooks, tests, and CI enforce behavior**. Claude’s own docs distinguish guidance from enforcement: `CLAUDE.md` and skills are context/instructions, while hooks can block tool calls before they run. `PreToolUse` fires before tool execution, and exit code `2` blocks the tool call, which is exactly the enforcement primitive you need. ([Claude](https://code.claude.com/docs/en/memory))
+
+---
+
+## Phase-by-phase Claude Code workflow
+
+| Phase | Best Claude Code tool | What it produces | Hackathon configuration |
+|---|---|---|---|
+| 1. Project Bootstrap | `/init`, `/memory`, `/project-automation-buildout`, deterministic scripts | `CLAUDE.md`, tooling, hooks, CI, repo docs | One-time setup; keep it lean |
+| 2. Requirements & Planning | `/feature-dev` for big changes, `/plan` for small ones, sequential-thinking MCP for hard ambiguity | Design card, risks, acceptance criteria, test plan | Strict for scorer/harness; lightweight elsewhere |
+| 3. Implementation | `/feature-dev` for features/refactors; `/debug` or a systematic bug loop for fixes | Small atomic diff | No coding on evaluator logic until failing test exists |
+| 4. Testing | `pytest`, contract tests, Hypothesis, Promptfoo red team | Regression, property, adversarial coverage | Fast suite before commits; full adversarial suite at milestones |
+| 5. Review & Quality | `/simplify`, `/review`, `/security-review`, adversarial-review, optional PR Review Toolkit | Human-like solo review layers | Use different reviews for different risks |
+| 6. Docs & Knowledge | `CLAUDE.md`, `CONTRACTS.md`, `CHANGELOG.md`, `ITERATIONS.md`, ADRs | Presentation-ready narrative | Manual summaries beat fully automated changelog |
+| 7. Retrospective | `/memory`, `ITERATIONS.md`, `RISK_REGISTER.md` | Process learning loop | Update after every major change |
+
+Claude Code’s `/init` is the closest built-in bootstrap entry point: it creates a starter `CLAUDE.md`, and the newer interactive flow can also walk through skills, hooks, and memory setup. `/review`, `/security-review`, `/simplify`, `/plan`, `/debug`, `/diff`, and `/memory` are all first-class commands in Claude Code’s workflow reference. ([Claude](https://code.claude.com/docs/en/commands))
+
+---
+
+# 1. Day 0 setup checklist
+
+Since you already have 3,000+ lines, treat this as a **Day 0 retrofit** before fixing more bugs.
+
+## A. Install the core Python tooling
+
+Use `uv` if your project does not already have a package manager. `uv run` keeps the project environment synced from the lockfile before running commands, which is useful for reproducible local and CI runs. ([Astral Docs](https://docs.astral.sh/uv/concepts/projects/sync/?utm_source=chatgpt.com))
+
+```bash
+# From repo root
+uv add --dev ruff pytest pytest-cov hypothesis mypy pre-commit bandit detect-secrets
+```
+
+Recommended purpose:
+
+- **Ruff**: formatting + linting in one fast tool. ([Astral Docs](https://docs.astral.sh/ruff/?utm_source=chatgpt.com))
+- **pytest**: unit, integration, contract, and adversarial test runner. ([pytest](https://docs.pytest.org/?utm_source=chatgpt.com))
+- **Hypothesis**: property-based testing for scorer/harness invariants. ([Hypothesis](https://hypothesis.readthedocs.io/en/latest/quickstart.html?utm_source=chatgpt.com))
+- **mypy or pyright**: static typing for the core evaluator model. Mypy is mature and easy to run in pre-commit; Pyright LSP is valuable inside Claude Code. ([mypy](https://mypy.readthedocs.io/en/stable/getting_started.html?utm_source=chatgpt.com))
+- **pre-commit**: actual Git hook enforcement, not just Claude instruction-following. ([Pre-commit](https://pre-commit.com/?utm_source=chatgpt.com))
+- **Bandit + detect-secrets**: cheap security/secret checks. ([Bandit](https://bandit.readthedocs.io/en/latest/?utm_source=chatgpt.com))
+
+Add `mutmut` later, not in the first hour. Mutation testing is high-signal for scorer logic, but it is too slow for every commit. It is good for one targeted hardening pass on `src/scorer*` or equivalent. ([Mutmut](https://mutmut.readthedocs.io/en/latest/index.html?utm_source=chatgpt.com))
+
+---
+
+## B. Install Claude Code plugins
+
+Run these inside Claude Code:
+
+```text
+/plugin install feature-dev@claude-plugins-official
+/plugin install pyright-lsp@claude-plugins-official
+/reload-plugins
+```
+
+If `feature-dev` is not found by that exact command, use `/plugin > Discover` and search **Feature Dev**. The official plugin marketplace uses `/plugin install {plugin-name}@claude-plugins-official`, but some plugins also appear through Anthropic’s bundled/plugin repository paths depending on your Claude Code version. ([GitHub](https://github.com/anthropics/claude-plugins-official))
+
+Install **Feature Dev** because it is exactly the missing process you described: it forces discovery, codebase exploration, clarifying questions, architecture design, implementation, quality review, and summary. It also uses specialized explorer, architect, and reviewer agents. ([Claude](https://claude.com/plugins/feature-dev))
+
+Optional:
+
+```text
+/plugin install pr-review-toolkit@claude-plugins-official
+```
+
+The PR Review Toolkit is useful because it has focused agents for test coverage quality, error handling, type design, simplification, comments, and general code quality. That maps directly to your bug class around silent failures and missing behavioral tests. ([GitHub](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/pr-review-toolkit))
+
+Context7 is optional:
+
+```text
+/plugin marketplace add upstash/context7
+/plugin install context7-plugin@context7-marketplace
+```
+
+Install it if you are using evolving APIs or unfamiliar libraries. It auto-triggers documentation lookups and adds a docs researcher agent, but for a mostly pure Python evaluation harness, it is not your highest ROI. ([Context7](https://context7.com/docs/clients/claude-code))
+
+Do **not** install Superpowers as your default workflow during the hackathon. It is powerful, but it deliberately enforces structured practices such as red-green-refactor TDD, systematic debugging, brainstorming, and subagent-driven development. That is excellent for long-lived engineering work; for a deadline, use those practices selectively rather than letting a global methodology plugin slow every change. ([Claude](https://claude.com/plugins/superpowers))
+
+---
+
+## C. Add repo structure
+
+```bash
+mkdir -p src tests/unit tests/integration tests/contracts tests/adversarial
+mkdir -p docs/adr scripts .claude/hooks .github/workflows
+touch ARCHITECTURE.md CONTRACTS.md CHANGELOG.md docs/ITERATIONS.md docs/RISK_REGISTER.md
+```
+
+Use this structure:
+
+```text
+src/
+  evaluator/
+  harness/
+  scorer/
+  models/
+tests/
+  unit/          # pure function tests
+  integration/   # harness + scorer together
+  contracts/     # invariants that must never break
+  adversarial/   # gaming attempts, malicious/self-reporting transcripts
+docs/
+  adr/           # architecture decision records
+  ITERATIONS.md  # what changed, what broke, what was learned
+  RISK_REGISTER.md
+ARCHITECTURE.md
+CONTRACTS.md
+CHANGELOG.md
+CLAUDE.md
+```
+
+For your project, `CONTRACTS.md` is more important than generic docs. It should define the invariants that would have caught the three bugs.
+
+Start with this:
+
+```md
+# Evaluation Contracts
+
+## Source-of-truth contract
+The scorer must derive success/failure from observed harness events, tool results,
+exceptions, and validated state transitions. It must never trust model self-reports
+as evidence of success.
+
+## Execution-order contract
+Any blocking, validation, permission, or policy check must run before the tool side
+effect it is intended to prevent.
+
+## Outcome contract
+Failed, blocked, timed-out, invalid, or exception-producing operations must not be
+counted as success. A success requires an observed successful operation result.
+
+## Auditability contract
+Every scored operation must be traceable to:
+- operation_id
+- requested action
+- observed harness event
+- observed result status
+- scorer decision
+- reason
+```
+
+Then require Claude to read this before touching evaluator logic.
+
+---
+
+## D. Add `pyproject.toml` quality config
+
+Adjust `src` package names to your actual layout.
+
+```toml
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+  "E",    # pycodestyle errors
+  "F",    # pyflakes
+  "I",    # import sorting
+  "B",    # bugbear
+  "UP",   # pyupgrade
+  "SIM",  # simplify
+  "C4"    # comprehensions
+]
+ignore = [
+  "E501"  # let formatter handle line length pragmatically
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+  "unit: fast unit tests",
+  "integration: multi-component tests",
+  "contract: evaluator invariants",
+  "adversarial: attempts to game scorer/harness",
+  "slow: not required before every commit"
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_ignores = true
+no_implicit_optional = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+```
+
+For an existing fast-moving hackathon repo, use strict typing on `src/`, not necessarily on `tests/` or quick scripts.
+
+---
+
+## E. Add deterministic quality gate
+
+Create `scripts/quality_gate.sh`:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+COVERAGE_MIN="${COVERAGE_MIN:-60}"
+
+echo "== Ruff format check =="
+uv run ruff format --check .
+
+echo "== Ruff lint =="
+uv run ruff check .
+
+echo "== Mypy =="
+uv run mypy src
+
+echo "== Security scan =="
+uv run bandit -q -r src || {
+  echo "Bandit found issues. If false positive, document and suppress narrowly."
+  exit 1
+}
+
+echo "== Fast tests with coverage =="
+uv run pytest -q -m "not slow and not adversarial" \
+  --cov=src \
+  --cov-branch \
+  --cov-fail-under="${COVERAGE_MIN}"
+```
+
+Then:
+
+```bash
+chmod +x scripts/quality_gate.sh
+```
+
+Set `COVERAGE_MIN` to whatever passes today, then ratchet upward. For a new project, start at 70. For your current project, do not block progress with an unrealistic threshold; the more important gate is that **contract tests for the three discovered bugs must exist and pass**.
+
+---
+
+## F. Add actual Git pre-commit hook
+
+Create `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format-check
+        name: ruff format check
+        entry: uv run ruff format --check .
+        language: system
+        pass_filenames: false
+
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check .
+        language: system
+        pass_filenames: false
+
+      - id: mypy
+        name: mypy src
+        entry: uv run mypy src
+        language: system
+        pass_filenames: false
+
+      - id: contract-tests
+        name: pytest contract tests
+        entry: uv run pytest -q tests/contracts
+        language: system
+        pass_filenames: false
+
+      - id: no-secrets
+        name: detect secrets
+        entry: uv run detect-secrets-hook
+        language: system
+```
+
+Then:
+
+```bash
+uv run pre-commit install
+uv run pre-commit run --all-files
+```
+
+This protects commits made outside Claude Code too.
+
+---
+
+## G. Add Claude Code `PreToolUse` commit blocker
+
+This is the right way to use Claude Code hooks: block Claude’s `git commit` Bash call before it executes if the quality gate fails. Claude Code hooks can match `Bash` tool calls, and exit code `2` blocks the call. ([Claude](https://code.claude.com/docs/en/hooks))
+
+Create `.claude/hooks/block_bad_commit.py`:
+
+```python
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+COMMIT_PATTERN = re.compile(r"(^|[;&|])\s*git\s+commit\b")
+
+
+def main() -> int:
+    payload = json.load(sys.stdin)
+    tool_input = payload.get("tool_input") or {}
+    command = tool_input.get("command") or ""
+
+    if not COMMIT_PATTERN.search(command):
+        return 0
+
+    gate = Path("scripts/quality_gate.sh")
+    if not gate.exists():
+        print(
+            "Blocked git commit: scripts/quality_gate.sh is missing.",
+            file=sys.stderr,
+        )
+        return 2
+
+    result = subprocess.run(
+        ["bash", str(gate)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    if result.returncode != 0:
+        print("Blocked git commit: quality gate failed.\n", file=sys.stderr)
+        print(result.stdout, file=sys.stderr)
+        print(result.stderr, file=sys.stderr)
+        return 2
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+Then:
+
+```bash
+chmod +x .claude/hooks/block_bad_commit.py
+```
+
+Add `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/block_bad_commit.py"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+This is better than a “pre-commit quality guard skill” because it is deterministic. The skill can remind Claude; the hook can stop Claude.
+
+---
+
+## H. Add CI
+
+Use CI even as a solo developer. It catches “works on my machine” issues and gives you presentation proof.
+
+`.github/workflows/ci.yml`:
+
+```yaml
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.11
+
+      - name: Sync dependencies
+        run: uv sync --locked --all-extras --dev
+
+      - name: Quality gate
+        run: COVERAGE_MIN=60 bash scripts/quality_gate.sh
+
+      - name: Contract tests
+        run: uv run pytest -q tests/contracts
+
+      - name: Integration tests
+        run: uv run pytest -q tests/integration
+```
+
+Astral recommends `setup-uv` for GitHub Actions, and GitHub Actions is the standard repo-native automation surface for build/test workflows. ([Astral Docs](https://docs.astral.sh/uv/guides/integration/github/?utm_source=chatgpt.com))
+
+---
+
+## I. Add Claude project memory
+
+Run:
+
+```text
+CLAUDE_CODE_NEW_INIT=1 claude
+/init
+/memory
+/project-automation-buildout
+```
+
+Then add this to `CLAUDE.md`:
+
+```md
+## Development Protocol
+
+For evaluator, scorer, harness, tool execution, or grading changes:
+
+1. Read CONTRACTS.md first.
+2. Produce a design card before coding:
+   - Problem
+   - Proposed change
+   - Data source of truth
+   - Failure modes
+   - Tests to add
+   - Files expected to change
+3. Write or update a failing regression/contract test before implementation.
+4. Never trust model self-reported success as scoring evidence.
+5. Never count failed, blocked, timed-out, or exception operations as success.
+6. Every scoring decision must be traceable to observed harness data.
+7. Done means:
+   - quality gate passes
+   - relevant contract tests pass
+   - CHANGELOG.md updated
+   - docs/ITERATIONS.md updated for major changes
+```
+
+Claude’s docs recommend adding items to `CLAUDE.md` when a review catches something Claude should have known, when you repeatedly correct Claude, or when a new teammate would need the same context. That is exactly your situation. ([Claude](https://code.claude.com/docs/en/memory))
+
+---
+
+# 2. Development loop for every feature/fix
+
+Use two lanes: **fast lane** for low-risk changes and **critical lane** for evaluator correctness.
+
+## Fast lane: docs, logging, small CLI, non-core cleanup
+
+1. State goal in one sentence.
+2. Ask Claude for `/plan`.
+3. Implement.
+4. Run fast tests.
+5. Run `/simplify` if code got messy.
+6. Commit.
+
+Example:
+
+```text
+/plan Add a --verbose flag to show scorer trace summaries. This should not change scoring behavior.
+```
+
+Then:
+
+```bash
+bash scripts/quality_gate.sh
+git add .
+git commit -m "feat(cli): add scorer trace verbosity"
+```
+
+## Critical lane: scorer, harness, evaluation semantics, adversarial robustness
+
+Use this for the exact bug class you hit.
+
+1. Start with `/feature-dev`.
+2. Require a design card.
+3. Update `CONTRACTS.md` if a new invariant is discovered.
+4. Write failing contract/adversarial test first.
+5. Implement minimal fix.
+6. Run unit + contract + integration tests.
+7. Run `/simplify` only after tests pass.
+8. Run `/review`.
+9. Run `/security-review` if trust boundary, file IO, shell execution, prompt injection, secrets, or untrusted model output is involved.
+10. Run adversarial-review or Promptfoo for changes touching dialogue behavior or scorer gaming.
+11. Update `CHANGELOG.md` and `docs/ITERATIONS.md`.
+12. Commit.
+
+Example prompt:
+
+```text
+/feature-dev Fix scorer trust boundary so it derives success only from observed harness events, not model self-reports. Use CONTRACTS.md as binding requirements. Before implementation, design the data flow and list regression tests for self-reported success, blocked operations, and failed tool calls.
+```
+
+Feature Dev is appropriate here because it explicitly explores existing code paths, maps architecture, proposes tradeoffs, implements after approval, and runs quality review. It is not only for “new product features”; it is useful for **multi-file architectural fixes**. ([GitHub](https://github.com/anthropics/claude-code/tree/main/plugins/feature-dev))
+
+---
+
+# 3. Testing strategy: when to test first vs when to code first
+
+Your bugs were not lint failures. They were **missing invariant tests**. The tool that catches them is not Ruff; it is executable contracts.
+
+## Use test-first for these
+
+Always write the failing test before code when touching:
+
+- Scoring semantics.
+- Harness execution order.
+- Tool blocking/permission logic.
+- Success/failure classification.
+- Anything involving untrusted model claims.
+- Any bug found by an auditor.
+- Any behavior you will mention in the hackathon presentation.
+
+Minimum regression tests for your three bugs:
+
+```text
+tests/contracts/test_execution_order_contract.py
+  - test_blocking_check_happens_before_tool_side_effect
+
+tests/contracts/test_scorer_source_of_truth_contract.py
+  - test_model_self_reported_success_does_not_count_without_observed_success
+
+tests/contracts/test_failed_operations_contract.py
+  - test_failed_tool_operation_is_not_scored_as_success
+  - test_blocked_operation_is_not_scored_as_success
+  - test_exception_operation_is_not_scored_as_success
+```
+
+## Code-first is acceptable for these
+
+- README edits.
+- Changelog cleanup.
+- Logging message wording.
+- Throwaway experiment scripts.
+- Demo formatting.
+- Non-critical CLI ergonomics.
+
+Even then, run the quality gate before commit.
+
+## Test types and when to use them
+
+| Test type | Use when | Example |
+|---|---|---|
+| Unit | Pure function behavior | `score_operation(event) -> failed` |
+| Contract | Cross-component invariant | self-report never becomes evidence |
+| Integration | Harness + scorer together | simulated multi-turn dialogue with tool events |
+| Property | Many generated variants | all failed/blocked statuses score as non-success |
+| Adversarial | Gaming attempts | model says “I succeeded” after blocked tool |
+| Promptfoo red team | LLM behavior/prompt surface changes | prompt injection or metric gaming attempts |
+
+Hypothesis is especially useful for the third bug: generate many operation statuses and assert that only observed success statuses count as success. Promptfoo is useful for adversarial LLM evals and red-team scans around prompt, agent, and RAG-style behaviors. ([Hypothesis](https://hypothesis.readthedocs.io/en/latest/quickstart.html?utm_source=chatgpt.com))
+
+---
+
+# 4. Review workflow: which review tool to use when
+
+Use reviews in this order:
+
+## `/simplify`: after tests pass, before final review
+
+Use when the code works but may be messy, duplicated, over-engineered, or inefficient. `/simplify` can modify recently changed files, so run it before the final correctness/security review. Claude Code describes it as a skill that reviews recent files for reuse, quality, and efficiency issues, then fixes them. ([Claude](https://code.claude.com/docs/en/commands))
+
+Use:
+
+```text
+/simplify focus on scorer clarity, explicit status handling, and avoiding implicit truthiness
+```
+
+## `/review`: before committing meaningful changes
+
+Use for ordinary correctness review. It is read-oriented and good for catching logic issues in the diff.
+
+```text
+/review
+```
+
+## `/security-review`: whenever a trust boundary is involved
+
+Use for:
+
+- untrusted model output,
+- shell/tool execution,
+- file paths,
+- external APIs,
+- secrets,
+- sandboxing,
+- prompt injection,
+- eval gaming.
+
+Claude Code’s `/security-review` analyzes pending branch changes for injection, auth issues, and data exposure. ([Claude](https://code.claude.com/docs/en/commands))
+
+```text
+/security-review
+```
+
+## adversarial-review: before declaring evaluator changes done
+
+Use for scorer/harness changes. Ask it to assume the model is trying to game the metric.
+
+Good prompt:
+
+```text
+Run adversarial review on the scorer and harness changes. Assume the evaluated model is malicious and tries to obtain success credit without performing the required operation. Focus on self-reported success, failed tool calls, blocked actions, event ordering, and missing audit trails.
+```
+
+## Promptfoo red team: before demo milestones, not every commit
+
+Use Promptfoo when the prompt/dialogue/eval target changes, or before the final presentation. Its red-team workflow is designed to generate and run adversarial test cases against a target, then report results. ([Promptfoo](https://www.promptfoo.dev/docs/red-team/configuration/?utm_source=chatgpt.com))
+
+## PR Review Toolkit: use selectively
+
+Use the specific agents after larger diffs:
+
+- `pr-test-analyzer`: after adding/changing tests.
+- `silent-failure-hunter`: after error handling or outcome logic.
+- type/design reviewer: after changing data models.
+- simplification reviewer: after a refactor.
+
+Do not run it on every tiny commit.
+
+---
+
+# 5. Documentation and presentation narrative
+
+Do not rely only on auto-generated changelogs. A hackathon presentation needs a story:
+
+> “We found architectural risks, installed a professional workflow, converted bugs into contracts, hardened the scorer, and verified robustness with adversarial tests.”
+
+Use three docs.
+
+## `CHANGELOG.md`
+
+Keep this human-readable:
+
+```md
+# Changelog
+
+## Unreleased
+
+### Added
+- Deterministic quality gate for Python checks and contract tests.
+- Claude Code PreToolUse hook blocking commits when checks fail.
+- Contract tests for scorer trust boundaries.
+- Adversarial tests for self-reported success attempts.
+
+### Fixed
+- Harness blocking now occurs before tool execution.
+- Scorer no longer trusts model self-reported success.
+- Failed, blocked, and exception operations no longer count as success.
+
+### Changed
+- Scoring decisions now require observed harness evidence.
+- Evaluation output now includes traceable scorer rationale.
+
+### Validation
+- Added contract suite for execution order, source of truth, and outcome semantics.
+- Added Promptfoo/adversarial review workflow for major scoring changes.
+```
+
+## `docs/ITERATIONS.md`
+
+This is your retrospective log:
+
+```md
+## 2026-05-18 — Evaluation hardening baseline
+
+Goal:
+- Prevent recurrence of three externally audited architecture bugs.
+
+Changed:
+- Added quality gate, pre-commit, Claude PreToolUse commit blocker.
+- Added CONTRACTS.md with scorer/harness invariants.
+
+Checks:
+- Ruff, mypy, unit tests, contract tests passing.
+
+What broke:
+- Existing tests assumed self-reported success was valid in one fixture.
+
+What we learned:
+- The scorer must treat model claims as untrusted input.
+
+Next:
+- Add property tests for all operation statuses.
+```
+
+## ADRs
+
+Use short Architecture Decision Records:
+
+```md
+# ADR-001: Scorer source of truth
+
+## Decision
+Scoring success must be derived only from observed harness events and validated tool results.
+
+## Context
+Auditor found that the scorer trusted model self-reported data.
+
+## Consequences
+- All scorer APIs require observed event IDs.
+- Self-report fields may be stored for analysis but never used as success evidence.
+- Contract tests enforce this.
+```
+
+For changelog generation from commits, use **git-cliff** near the end if you adopt Conventional Commits. It can generate changelogs from Git history and supports Conventional Commits/custom parsers. ([Git Cliff](https://git-cliff.org/docs/?utm_source=chatgpt.com))
+
+Commit examples:
+
+```bash
+git commit -m "test(scorer): add contract for self-reported success"
+git commit -m "fix(scorer): derive success from observed harness events"
+git commit -m "fix(harness): run blocking checks before tool execution"
+git commit -m "docs(process): document evaluator hardening workflow"
+```
+
+But keep `CHANGELOG.md` manually curated for the judges.
+
+---
+
+# 6. What would have caught your three actual bugs?
+
+| Bug | What catches it | Tooling role |
+|---|---|---|
+| Harness blocks after tool executes | Contract test with side-effect sentinel | PreToolUse pattern reminds you what “before execution” means |
+| Scorer trusts self-reported data | Source-of-truth contract + adversarial test | adversarial-review and `/security-review` help if contract is documented |
+| Failed operations counted as success | Property test over operation statuses | Hypothesis + contract tests |
+
+Static typing might help model the difference between `ObservedSuccess`, `ModelClaimedSuccess`, `FailedOperation`, and `BlockedOperation`, but only executable tests enforce the semantics.
+
+A good data model would make invalid scoring harder:
+
+```python
+from dataclasses import dataclass
+from enum import StrEnum
+
+
+class ObservedStatus(StrEnum):
+    SUCCESS = "success"
+    FAILED = "failed"
+    BLOCKED = "blocked"
+    TIMED_OUT = "timed_out"
+    EXCEPTION = "exception"
+
+
+@dataclass(frozen=True)
+class ObservedOperation:
+    operation_id: str
+    requested_action: str
+    status: ObservedStatus
+    evidence_ref: str
+
+
+@dataclass(frozen=True)
+class ModelClaim:
+    operation_id: str
+    claimed_success: bool
+    text: str
+
+
+def counts_as_success(operation: ObservedOperation) -> bool:
+    return operation.status is ObservedStatus.SUCCESS
+```
+
+The architectural move is to make `ModelClaim` impossible to pass into `counts_as_success`.
+
+---
+
+# 7. Where to be strict vs where to cut corners
+
+## Be strict
+
+- Scorer/harness correctness.
+- Evaluation contracts.
+- Test-first for audited bugs.
+- Pre-commit and Claude `PreToolUse` commit blocker.
+- Traceability of every success/failure decision.
+- Commit history and changelog.
+
+## Be pragmatic
+
+- Coverage threshold. Start at current passing level, then ratchet.
+- Type checking. Strict for `src/evaluator`, `src/scorer`, `src/harness`; relaxed for tests/scripts.
+- Feature Dev. Use for multi-file or architectural changes, not one-line fixes.
+- Promptfoo/adversarial runs. Run before milestones, not every commit.
+
+## Cut corners
+
+- Do not build a perfect plugin ecosystem.
+- Do not enforce full TDD globally.
+- Do not run mutation testing on the whole repo.
+- Do not over-document every minor edit.
+- Do not install giant lifecycle suites during the hackathon.
+
+---
+
+# Final tool decision matrix
+
+| Tool/plugin | Decision | Why |
+|---|---:|---|
+| `feature-dev` | **Install** | Best match for missing architecture/design/review process |
+| Claude `PreToolUse` hook | **Use** | Deterministic, blocks before bad commit/tool action |
+| Actual `pre-commit` | **Use** | Protects commits outside Claude Code too |
+| `pre-commit-quality-guard` skill | **Skip** | Prompt guidance, not enforcement |
+| `pre-commit-review` skill | **Skip for every commit** | Too slow/noisy; use targeted reviews instead |
+| Superpowers | **Defer** | Excellent discipline, too globally strict for 2–3 day deadline |
+| Context7 | **Optional** | Useful for changing external APIs; not core to evaluator logic |
+| Pyright LSP | **Install** | High ROI Claude Code Python intelligence |
+| PR Review Toolkit | **Optional install** | Useful for test/error/silent-failure reviews |
+| Promptfoo red team | **Use at milestones** | Best for adversarial dialogue/eval behavior |
+| adversarial-review | **Use on scorer/harness** | Best solo substitute for a hostile reviewer |
+| git-cliff | **Optional near final** | Good commit-to-changelog generator, but manual narrative still needed |
+
+The minimal professional workflow is: **`/init` + CLAUDE.md + CONTRACTS.md + Feature Dev for risky work + deterministic pre-commit/PreToolUse gates + contract/adversarial tests + staged reviews + iteration log.** That gives you the highest protection per setup hour without turning the hackathon into process theater.

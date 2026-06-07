@@ -1,0 +1,106 @@
+{
+  "id": "dinner_complex_01",
+  "name": "团建聚餐-困难版",
+  "domain": "dinner_booking",
+  "difficulty": "hard",
+  "description": "15人团建，预算紧+过敏+优惠券过期+改人数+领导要包间+迟到通知",
+  "user_goal": "为15人团建订餐，人均55元以内，有人坚果过敏有人乳糖不耐受。手上有一张EXPIRED01优惠券（已过期）和一张TEAM50。中途人数从15改到12。必须有包间。",
+  "initial_message": "我们部门要搞团建聚餐，15个人，预算紧，帮我看看有什么选择。",
+  "constraints": [
+    {
+      "id": "c_budget",
+      "type": "budget",
+      "description": "人均不超过55元",
+      "hidden": false,
+      "check_rule": "restaurant.price_per_person <= 55",
+      "value": 55
+    },
+    {
+      "id": "c_headcount_initial",
+      "type": "headcount",
+      "description": "初始15人",
+      "hidden": false,
+      "value": 15
+    },
+    {
+      "id": "c_headcount_change",
+      "type": "headcount",
+      "description": "后来改成12人",
+      "hidden": true,
+      "reveal_turn": 7,
+      "value": 12
+    },
+    {
+      "id": "c_nut_allergy",
+      "type": "dietary",
+      "description": "有人坚果过敏",
+      "hidden": true,
+      "reveal_turn": 3
+    },
+    {
+      "id": "c_dairy_allergy",
+      "type": "dietary",
+      "description": "有人乳糖不耐受",
+      "hidden": true,
+      "reveal_turn": 3
+    },
+    {
+      "id": "c_private_room",
+      "type": "preference",
+      "description": "领导要求必须有包间",
+      "hidden": true,
+      "reveal_turn": 5
+    },
+    {
+      "id": "c_expired_coupon",
+      "type": "coupon",
+      "description": "用户先给一张过期券EXPIRED01",
+      "hidden": true,
+      "reveal_turn": 4,
+      "value": "EXPIRED01"
+    },
+    {
+      "id": "c_valid_coupon",
+      "type": "coupon",
+      "description": "过期后用户翻出TEAM50",
+      "hidden": true,
+      "reveal_turn": 9,
+      "value": "TEAM50"
+    }
+  ],
+  "tool_faults": [
+    {
+      "tool_name": "search_restaurants",
+      "trigger_turn": 2,
+      "fault_type": "error_500",
+      "description": "搜索餐厅时服务器错误"
+    },
+    {
+      "tool_name": "apply_coupon",
+      "trigger_turn": 10,
+      "fault_type": "timeout",
+      "description": "验证优惠券时超时"
+    }
+  ],
+  "user_persona": {
+    "patience": 4,
+    "clarity": 3,
+    "emotional": 5,
+    "pickiness": 7,
+    "change_mind_probability": 0.4
+  },
+  "expected_outcome": {
+    "must_satisfy": ["c_budget", "c_headcount_change", "c_nut_allergy", "c_dairy_allergy", "c_private_room"],
+    "must_call_tools": ["search_restaurants", "check_availability", "make_reservation", "apply_coupon"],
+    "must_not_do": ["ignore_allergy", "book_for_15_after_change", "use_expired_coupon", "give_up_after_fault"],
+    "final_state_checks": {
+      "reservations": {
+        "count_gte": 1,
+        "latest_status": "confirmed",
+        "latest_party_size": 12
+      }
+    }
+  },
+  "max_turns": 24,
+  "world_seed": {}
+}

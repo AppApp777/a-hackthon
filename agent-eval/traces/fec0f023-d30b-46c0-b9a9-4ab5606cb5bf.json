@@ -1,0 +1,816 @@
+{
+  "id": "fec0f023-d30b-46c0-b9a9-4ab5606cb5bf",
+  "scenario": {
+    "id": "dinner_basic_01",
+    "name": "团建聚餐-基础版",
+    "domain": "dinner_booking",
+    "difficulty": "medium",
+    "description": "10人团建聚餐，预算有限，有人坚果过敏，用户会中途改时间",
+    "user_goal": "为10人团建订一个人均不超过70元的餐厅，需要包间，有人坚果过敏。原定周二改到周三同一时间。最终要完成预订。",
+    "initial_message": "帮我订个团建聚餐，大概10个人，下周二晚上。",
+    "constraints": [
+      {
+        "id": "c_budget",
+        "type": "budget",
+        "description": "人均不超过70元",
+        "hidden": false,
+        "reveal_turn": null,
+        "check_rule": "restaurant.price_per_person <= 70",
+        "value": 70
+      },
+      {
+        "id": "c_headcount",
+        "type": "headcount",
+        "description": "10人用餐",
+        "hidden": false,
+        "reveal_turn": null,
+        "check_rule": null,
+        "value": 10
+      },
+      {
+        "id": "c_private_room",
+        "type": "preference",
+        "description": "需要包间",
+        "hidden": true,
+        "reveal_turn": 3,
+        "check_rule": "restaurant.has_private_room == 1",
+        "value": null
+      },
+      {
+        "id": "c_allergy",
+        "type": "dietary",
+        "description": "有同事坚果过敏",
+        "hidden": true,
+        "reveal_turn": 4,
+        "check_rule": "restaurant.allergen_free_options contains 'nut_free'",
+        "value": null
+      },
+      {
+        "id": "c_time_change",
+        "type": "time",
+        "description": "原定周二改到周三",
+        "hidden": true,
+        "reveal_turn": 6,
+        "check_rule": null,
+        "value": "2026-05-20"
+      },
+      {
+        "id": "c_coupon",
+        "type": "coupon",
+        "description": "用户有一张TEAM50优惠券想用",
+        "hidden": true,
+        "reveal_turn": 8,
+        "check_rule": null,
+        "value": "TEAM50"
+      }
+    ],
+    "tool_faults": [
+      {
+        "tool_name": "check_availability",
+        "trigger_turn": 5,
+        "fault_type": "timeout",
+        "description": "查询可用性时超时"
+      }
+    ],
+    "user_persona": {
+      "patience": 6,
+      "clarity": 4,
+      "emotional": 3,
+      "pickiness": 6,
+      "change_mind_probability": 0.3
+    },
+    "expected_outcome": {
+      "must_satisfy": [
+        "c_budget",
+        "c_headcount",
+        "c_private_room",
+        "c_allergy"
+      ],
+      "must_call_tools": [
+        "search_restaurants",
+        "check_availability",
+        "make_reservation"
+      ],
+      "must_not_do": [
+        "recommend_restaurant_over_budget",
+        "ignore_allergy",
+        "book_without_confirming_change"
+      ],
+      "final_state_checks": {
+        "reservations": {
+          "count_gte": 1,
+          "latest_status": "confirmed",
+          "latest_party_size": 10
+        }
+      }
+    },
+    "max_turns": 20,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "dinner_basic_01",
+    "messages": [
+      {
+        "turn": 0,
+        "role": "user",
+        "content": "帮我订个团建聚餐，大概10个人，下周二晚上。",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:36:52.015585",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "好的！团建聚餐，10人，下周二（5月20日）晚上。我再确认几个信息帮你精准筛选：\n\n1. **菜系偏好**？火锅、中餐、日料、西餐，还是都行？\n2. **人均预算**大概多少？\n3. **需要包间吗**？团建的话包间可能方便些。\n4. **有没有过敏忌口**需要注意的？\n\n你说个大方向，我来搜合适的餐厅。",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:37:11.485928",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "人均70以内吧，中餐就行。嗯对，最好有包间。",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:37:21.129747",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "搜索到一家符合条件的餐厅：\n\n**外婆家**\n- 📍 地址：朝阳区三里屯路19号\n- 💰 人均：55元\n- ⭐ 评分：4.3\n- 🚪 有包间，最多容纳50人\n- ⏰ 营业时间：11:00–22:00\n\n完全在你70元预算内，包间也有。要我帮你查一下5月20日（下周二）晚上的可订时段吗？或者你想看看他们的菜单？",
+        "tool_calls": [
+          {
+            "id": "bdfc42fb",
+            "tool_name": "search_restaurants",
+            "arguments": {
+              "cuisine": "chinese",
+              "max_price_per_person": 70,
+              "min_capacity": 10,
+              "need_private_room": true
+            },
+            "result": [
+              {
+                "id": "r4",
+                "name": "外婆家",
+                "cuisine": "chinese",
+                "price_per_person": 55.0,
+                "rating": 4.3,
+                "address": "朝阳区三里屯路19号",
+                "has_private_room": 1,
+                "max_capacity": 50,
+                "allergen_free_options": [
+                  "nut_free"
+                ],
+                "opening_hour": 11,
+                "closing_hour": 22
+              }
+            ],
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false
+          }
+        ],
+        "timestamp": "2026-05-17T10:37:40.168145",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "外婆家啊，行，那帮我看看周二晚上能不能订到包间吧，大概六点半到七点的样子。",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:37:59.034456",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "查到了！5月20日（周二）外婆家有两个可订时段：\n\n| 时段 | 剩余座位 |\n|------|----------|\n| 18:00 | 20位 |\n| 19:00 | 15位 |\n\n没有正好六点半的时段，但 **19:00（晚7点）** 正好在你说的范围内，10人完全没问题。\n\n要我帮你预订 **5月20日 19:00、10人、包间** 吗？有没有其他特殊要求（比如提前摆好茶水、投影设备之类的）？",
+        "tool_calls": [
+          {
+            "id": "274cea2f",
+            "tool_name": "check_availability",
+            "arguments": {
+              "restaurant_id": "r4",
+              "date": "2025-05-20",
+              "party_size": 10
+            },
+            "result": [],
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false
+          },
+          {
+            "id": "9b2d6b09",
+            "tool_name": "check_availability",
+            "arguments": {
+              "restaurant_id": "r4",
+              "date": "2026-05-20",
+              "party_size": 10
+            },
+            "result": [
+              {
+                "restaurant_id": "r4",
+                "date": "2026-05-20",
+                "time_slot": "18:00",
+                "seats_available": 20
+              },
+              {
+                "restaurant_id": "r4",
+                "date": "2026-05-20",
+                "time_slot": "19:00",
+                "seats_available": 15
+              }
+            ],
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false
+          }
+        ],
+        "timestamp": "2026-05-17T10:38:38.297926",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "user",
+        "content": "行，七点可以。对了我突然想起来，我们有个同事坚果过敏，这家能处理吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:38:45.539438",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "好消息！**外婆家确认支持无坚果选项**，你同事的坚果过敏可以放心。\n\n那我帮你预订：\n\n- 🏠 外婆家\n- 📅 5月20日（周二）\n- ⏰ 19:00\n- 👥 10人\n- 🚪 包间\n- ⚠️ 特殊要求：有坚果过敏，需要全程无坚果\n\n确认没问题的话我就下单预订了？",
+        "tool_calls": [
+          {
+            "id": "aafa66dc",
+            "tool_name": "search_restaurants",
+            "arguments": {
+              "cuisine": "chinese",
+              "max_price_per_person": 70,
+              "min_capacity": 10,
+              "need_private_room": true,
+              "allergen_free": "nut_free"
+            },
+            "result": [
+              {
+                "id": "r4",
+                "name": "外婆家",
+                "cuisine": "chinese",
+                "price_per_person": 55.0,
+                "rating": 4.3,
+                "address": "朝阳区三里屯路19号",
+                "has_private_room": 1,
+                "max_capacity": 50,
+                "allergen_free_options": [
+                  "nut_free"
+                ],
+                "opening_hour": 11,
+                "closing_hour": 22
+              }
+            ],
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false
+          }
+        ],
+        "timestamp": "2026-05-17T10:39:15.527977",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "user",
+        "content": "等等，我刚收到通知，周二有人有事改不了，得换到周三同一时间，能改吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:39:21.730804",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "不好意思，系统连续两次查询周三空位都超时了，可能是服务器暂时不稳定。\n\n给你几个方案：\n\n1. **稍后再试** — 等几分钟我再帮你查周三外婆家的空位\n2. **换一家试试** — 我可以重新搜索其他符合条件的中餐厅（人均70以内、包间、10人、无坚果），看看有没有周三有位的\n3. **你直接确认** — 如果你比较确定外婆家周三应该有位，我可以直接尝试提交预订（19:00、10人、包间），预订接口可能走不同通道\n\n你倾向哪个？",
+        "tool_calls": [
+          {
+            "id": "f6f571b2",
+            "tool_name": "check_availability",
+            "arguments": {
+              "restaurant_id": "r4",
+              "date": "2025-05-21",
+              "party_size": 10
+            },
+            "result": null,
+            "error": "[FAULT] timeout: 查询可用性时超时",
+            "latency_ms": 3000,
+            "fault_injected": true
+          },
+          {
+            "id": "cd0ea287",
+            "tool_name": "check_availability",
+            "arguments": {
+              "restaurant_id": "r4",
+              "date": "2026-05-21",
+              "party_size": 10
+            },
+            "result": null,
+            "error": "[FAULT] timeout: 查询可用性时超时",
+            "latency_ms": 3000,
+            "fault_injected": true
+          }
+        ],
+        "timestamp": "2026-05-17T10:39:55.103449",
+        "metadata": {}
+      },
+      {
+        "turn": 6,
+        "role": "user",
+        "content": "那就等一下再查吧，不急这一两分钟。周三同一时间，七点，其他都不变。",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:40:05.528677",
+        "metadata": {}
+      },
+      {
+        "turn": 6,
+        "role": "agent",
+        "content": "这次查到了！周三（5月21日）外婆家有位：\n\n| 时段 | 剩余座位 |\n|------|----------|\n| 18:00 | 15位 |\n| **19:00** | **12位** |\n| 20:00 | 10位 |\n\n**19:00 有12个空位**，10人完全没问题。\n\n确认一下预订信息：\n\n- 🏠 外婆家\n- 📅 **5月21日（周三）**\n- ⏰ 19:00\n- 👥 10人\n- 🚪 包间\n- ⚠️ 特殊要求：有坚果过敏，需全程无坚果\n\n没问题我就下单了？",
+        "tool_calls": [
+          {
+            "id": "16c3aa4b",
+            "tool_name": "check_availability",
+            "arguments": {
+              "restaurant_id": "r4",
+              "date": "2026-05-21",
+              "party_size": 10
+            },
+            "result": [
+              {
+                "restaurant_id": "r4",
+                "date": "2026-05-21",
+                "time_slot": "18:00",
+                "seats_available": 15
+              },
+              {
+                "restaurant_id": "r4",
+                "date": "2026-05-21",
+                "time_slot": "19:00",
+                "seats_available": 12
+              },
+              {
+                "restaurant_id": "r4",
+                "date": "2026-05-21",
+                "time_slot": "20:00",
+                "seats_available": 10
+              }
+            ],
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false
+          }
+        ],
+        "timestamp": "2026-05-17T10:40:34.434075",
+        "metadata": {}
+      },
+      {
+        "turn": 7,
+        "role": "user",
+        "content": "嗯没问题，就这样订吧。",
+        "tool_calls": [],
+        "timestamp": "2026-05-17T10:40:41.788273",
+        "metadata": {}
+      },
+      {
+        "turn": 7,
+        "role": "agent",
+        "content": "预订成功！🎉\n\n**预订确认信息：**\n\n- 🏠 外婆家（朝阳区三里屯路19号）\n- 📅 5月21日（周三）\n- ⏰ 19:00\n- 👥 10人\n- 🚪 包间\n- ⚠️ 已备注坚果过敏\n- 🔖 预订号：**res_8619**\n\n记好预订号，到时候到店报号就行。\n\n还需要我帮你提前看看菜单点菜，或者有优惠券要用吗？",
+        "tool_calls": [
+          {
+            "id": "657db1e6",
+            "tool_name": "make_reservation",
+            "arguments": {
+              "restaurant_id": "r4",
+              "date": "2026-05-21",
+              "time_slot": "19:00",
+              "party_size": 10,
+              "special_requests": "需要包间；团队中有人坚果过敏，所有菜品请确保无坚果成分"
+            },
+            "result": {
+              "reservation_id": "res_8619",
+              "status": "confirmed",
+              "restaurant_id": "r4",
+              "date": "2026-05-21",
+              "time_slot": "19:00",
+              "party_size": 10
+            },
+            "error": null,
+            "latency_ms": 1,
+            "fault_injected": false
+          }
+        ],
+        "timestamp": "2026-05-17T10:41:06.720205",
+        "metadata": {}
+      }
+    ],
+    "started_at": "2026-05-17T10:36:52.014701",
+    "ended_at": "2026-05-17T10:41:06.720426",
+    "termination_reason": "natural_end"
+  },
+  "score_report": {
+    "scenario_id": "dinner_basic_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "success",
+      "confirmed_reservations": 1,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 14,
+    "hard_score": 1.0,
+    "soft_score": null,
+    "overall_score": 1.0,
+    "official": true,
+    "checks": [
+      {
+        "check_id": "budget_c_budget_reservation",
+        "check_type": "rule",
+        "dimension": "constraint_satisfaction",
+        "description": "预算约束: 人均不超过70元",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": 7,
+        "evidence_text": "",
+        "explanation": "预订已确认（餐厅价格需额外验证）"
+      },
+      {
+        "check_id": "tool_used_make_reservation",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用工具: make_reservation",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已调用 make_reservation"
+      },
+      {
+        "check_id": "tool_used_check_availability",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用工具: check_availability",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已调用 check_availability"
+      },
+      {
+        "check_id": "tool_used_search_restaurants",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用工具: search_restaurants",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已调用 search_restaurants"
+      },
+      {
+        "check_id": "final_state_reservations_count",
+        "check_type": "rule",
+        "dimension": "constraint_satisfaction",
+        "description": "最终状态: reservations 至少 1 条记录",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际 1 条"
+      },
+      {
+        "check_id": "final_state_reservations_status",
+        "check_type": "rule",
+        "dimension": "constraint_satisfaction",
+        "description": "最终状态: 最新reservations状态为 confirmed",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际状态: confirmed"
+      },
+      {
+        "check_id": "final_state_reservations_party_size",
+        "check_type": "rule",
+        "dimension": "constraint_satisfaction",
+        "description": "最终状态: 用餐人数为 10",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际人数: 10"
+      },
+      {
+        "check_id": "ack_c_private_room",
+        "check_type": "rule",
+        "dimension": "information_gathering",
+        "description": "Agent 是否回应了约束: 需要包间",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已回应 (约束在第3轮透露)"
+      },
+      {
+        "check_id": "ack_c_allergy",
+        "check_type": "rule",
+        "dimension": "information_gathering",
+        "description": "Agent 是否回应了约束: 有同事坚果过敏",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已回应 (约束在第4轮透露)"
+      },
+      {
+        "check_id": "recovery_check_availability_timeout",
+        "check_type": "rule",
+        "dimension": "recovery",
+        "description": "工具故障恢复: check_availability timeout",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "成功重试/恢复"
+      }
+    ],
+    "constraint_ledger": [
+      {
+        "constraint": {
+          "id": "c_budget",
+          "type": "budget",
+          "description": "人均不超过70元",
+          "hidden": false,
+          "reveal_turn": null,
+          "check_rule": "restaurant.price_per_person <= 70",
+          "value": 70
+        },
+        "events": [
+          {
+            "constraint_id": "c_budget",
+            "event_type": "introduced",
+            "turn": 0,
+            "evidence": "In initial scenario / user's first message"
+          },
+          {
+            "constraint_id": "c_budget",
+            "event_type": "satisfied",
+            "turn": 7,
+            "evidence": "Reservation made"
+          }
+        ],
+        "final_status": "satisfied"
+      },
+      {
+        "constraint": {
+          "id": "c_headcount",
+          "type": "headcount",
+          "description": "10人用餐",
+          "hidden": false,
+          "reveal_turn": null,
+          "check_rule": null,
+          "value": 10
+        },
+        "events": [
+          {
+            "constraint_id": "c_headcount",
+            "event_type": "introduced",
+            "turn": 0,
+            "evidence": "In initial scenario / user's first message"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_private_room",
+          "type": "preference",
+          "description": "需要包间",
+          "hidden": true,
+          "reveal_turn": 3,
+          "check_rule": "restaurant.has_private_room == 1",
+          "value": null
+        },
+        "events": [
+          {
+            "constraint_id": "c_private_room",
+            "event_type": "revealed",
+            "turn": 3,
+            "evidence": "外婆家啊，行，那帮我看看周二晚上能不能订到包间吧，大概六点半到七点的样子。"
+          },
+          {
+            "constraint_id": "c_private_room",
+            "event_type": "acknowledged",
+            "turn": 4,
+            "evidence": "好消息！**外婆家确认支持无坚果选项**，你同事的坚果过敏可以放心。\n\n那我帮你预订：\n\n- 🏠 外婆家\n- 📅 5月20日（周二）\n- ⏰ 19:00\n- 👥 10人\n- 🚪 包间\n- ⚠️ 特殊要"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_allergy",
+          "type": "dietary",
+          "description": "有同事坚果过敏",
+          "hidden": true,
+          "reveal_turn": 4,
+          "check_rule": "restaurant.allergen_free_options contains 'nut_free'",
+          "value": null
+        },
+        "events": [
+          {
+            "constraint_id": "c_allergy",
+            "event_type": "revealed",
+            "turn": 4,
+            "evidence": "行，七点可以。对了我突然想起来，我们有个同事坚果过敏，这家能处理吗？"
+          },
+          {
+            "constraint_id": "c_allergy",
+            "event_type": "acknowledged",
+            "turn": 6,
+            "evidence": "这次查到了！周三（5月21日）外婆家有位：\n\n| 时段 | 剩余座位 |\n|------|----------|\n| 18:00 | 15位 |\n| **19:00** | **12位** |\n| 2"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_time_change",
+          "type": "time",
+          "description": "原定周二改到周三",
+          "hidden": true,
+          "reveal_turn": 6,
+          "check_rule": null,
+          "value": "2026-05-20"
+        },
+        "events": [
+          {
+            "constraint_id": "c_time_change",
+            "event_type": "revealed",
+            "turn": 6,
+            "evidence": "那就等一下再查吧，不急这一两分钟。周三同一时间，七点，其他都不变。"
+          }
+        ],
+        "final_status": "not_evaluated"
+      },
+      {
+        "constraint": {
+          "id": "c_coupon",
+          "type": "coupon",
+          "description": "用户有一张TEAM50优惠券想用",
+          "hidden": true,
+          "reveal_turn": 8,
+          "check_rule": null,
+          "value": "TEAM50"
+        },
+        "events": [],
+        "final_status": "unknown"
+      }
+    ],
+    "state_snapshots": [
+      {
+        "turn": 0,
+        "after_tool_call": "initial_state",
+        "reservations": [],
+        "orders": [],
+        "coupons_used": [],
+        "diff_description": "初始状态"
+      },
+      {
+        "turn": 7,
+        "after_tool_call": "make_reservation",
+        "reservations": [
+          {
+            "id": "res_8619",
+            "restaurant_id": "r4",
+            "date": "2026-05-21",
+            "time_slot": "19:00",
+            "party_size": 10,
+            "status": "confirmed",
+            "special_requests": "需要包间；团队中有人坚果过敏，所有菜品请确保无坚果成分",
+            "coupon_code": null,
+            "created_at": "2026-05-17 02:40:59"
+          }
+        ],
+        "orders": [],
+        "coupons_used": [],
+        "diff_description": "+1 预订"
+      }
+    ],
+    "failure_summary": [],
+    "rubric": {
+      "dimensions": [],
+      "binary_items": [],
+      "dimension_total": 0,
+      "binary_net": 0,
+      "rubric_total": 0,
+      "grade": ""
+    },
+    "generated_at": "2026-05-17T10:41:06.720697"
+  },
+  "run_metadata": {
+    "model_backend": "claude_cli",
+    "scenario_version": "1.0",
+    "agent_type": "baseline",
+    "timestamp": "2026-05-17T10:41:06.721014"
+  },
+  "metadata": {
+    "db_state": {
+      "reservations": [
+        {
+          "id": "res_8619",
+          "restaurant_id": "r4",
+          "date": "2026-05-21",
+          "time_slot": "19:00",
+          "party_size": 10,
+          "status": "confirmed",
+          "special_requests": "需要包间；团队中有人坚果过敏，所有菜品请确保无坚果成分",
+          "coupon_code": null,
+          "created_at": "2026-05-17 02:40:59"
+        }
+      ],
+      "orders": [],
+      "coupons": [
+        {
+          "code": "TEAM50",
+          "discount_type": "fixed",
+          "discount_value": 50.0,
+          "min_order": 200.0,
+          "max_discount": 50.0,
+          "valid_until": "2026-06-01",
+          "used": 0,
+          "applicable_restaurants": "[]"
+        },
+        {
+          "code": "NEWUSER20",
+          "discount_type": "percent",
+          "discount_value": 20.0,
+          "min_order": 100.0,
+          "max_discount": 80.0,
+          "valid_until": "2026-05-25",
+          "used": 0,
+          "applicable_restaurants": "[]"
+        },
+        {
+          "code": "HOTPOT30",
+          "discount_type": "fixed",
+          "discount_value": 30.0,
+          "min_order": 150.0,
+          "max_discount": 30.0,
+          "valid_until": "2026-05-22",
+          "used": 0,
+          "applicable_restaurants": "[\"r1\",\"r5\"]"
+        },
+        {
+          "code": "EXPIRED01",
+          "discount_type": "fixed",
+          "discount_value": 100.0,
+          "min_order": 0.0,
+          "max_discount": 100.0,
+          "valid_until": "2026-05-01",
+          "used": 0,
+          "applicable_restaurants": "[]"
+        }
+      ]
+    },
+    "preflight": {
+      "valid": true,
+      "feasible_restaurants": [
+        "r4"
+      ],
+      "feasible_slots": [
+        {
+          "restaurant_id": "r4",
+          "date": "2026-05-20",
+          "time_slot": "18:00",
+          "seats": 20
+        },
+        {
+          "restaurant_id": "r4",
+          "date": "2026-05-20",
+          "time_slot": "19:00",
+          "seats": 15
+        }
+      ],
+      "issues": [],
+      "final_date": "2026-05-20",
+      "effective_constraints": {
+        "date": "2026-05-20",
+        "headcount": 10,
+        "budget": 70.0,
+        "private_room": true,
+        "dietary": [
+          "nut_free"
+        ]
+      }
+    }
+  }
+}

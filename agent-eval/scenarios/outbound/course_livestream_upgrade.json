@@ -1,0 +1,334 @@
+{
+  "id": "outbound_course_01",
+  "name": "课程直播产品升级通知-负责人配合型",
+  "domain": "outbound_call",
+  "call_type": "merchant_notify",
+  "difficulty": "hard",
+  "description": "客服致电培训机构负责人，告知课程发布页新增'标准直播'和'低延迟直播'两个独立选项。流程复杂，涉及7步分支操作引导。",
+  "call_purpose": "告知机构客户课程发布页将新增标准直播和低延迟直播两个独立选项，鼓励选择低延迟直播用于实时互动课程",
+  "raw_instruction": "# Role: Customer Support Specialist for Course Publishing Platform\n\n## Task: 告知机构客户，课程发布页面将新增\"标准直播\"和\"低延迟直播\"两个独立选项。当需要实时互动时，鼓励选择低延迟直播。\n\n# Constraints:\n- 每次回复极简——最多15-20个字\n- 使用简短、自然的口语化表达，符合电话沟通风格\n- 频繁给商家发言和提问的机会\n- 若对话被打断，使用简短过渡语，如\"您刚才提到……\"或\"我刚说到……\"\n- 给出信息后，暂停等待商家回应再继续\n- 即使任务完成，若商家有疑问，继续简短作答\n- 不使用正式或冗长的解释——保持随意直接\n- 不说\"好的\"、\"哈哈\"、\"嘿嘿\"、\"嘻嘻\"等语气词\n- 不能承诺给商家折扣券或优惠券\n- 若老板说忙，说\"就1分钟，保证简短\"后继续简短说明\n- 若商家说在开车，礼貌说\"那我稍后再打\"后挂断\n\n# Opening Line: 您好，请问您是贵培训机构/校区的负责人吗？\n\n# Conversation Flow:\n\n## Step 1: 身份确认\n- 若是负责人 → 进入第2步\n- 若不是 → 请其转达，然后进入第2步\n\n**参考话术：** 我们对直播产品做了升级，新增了独立的\"低延迟直播\"选项。发课时选低延迟直播即可，其他流程不变。\n\n## Step 2: 确认是否知情\n**询问：** 您之前选的是标准直播，但我们后台其实已为您走低延迟线路以保障质量，您知道吗？\n\n- 若不知情 → 说明前端当时未开放，临时开启低延迟是为保障音视频与白板同步\n- 若已知情 → 进入第3步\n\n## Step 3: 传达升级内容\n**参考话术：** 之后发布页会分开显示两个选项，根据课程类型自行选择即可。\n\n### 3.1 区别\n- **标准直播：** 费用较低；延迟约5-10秒；适合大班课\n- **低延迟直播：** 延迟约1-2秒；互动更流畅；适合小班课/实操课\n\n### 3.2 价格\n- 标准直播更便宜\n- 低延迟直播带宽和节点保障更强，费用略高\n\n### 3.3 其他问题\n- 按知识库作答，然后进入第4步\n\n## Step 4: 确认前端是否可见\n\n### 4.1 询问发布方式\n**询问：** 您是通过Web控制台、校务系统A，还是SaaS系统B发课？\n\n**Web控制台：**\n- 若低延迟直播已显示 → 直接使用\n- 若未显示 → 后台为其配置，请其明天再查看\n\n**第三方系统：**\n- 若已显示 → 按需选择即可\n- 若未显示 → 缓慢引导开通（每步暂停3秒）：\n  1. 进入【我的】\n  2. 点击【服务商/直播平台管理】\n  3. 选择【直播平台】\n  4. 在【服务产品】下勾选低延迟直播，保存\n\n## Step 5: 检查学员端费用/加速线路费（如有使用）\n- 未设置费用 → 进入第6步\n- 已设置费用 → 提醒确认低延迟直播也已适用该费用\n\n**若无法自行配置 → 缓慢引导设置（每步暂停3秒）：**\n1. 【我的】→【教务/财务设置】\n2. →【收费规则】\n3. →编辑直播线路附加费，为低延迟直播启用\n4. 保存\n\n## Step 6: 企业微信添加\n- 若当前号码可添加 → 告知稍后通过企业微信添加，请通过验证\n- 若不可添加 → 请提供可添加的手机号，再发送同样的验证提示\n\n## Step 7: 结束通话\n- 按知识库解答剩余问题\n- 若无问题，祝其课程顺利、招生满满，结束通话",
+  "response_length_limit": 20,
+  "knowledge_points": [
+    "标准直播费用较低，延迟约5-10秒，适合大班课",
+    "低延迟直播延迟约1-2秒，互动更流畅，适合小班课和实操课",
+    "低延迟直播带宽和节点保障更强，费用略高于标准直播",
+    "后台已为部分商家临时开启低延迟线路以保障音视频与白板同步",
+    "退出飞毛腿需前一天20点前在App取消"
+  ],
+  "call_context": {
+    "order_id": "",
+    "customer_name": "李校长",
+    "customer_phone": "13800138002",
+    "order_items": [],
+    "delivery_address": "",
+    "delivery_time": "",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "",
+    "merchant_name": "优学培训",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "identity_confirm",
+      "order": 1,
+      "instruction": "确认对方是否为培训机构/校区负责人",
+      "required_actions": [
+        "confirm_identity"
+      ],
+      "completion_condition": "对方确认身份或请转达",
+      "branches": [
+        {
+          "condition": "是负责人",
+          "next_step": "awareness_check",
+          "description": "直接进入下一步"
+        },
+        {
+          "condition": "不是负责人",
+          "next_step": "awareness_check",
+          "description": "请其转达后继续"
+        }
+      ]
+    },
+    {
+      "step_id": "awareness_check",
+      "order": 2,
+      "instruction": "告知直播产品升级，询问商家是否知道后台已为其走低延迟线路",
+      "required_actions": [
+        "notify_upgrade",
+        "check_awareness"
+      ],
+      "completion_condition": "商家回应是否知情",
+      "branches": [
+        {
+          "condition": "商家不知情",
+          "next_step": "deliver_upgrade",
+          "description": "先解释背景再传达升级"
+        },
+        {
+          "condition": "商家已知情",
+          "next_step": "deliver_upgrade",
+          "description": "直接传达升级"
+        }
+      ]
+    },
+    {
+      "step_id": "deliver_upgrade",
+      "order": 3,
+      "instruction": "传达升级内容：发布页将分开显示标准直播和低延迟直播两个选项，解释两者区别和价格差异",
+      "required_actions": [
+        "explain_options",
+        "explain_difference",
+        "explain_pricing"
+      ],
+      "completion_condition": "商家表示理解两种选项的区别"
+    },
+    {
+      "step_id": "check_frontend",
+      "order": 4,
+      "instruction": "询问商家通过什么方式发课（Web控制台/校务系统A/SaaS系统B），确认低延迟直播选项是否可见，不可见则引导开通",
+      "required_actions": [
+        "ask_publish_method",
+        "check_visibility"
+      ],
+      "completion_condition": "确认商家能看到低延迟直播选项或已引导开通",
+      "branches": [
+        {
+          "condition": "Web控制台已显示",
+          "next_step": "check_fee",
+          "description": "直接使用"
+        },
+        {
+          "condition": "Web控制台未显示",
+          "next_step": "check_fee",
+          "description": "后台配置，明天查看"
+        },
+        {
+          "condition": "第三方系统未显示",
+          "next_step": "check_fee",
+          "description": "引导开通四步操作"
+        }
+      ]
+    },
+    {
+      "step_id": "check_fee",
+      "order": 5,
+      "instruction": "检查学员端是否设置了加速线路费，如有则提醒确认低延迟直播也适用该费用",
+      "required_actions": [
+        "check_fee_setting"
+      ],
+      "is_optional": true,
+      "completion_condition": "费用设置已确认或不适用"
+    },
+    {
+      "step_id": "wechat_add",
+      "order": 6,
+      "instruction": "询问是否方便添加企业微信，以便后续服务",
+      "required_actions": [
+        "request_wechat"
+      ],
+      "completion_condition": "商家同意添加或提供其他号码"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 7,
+      "instruction": "解答剩余问题，祝课程顺利、招生满满，礼貌结束通话并记录结果",
+      "required_actions": [
+        "answer_remaining",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，请问您是贵培训机构/校区的负责人吗",
+  "mandatory_closing": "",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_discount",
+      "description": "承诺给商家折扣券或优惠券",
+      "severity": "critical",
+      "detection_keywords": [
+        "折扣",
+        "优惠券",
+        "打折",
+        "免费",
+        "赠送"
+      ]
+    },
+    {
+      "id": "fb_filler_words",
+      "description": "使用不当语气词",
+      "severity": "minor",
+      "detection_keywords": [
+        "哈哈",
+        "嘿嘿",
+        "嘻嘻"
+      ]
+    },
+    {
+      "id": "fb_verbose",
+      "description": "使用正式或冗长的解释（超过20字）",
+      "severity": "major",
+      "detection_keywords": [
+        "综上所述",
+        "总结一下",
+        "接下来我为您详细介绍"
+      ]
+    }
+  ],
+  "callee_role": "培训机构负责人",
+  "callee_context": "- 你是优学培训的李校长，负责线上课程运营\n- 你目前用Web控制台发课，选的是标准直播\n- 你不知道后台已经为你走了低延迟线路\n- 你对技术细节不太了解，但愿意配合升级\n- 你比较忙，希望电话尽量简短",
+  "callee_persona": {
+    "patience": 5,
+    "cooperativeness": 7,
+    "comprehension": 6,
+    "emotional": 2,
+    "signal_quality": 9,
+    "busy_level": 6,
+    "trust_level": 7,
+    "has_additional_issue": true,
+    "additional_issue": "低延迟直播费用具体高多少？有没有价格表？"
+  },
+  "callee_goal": "你想快速了解这次升级对自己课程有什么影响，不想浪费时间。如果对方说的清楚你会配合操作，但如果太啰嗦你会催。你想知道费用差异。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 6,
+  "max_turns": 20,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_merchant_info",
+      "description": "查询商家信息（机构名称、负责人、当前直播配置、发课方式等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "机构名称"
+          },
+          "phone": {
+            "type": "string",
+            "description": "联系电话"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "check_platform_config",
+      "description": "查询商家的直播平台配置状态（是否已开通低延迟直播、前端是否可见）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "机构名称"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "enable_low_latency",
+      "description": "后台为商家开通低延迟直播选项（次日生效）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "机构名称"
+          },
+          "reason": {
+            "type": "string",
+            "description": "开通原因"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "send_wechat_invite",
+      "description": "发送企业微信添加邀请",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "description": "对方手机号"
+          }
+        },
+        "required": [
+          "phone"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_merchant_info": {
+      "merchant_name": "优学培训",
+      "contact_person": "李校长",
+      "phone": "13800138002",
+      "current_livestream_type": "标准直播",
+      "backend_route": "低延迟（后台临时开启）",
+      "publish_method": "Web控制台",
+      "monthly_courses": 24,
+      "avg_students_per_course": 35,
+      "has_acceleration_fee": false
+    },
+    "check_platform_config": {
+      "merchant_name": "优学培训",
+      "standard_livestream": "已开通",
+      "low_latency_livestream": "后台已启用，前端未显示",
+      "frontend_visible": false,
+      "can_enable_frontend": true,
+      "estimated_enable_time": "次日生效"
+    },
+    "enable_low_latency": {
+      "merchant_name": "优学培训",
+      "status": "已开通",
+      "effective_time": "明天起可在发课页看到",
+      "note": "请商家明天刷新页面查看"
+    },
+    "send_wechat_invite": {
+      "status": "已发送",
+      "message": "企业微信验证消息已发送，请对方通过"
+    }
+  },
+  "expected_steps_completed": [
+    "identity_confirm",
+    "awareness_check",
+    "deliver_upgrade",
+    "check_frontend",
+    "wechat_add",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "identity_confirm": "是负责人",
+    "awareness_check": "商家不知情",
+    "check_frontend": "Web控制台未显示"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "承诺折扣",
+    "使用不当语气词"
+  ],
+  "context_checkpoints": [],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

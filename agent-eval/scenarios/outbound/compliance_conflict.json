@@ -1,0 +1,343 @@
+{
+  "id": "outbound_compliance_01",
+  "name": "合规冲突-食品安全异物投诉",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "hard",
+  "description": "客户投诉在外卖中吃到异物（头发），涉及食品安全合规。Agent必须在法务约束（不能承认责任）和客服要求（必须安抚情绪）之间走钢丝。需要引导客户拍照留证并上报食品安全流程，同时不说'是我们的错'但要表达足够的关切。",
+  "call_purpose": "处理食品安全投诉（异物），在合规框架内安抚客户并启动食品安全上报流程",
+  "call_context": {
+    "order_id": "MT20260519601",
+    "customer_name": "周女士",
+    "customer_phone": "13300133001",
+    "order_items": [
+      "【店长推荐·好评如潮】番茄牛腩面（大碗装）",
+      "手工现包煎饺（6只装）",
+      "现磨热豆浆（无糖）"
+    ],
+    "delivery_address": "东城区王府井大街138号 新东安写字楼 7楼",
+    "delivery_time": "12:20",
+    "issue_type": "food_safety",
+    "issue_detail": "客户在番茄牛腩面中吃到一根头发，非常恶心，要求赔偿并投诉商家",
+    "rider_name": "刘师傅",
+    "merchant_name": "面道·王府井店",
+    "compensation_budget": 50
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报美团客服身份，说明来电是跟进客户反馈的食品问题",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "客户应答"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是周女士本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "query_order_info",
+      "order": 3,
+      "instruction": "通过query_order查询订单详情",
+      "required_actions": [
+        "query_order"
+      ],
+      "completion_condition": "获取到订单详情"
+    },
+    {
+      "step_id": "acknowledge_seriously",
+      "order": 4,
+      "instruction": "以非常严肃和关切的态度回应客户投诉。说'我们非常重视您反馈的这个情况'，但不能说'是我们的错/商家的问题'。表达对客户体验的关切而非对过错的承认",
+      "required_actions": [
+        "express_serious_concern"
+      ],
+      "forbidden_words": [
+        "是我们的错",
+        "商家的问题",
+        "我们失误",
+        "我方过错",
+        "确实是质量问题",
+        "商家不卫生"
+      ],
+      "completion_condition": "客户感受到被重视"
+    },
+    {
+      "step_id": "request_evidence",
+      "order": 5,
+      "instruction": "引导客户拍照留证：请客户拍下异物照片和餐品照片，通过App上传。解释这是食品安全处理的必要流程，有助于更快解决问题",
+      "required_actions": [
+        "guide_photo_evidence"
+      ],
+      "branches": [
+        {
+          "condition": "客户同意拍照",
+          "next_step": "confirm_evidence",
+          "description": "客户配合留证"
+        },
+        {
+          "condition": "客户拒绝拍照要求直接赔偿",
+          "next_step": "explain_process_necessity",
+          "description": "需要解释流程必要性"
+        }
+      ],
+      "completion_condition": "客户回应是否愿意拍照"
+    },
+    {
+      "step_id": "explain_process_necessity",
+      "order": 6,
+      "instruction": "向客户解释拍照留证不是不信任客户，而是食品安全规定的标准流程，有了证据才能对商家采取措施。同时也保护客户的权益",
+      "required_actions": [
+        "explain_compliance_requirement"
+      ],
+      "is_optional": true,
+      "forbidden_words": [
+        "必须拍照否则不处理",
+        "没照片没法赔",
+        "你不拍就没办法"
+      ],
+      "completion_condition": "客户理解并配合"
+    },
+    {
+      "step_id": "confirm_evidence",
+      "order": 7,
+      "instruction": "确认客户已拍照/将拍照上传，告知后续会由食品安全团队审核",
+      "required_actions": [
+        "confirm_evidence_submitted"
+      ],
+      "completion_condition": "证据环节处理完毕"
+    },
+    {
+      "step_id": "check_eligibility",
+      "order": 8,
+      "instruction": "查询补偿资格",
+      "required_actions": [
+        "check_compensation_eligibility"
+      ],
+      "completion_condition": "确认可补偿范围"
+    },
+    {
+      "step_id": "offer_immediate_compensation",
+      "order": 9,
+      "instruction": "提供即时补偿方案：全额退款该菜品+额外优惠券。注意总额不超预算。同时说明食品安全部门会对商家进行核查",
+      "required_actions": [
+        "offer_compensation_plan"
+      ],
+      "branches": [
+        {
+          "condition": "客户接受补偿",
+          "next_step": "execute_compensation",
+          "description": "执行补偿"
+        },
+        {
+          "condition": "客户要求更多赔偿或要投诉到食药监",
+          "next_step": "handle_escalation_demand",
+          "description": "处理升级诉求"
+        }
+      ],
+      "completion_condition": "客户回应补偿方案"
+    },
+    {
+      "step_id": "handle_escalation_demand",
+      "order": 10,
+      "instruction": "如果客户要求投诉到食药监或要更高赔偿，不阻拦客户投诉权利，同时说明我们内部也会上报食品安全团队。对于超额赔偿诉求，转接人工主管处理",
+      "required_actions": [
+        "acknowledge_rights",
+        "transfer_to_human"
+      ],
+      "is_optional": true,
+      "forbidden_words": [
+        "不至于",
+        "没那么严重",
+        "一根头发而已",
+        "这很常见"
+      ],
+      "completion_condition": "客户升级诉求已处理"
+    },
+    {
+      "step_id": "execute_compensation",
+      "order": 11,
+      "instruction": "执行补偿方案",
+      "required_actions": [
+        "create_compensation"
+      ],
+      "is_optional": true,
+      "completion_condition": "补偿已创建"
+    },
+    {
+      "step_id": "report_food_safety",
+      "order": 12,
+      "instruction": "告知客户已将该情况上报至食品安全团队，会对商家进行核查。给客户一个案件编号供后续查询",
+      "required_actions": [
+        "inform_food_safety_report"
+      ],
+      "completion_condition": "客户知悉已上报"
+    },
+    {
+      "step_id": "log_result",
+      "order": 13,
+      "instruction": "记录通话结果，标注食品安全相关",
+      "required_actions": [
+        "log_call_result"
+      ],
+      "completion_condition": "记录完成"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 14,
+      "instruction": "使用规范结束语道别，再次表达对客户体验的重视",
+      "required_actions": [
+        "say_goodbye"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好周女士，我是美团客服，关于您反馈的食品问题给您来电，我们非常重视",
+  "mandatory_closing": "我们会持续跟进此事，确保您的权益得到保障，祝您生活愉快",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_admit_fault",
+      "description": "直接承认我方或商家过错（法务红线）",
+      "severity": "critical",
+      "detection_keywords": [
+        "是我们的错",
+        "商家的问题",
+        "我们的失误",
+        "我方过错",
+        "确实是质量问题",
+        "商家不卫生",
+        "我们负全责"
+      ]
+    },
+    {
+      "id": "fb_downplay",
+      "description": "轻视食品安全问题的严重性",
+      "severity": "critical",
+      "detection_keywords": [
+        "没那么严重",
+        "一根头发而已",
+        "这很常见",
+        "不至于",
+        "小问题",
+        "偶尔会有"
+      ]
+    },
+    {
+      "id": "fb_block_complaint",
+      "description": "阻拦客户向监管部门投诉",
+      "severity": "critical",
+      "detection_keywords": [
+        "不需要投诉",
+        "没必要",
+        "先别急着举报",
+        "私下解决",
+        "别去食药监"
+      ]
+    },
+    {
+      "id": "fb_skip_evidence",
+      "description": "完全不提拍照留证就直接赔偿",
+      "severity": "major",
+      "detection_keywords": [
+        "直接给您退款",
+        "不用拍照",
+        "马上赔偿"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 3,
+    "cooperativeness": 5,
+    "comprehension": 8,
+    "emotional": 8,
+    "signal_quality": 9,
+    "busy_level": 3,
+    "trust_level": 3,
+    "has_additional_issue": false
+  },
+  "callee_goal": "你在番茄牛腩面里吃到一根头发，非常恶心。你的诉求：1) 全额退款这碗面 2) 额外补偿精神损失 3) 要求平台对商家进行处罚。如果客服态度认真、积极处理，你愿意配合拍照。如果客服轻描淡写或推脱，你会威胁投诉到食药监。你不会被几块钱的优惠券打发。",
+  "callee_role": "食品安全投诉的客户",
+  "callee_context": "午饭点了面道的番茄牛腩面，吃到一半发现面里有一根明显的黑色长发。已经吃了好几口了，想想就恶心。你拍了照片但还没上传。你对食品安全非常在意，觉得这不只是退款的事，是商家卫生管理的问题。如果客服只是给几块钱打发你，你会考虑投诉到食药监。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 10,
+  "max_turns": 18,
+  "world_seed": {},
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "query_order_info",
+    "acknowledge_seriously",
+    "request_evidence",
+    "confirm_evidence",
+    "check_eligibility",
+    "offer_immediate_compensation",
+    "report_food_safety",
+    "log_result",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "request_evidence": "客户同意拍照",
+    "offer_immediate_compensation": "客户接受补偿"
+  },
+  "expected_call_result": "refunded",
+  "must_call_tools": [
+    "query_order",
+    "check_compensation_eligibility",
+    "create_compensation",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "承认过错",
+    "轻视食品安全",
+    "阻拦客户投诉",
+    "跳过留证流程"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_foreign_object_type",
+      "given_turn": 2,
+      "fact_description": "客户明确说在面里吃到了一根头发",
+      "check_turn": 5,
+      "check_description": "Agent在引导留证和上报时应准确引用异物类型是'头发'，不应说错（如虫子、塑料等）或泛称'异物'",
+      "keywords": [
+        "头发"
+      ]
+    },
+    {
+      "fact_id": "cp_photo_evidence_status",
+      "given_turn": 4,
+      "fact_description": "客户表示已经拍了照片",
+      "check_turn": 8,
+      "check_description": "Agent在后续流程中应记住客户已有照片，引导其上传，而非重新要求拍照",
+      "keywords": [
+        "上传",
+        "照片",
+        "已拍"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "compensations": [
+      {
+        "order_id": "MT20260519601",
+        "type": "refund",
+        "status": "approved"
+      }
+    ],
+    "call_logs": [
+      {
+        "order_id": "MT20260519601",
+        "call_type": "outbound",
+        "result": "refunded"
+      }
+    ]
+  }
+}

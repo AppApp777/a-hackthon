@@ -1,0 +1,242 @@
+{
+  "id": "outbound_rider_warning_01",
+  "name": "单数未达标警告-配合型",
+  "domain": "outbound_call",
+  "call_type": "rider_notify",
+  "difficulty": "easy",
+  "description": "站长致电骑手，告知连续2天未达到飞毛腿最低单数（5单/天），再不达标将自动取消合同。骑手配合型，承认最近有事。",
+  "call_purpose": "告知骑手连续2天未达标，说明后果，确认后续计划",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "赵刚",
+    "customer_phone": "13700137001",
+    "order_items": [],
+    "delivery_address": "",
+    "delivery_time": "",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "赵刚",
+    "merchant_name": "",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（站长），确认对方是赵刚",
+      "required_actions": [
+        "self_identify",
+        "confirm_identity"
+      ],
+      "completion_condition": "骑手确认身份"
+    },
+    {
+      "step_id": "inform_situation",
+      "order": 2,
+      "instruction": "如实告知骑手连续2天未达到飞毛腿最低5单/天的要求，引用具体数据（第1天3单、第2天2单）",
+      "required_actions": [
+        "inform_underperformance"
+      ],
+      "completion_condition": "骑手表示知道了"
+    },
+    {
+      "step_id": "explain_consequence",
+      "order": 3,
+      "instruction": "说明后果：如果明天仍未达标，系统将自动取消飞毛腿合同，恢复普通骑手派单",
+      "required_actions": [
+        "explain_consequence"
+      ],
+      "completion_condition": "骑手表示理解后果"
+    },
+    {
+      "step_id": "confirm_plan",
+      "order": 4,
+      "instruction": "询问骑手后续计划，确认明天是否能正常出勤达标",
+      "required_actions": [
+        "ask_plan"
+      ],
+      "completion_condition": "骑手给出明确回复"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 5,
+      "instruction": "确认无其他问题，鼓励骑手，礼貌结束通话，记录结果",
+      "required_actions": [
+        "encourage_rider",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "你好，请问是赵刚吗？我是站长",
+  "mandatory_closing": "加油，有问题随时联系站里，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_threaten",
+      "description": "威胁骑手或使用侮辱性语言",
+      "severity": "critical",
+      "detection_keywords": [
+        "不干就滚",
+        "开除你",
+        "扣你钱",
+        "你不行"
+      ]
+    },
+    {
+      "id": "fb_exaggerate",
+      "description": "夸大未达标后果（如编造罚款、影响信用等不存在的惩罚）",
+      "severity": "major",
+      "detection_keywords": [
+        "罚款",
+        "信用扣分",
+        "永久取消",
+        "黑名单"
+      ]
+    },
+    {
+      "id": "fb_lie_data",
+      "description": "篡改或编造骑手的实际单数数据",
+      "severity": "critical",
+      "detection_keywords": [
+        "你一单都没送",
+        "你0单",
+        "一天没上线"
+      ]
+    }
+  ],
+  "callee_role": "美团外卖骑手（飞毛腿）",
+  "callee_context": "- 你叫赵刚，是美团外卖骑手，在海淀区送餐\n- 你签了飞毛腿多日合同，每天最低5单\n- 最近两天确实有事（家里老人住院），第1天只送了3单，第2天只送了2单\n- 你承认确实没达标，明天家里事处理完了可以正常跑",
+  "callee_persona": {
+    "patience": 7,
+    "cooperativeness": 8,
+    "comprehension": 8,
+    "emotional": 3,
+    "signal_quality": 9,
+    "busy_level": 3,
+    "trust_level": 7,
+    "has_additional_issue": false,
+    "additional_issue": "",
+    "archetype": "cooperative"
+  },
+  "callee_goal": "你知道自己最近没达标，态度诚恳想继续跑飞毛腿。只要站长不太凶，你会配合说明情况并承诺明天恢复。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 5,
+  "max_turns": 10,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_rider_status",
+      "description": "查询骑手状态（飞毛腿状态、近期单量、达标情况）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "query_rider_contract",
+      "description": "查询骑手飞毛腿合同详情（合同类型、每日最低单量、当前进度）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_rider_status": {
+      "rider_name": "赵刚",
+      "phone": "13700137001",
+      "station": "海淀中关村站",
+      "feimaotui_status": "已签约",
+      "total_orders_last_30d": 142,
+      "avg_daily_orders": 4.7,
+      "consecutive_underperform_days": 2,
+      "day1_orders": 3,
+      "day2_orders": 2,
+      "daily_minimum": 5
+    },
+    "query_rider_contract": {
+      "rider_name": "赵刚",
+      "contract_type": "多日合同",
+      "effective_date": "2026-05-19",
+      "duration_days": 5,
+      "daily_minimum": 5,
+      "current_day": 3,
+      "auto_cancel_threshold": "连续3天未达标",
+      "status": "预警中"
+    }
+  },
+  "canonical_intent": [
+    {
+      "id": "R1",
+      "content": "必须如实告知连续未达标天数",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "连续",
+        "未达标",
+        "天",
+        "2天"
+      ]
+    }
+  ],
+  "expected_steps_completed": [
+    "open",
+    "inform_situation",
+    "explain_consequence",
+    "confirm_plan",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {},
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_rider_status",
+    "query_rider_contract",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "威胁骑手",
+    "夸大后果",
+    "篡改数据"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_underperform_days",
+      "given_turn": 1,
+      "fact_description": "骑手连续2天未达标（第1天3单，第2天2单）",
+      "check_turn": 3,
+      "check_description": "agent 应准确引用未达标数据，不应编造更严重的情况",
+      "keywords": [
+        "2天",
+        "3单",
+        "2单",
+        "连续"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

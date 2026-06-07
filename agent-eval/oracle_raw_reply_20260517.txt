@@ -1,0 +1,334 @@
+I see **19 numbered issues** in your paste, not 30. I’ll prioritize the 19 included, then add the new issues I found from the attached code.
+
+## Highest ROI demo plan
+
+For a 4–6 hour budget, I would not try to polish everything. I would fix these first:
+
+1. **Make scores defensible:** A1, A3, A5, C1, plus the new outcome-scoring bugs below.
+2. **Make Harness actually intervene:** the current Harness often blocks *after* tools already executed, and its system reminders are ignored by the agent.
+3. **Make Diagnose not look shallow:** add branch/step failure handling and stop reporting “no failure” when step/branch scores are bad.
+4. **Stabilize demo runs:** reduce simulator/judge randomness and remove impossible / misaligned scenario settings.
+
+The biggest embarrassment risk is not a wording issue. It is that **the evaluation can pass a call because the agent logged “refunded,” even if no successful refund happened**, and the Harness can claim to block a bad tool call after that tool call has already changed simulator state.
+
+---
+
+# Part 1 — Prioritize your known issues
+
+## A. Scoring fairness — `scorer_outbound.py`
+
+| ID | Demo impact | Why it matters | Simplest fix |
+|---|---:|---|---|
+| **A1** | **DEMO-UGLY** | Judges for Track 2 will expect complex instruction-following to dominate the score. Current formula can make the headline score feel like generic call-quality scoring. | Reweight so deterministic instruction components dominate. I would use: `overall = 0.30*hard + 0.20*soft + 0.35*step + 0.15*branch`. Do **not** blindly make `hard_score` 50% if hard includes greetings and generic checks. |
+| **A2** | **DEMO-UGLY** | Double-penalizing opening/closing makes the evaluator look unfair when a call fails mostly because of one greeting/farewell issue. | Keep opening/closing in rule checks, but tell the LLM rubric not to re-penalize them, or remove `self_identify` / `proper_goodbye` binary items from the final soft score. |
+| **A3** | **DEMO-FATAL** | A branch score of `1.0` when branches were not specified is a visible “fake green check.” Judges will notice if the extreme scenario shows 100% branch accuracy without branch tests. | If a scenario has branch definitions but `expected_branch_taken == {}`, set `branch_score = None` and print `未测试`, or fail scenario validation. Populate expected branches for demo scenarios. |
+| **A4** | **DEMO-UGLY** | False positives on normal phrases make the evaluator look brittle. Chinese substring matching is especially risky. | Replace raw substring checks with behavior-specific detectors. Example: phone leakage should require something like rider/phone context plus an 11-digit phone regex, not just `"138"` or `"骑手"`. |
+| **A5** | **DEMO-FATAL** | Running the same eval twice with different step scores destroys trust in the evaluator. | Set judge temperature to `0` for all scoring calls. Add deterministic fallback checks from tool calls, required actions, and known phrases. Cache LLM judge results per trace during demo. |
+
+---
+
+## B. Harness logic flaws — `harness.py`
+
+| ID | Demo impact | Why it matters | Simplest fix |
+|---|---:|---|---|
+| **B1** | **DEMO-UGLY** | Rigidly blocking direct human transfer can make Harness look like it worsens the agent. | Replace hardcoded rule with scenario-configurable prerequisites. Quick fix: allow `transfer_to_human` when the user asked for supervisor, says 投诉/主管/人工, or the branch is escalation. |
+| **B2** | **DEMO-UGLY** | `"你们"` is common neutral Chinese. False emotion alerts will cause weird “don’t end yet” blocks. | Remove `"你们"` from emotion keywords. Require at least one clearly negative word, e.g. 投诉/差评/生气/太慢/不满意/受不了. |
+| **B3** | **DEMO-UGLY** | Double goodbye is very visible in a live call transcript. | Before appending mandatory closing, check coverage of closing elements. If the agent already said ≥60% of the key elements or ends with 再见/生活愉快/用餐愉快, do not inject. |
+| **B4** | **DEMO-UGLY** | Harness can claim steps are complete when only partial phrases matched. That undermines the Treat layer. | Prefer tool-success and explicit required-action aliases. For text-only steps, use required phrase groups instead of `40%` keyword matching. For Chinese, `.split()` is not reliable anyway. |
+
+---
+
+## C. Scenario design holes
+
+| ID | Demo impact | Why it matters | Simplest fix |
+|---|---:|---|---|
+| **C1** | **DEMO-FATAL** | Extreme scenario with 6+ branches and empty expected branches makes branch accuracy meaningless. | Add expected branch path for the demo run, or mark branch score as `undertested` instead of `1.0`. |
+| **C2** | **DEMO-FATAL** | An unsolvable timeout scenario will look like the evaluator or Harness is broken, not like a hard test. | For demo, either remove the `create_compensation` timeout fault or change the expected outcome to an acceptable fallback such as `followup_required` / `escalated`. Do not require successful refund if the only refund tool times out and retry is unsupported. |
+| **C3** | **DEMO-FATAL** | If expected call result does not match simulator/tool behavior, scores become indefensible. | Align `expected_call_result` with actual `log_call_result` values and DB side effects. Add a tiny scenario validator that flags unknown or unreachable expected results. |
+| **C4** | **DEMO-UGLY** | “Apologize carefully” is not impossible, but it is brittle if the forbidden detector treats normal apology as liability admission. | Make the allowed apology explicit: “可以说：给您带来不便深表歉意；不能说：是我们/商家/骑手的错。” Detect liability phrases, not all apologies. |
+
+---
+
+## D. Callee simulator dead features — `user_sim_outbound.py`
+
+| ID | Demo impact | Why it matters | Simplest fix |
+|---|---:|---|---|
+| **D1** | **DEMO-UGLY** | If you pitch emotional state/action but the orchestrator ignores them, judges may see “simulator theater.” | Either stop highlighting these fields, or wire the easiest ones: `action == hang_up`, `action == silence`, `action == ask_repeat`, and `emotional_state` into Harness emotion tracking. |
+| **D2** | **DEMO-UGLY** | Additional issue may never appear, so your multi-turn complexity disappears in the live demo. | Trigger extra issue by milestone, not hardcoded turn: after solution offered, after agent asks “还有问题吗,” or after main issue is resolved. Quick patch: lower trigger to turn ≥3 and track `additional_issue_raised`. |
+| **D3** | **CODE-HYGIENE → DEMO-UGLY if pitched** | Persona numbers currently mostly decorate the prompt. Fine internally, bad if presented as behavioral simulation. | Add 3–4 deterministic rules only: low patience may hang up after N turns, low trust asks identity challenge, low signal asks repeat, high busy demands brevity. |
+
+---
+
+## E. Diagnosis engine gaps — `diagnosis.py`
+
+| ID | Demo impact | Why it matters | Simplest fix |
+|---|---:|---|---|
+| **E1** | **DEMO-FATAL for Diagnose** | Wrong branch vs skipped step are different root causes. Diagnose is supposed to be your differentiator. | If `branch_accuracy_score < 1`, add `FailureMode.BRANCH_ERROR` and report expected vs actual branch from `step_compliance`. |
+| **E2** | **CODE-HYGIENE → DEMO-UGLY if robot issue appears** | Dead enum makes the system look unfinished. | Add a simple classifier: repeated same phrase, excessive template style, or binary item `robot_detected` triggered → `MECHANICAL_RESPONSE`. |
+| **E3** | **DEMO-UGLY** | Harness can scrub template leakage before Diagnose sees it, so Diagnose may miss the very failure Harness fixed. | Preserve raw blocked/sanitized text in `interventions_log`, and let Diagnose inspect both raw and final outputs. |
+
+---
+
+# Part 2 — New issues I found
+
+## New DEMO-FATAL issues
+
+| ID | Issue | Why this is dangerous | Minimal fix |
+|---|---|---|---|
+| **N1** | **`Role.SYSTEM` messages are ignored by the agent but counted as Agent speech by scorer.** `baseline_agent_outbound._build_messages()` only includes `Role.USER` and `Role.AGENT`. But scorer transcript formatting treats every non-user role as `"外呼Agent"`. | Harness step reminders and regeneration prompts do not actually guide the agent, yet the scorer may credit or penalize them as if the agent said them. This can make both Treat and Evaluate look fake. | In agent `_build_messages()`, include `Role.SYSTEM` as user-side system reminder. In scorer/diagnosis transcripts, either omit `Role.SYSTEM` or label it as `系统提示，不计入Agent表现`. |
+| **N2** | **Harness tool gating happens after tools have already executed.** The agent executes tools inside `_generate()` before Harness sees `tool_calls`. | Harness can “block” `transfer_to_human` or `log_call_result` after the DB/call log has already changed. This is the single biggest Treat-layer correctness bug. | Quick patch: snapshot `tool_sim` state before each agent generation; if Harness blocks, restore snapshot and discard those tool calls. Better later: parse ACTION first, ask Harness approval, then execute. |
+| **N3** | **Call result scoring trusts `log_call_result`, which is agent self-report.** `actual_result = call_logs[-1]["result"]`. | An agent can skip refund, call `log_call_result(result="refunded")`, and pass outcome scoring. Judges may call this out immediately. | Cross-validate expected outcomes against actual tool side effects. Example: `refunded` requires a successful `create_compensation` record, not just a call log. |
+| **N4** | **Required tool usage counts failed tool calls as success.** `called_tools.add(tc.tool_name)` ignores `tc.error`. | In fault scenarios, a timed-out `create_compensation` still satisfies `must_call_tools`. That makes the evaluator reward attempts as completed operations. | Track `called_successfully = {tc.tool_name for tc in calls if not tc.error}`. For fault tests, report separate `attempted_tool` vs `successful_tool`. |
+| **N5** | **LLM judge failure is silently swallowed.** `_call_judge()` returns `{}`, rubric defaults to score `3`, step compliance defaults to `not_reached`, and run validity remains valid. | If Claude CLI hiccups during demo, the report may look “valid” but be garbage. | Add `judge_error_count`. If any required judge call fails, mark `run_validity.status = "invalid"` or fall back to deterministic scoring. Do not silently default rubric to pass-level `3`. |
+| **N6** | **Demo runs are highly non-deterministic.** Agent temp `0.5`, simulator temp `0.8`, judge temp `0.3`; no seed use. | The same scenario may take a different branch or score differently live. | For demo: judge temp `0`, simulator temp `0.1–0.2`, agent temp `0.2–0.3`. Keep one pre-recorded trace as backup. |
+| **N7** | **Default agent model is `gpt-4o`, but you said you only have Claude CLI.** `AGENT_MODEL = os.getenv("AGENT_MODEL", "gpt-4o")`. | A fresh run may fail or use the wrong backend unless env vars are perfectly set. | Default to `None` and let `llm.chat()` choose Claude CLI default, or default to your actual Claude model flag. Also print the resolved model at startup. |
+
+---
+
+## New DEMO-UGLY issues
+
+| ID | Issue | Why it looks bad | Minimal fix |
+|---|---|---|---|
+| **N8** | **Failure summary does not include step or branch score failures.** `failure_summary` only uses failed `CheckResult`s. | Diagnose can say “无明显失败” even when `step_compliance_score` or `branch_accuracy_score` is poor. | Add synthetic checks: `step_compliance_overall` and `branch_accuracy_overall`. Include them in `failure_summary`. |
+| **N9** | **Diagnosis clean-pass condition ignores step/branch/overall.** It returns clean if no `failure_summary` and `hard_score >= 0.9`. | A branch failure can disappear from Diagnose. | Require `step_compliance_score >= 0.95`, `branch_accuracy_score >= 0.95 or None`, and `overall_score >= threshold`. |
+| **N10** | **Branch judging is free-form but branch scoring requires exact string match.** LLM may return “用户同意等待” instead of `"客户表示可以等"`. | Correct branch can score as wrong. | In the step judge prompt, list allowed branch labels and require exact enum output. Normalize aliases before comparison. |
+| **N11** | **Harness pre-query result is invisible to the agent.** `pre_first_turn()` calls `query_order`, but agent history does not include tool results from prior messages. | Harness claims it helped by querying order, but the agent may still behave as if it did not know the result. | Include prior `tool_calls` and results in `baseline_agent._build_messages()` as private system context. |
+| **N12** | **Previous tool results are generally lost between turns.** Agent `_build_messages()` stores only agent/user content, not tool results attached to messages. | Multi-turn tool use becomes fragile; the agent may forget what tools returned. | Append a private tool-result summary after each agent message with tool calls. |
+| **N13** | **Step gating allows ending once `log_call_result` is called, even if other required tools are missing.** `_get_missing_required_steps()` returns `None` when `log_call_result` is in `all_called`. | Premature logging can bypass the gate. | Remove that bypass. Only allow ending when all required tools succeeded, and `log_call_result` should be last. |
+| **N14** | **Harness step progress aliasing misses common required actions.** `log_result` does not match `log_call_result`; Chinese completion conditions do not split well with `.split()`. | Harness progress display can be wrong in the demo. | Add explicit aliases: `log_result -> log_call_result`, `refund -> create_compensation`, `query_order -> query_order`, etc. For Chinese text, use phrase lists, not whitespace splitting. |
+| **N15** | **One tool can complete multiple unrelated optional steps.** `_update_step_progress()` checks `all_called` globally; any `create_compensation` can complete every step mapped to that tool. | Branch progress can show steps completed that were never reached. | Track step order/path. A tool should only complete the current active step or a reachable branch step. |
+| **N16** | **User simulator parses string `"false"` as truthy.** `bool(data.get("should_end", False))` turns `"false"` into `True`. | A slightly malformed LLM response can end the call early. | Add `parse_bool()` that handles booleans and strings `"true"/"false"`. Use it for `should_end`, `undertested`, and binary rubric fields too. |
+| **N17** | **User simulator sees hidden tool summaries as if the agent said them.** `_build_messages()` appends `[系统操作: tool]` to agent content and flips it into the simulator’s user message. | The callee may react to internal operations that should not be audible. | Put tool summaries into the simulator system prompt as private state, or label clearly: `[仅供模拟器了解，客户没有听到]`. |
+| **N18** | **Scenario expected steps omit branch target steps.** Example: after-sales expects refund branch but `expected_steps_completed` omits `execute_refund`. | Step score can be high even when the actual branch action was skipped. | Compute expected path from `expected_branch_taken`, or manually add branch target steps for demo scenarios. |
+| **N19** | **Per-step `forbidden_words` are not checked by `ForbiddenBehaviorChecker`.** It only iterates `scenario.forbidden_behaviors`. | The script can define step-level forbidden phrases that the evaluator never penalizes. | Merge all `step.forbidden_words` into the forbidden checker, tagged with the step ID. |
+| **N20** | **Opening/closing checker is too literal.** It splits templates into long fragments and checks substring presence. | A good paraphrase can fail; a bad template copy can pass. | For each mandatory opening/closing, define small required semantic slots: identity, company, purpose, thanks/apology, goodbye. Use regex/synonym lists. |
+| **N21** | **Rubric binary penalties do not affect `soft_score` / `overall_score`.** Binary items affect `rubric_total`, but `soft_score` is calculated from dimension checks only. | Report can show “越权承诺” binary penalty but headline overall barely moves. | Convert binary net to a normalized component, or add binary items as `CheckResult`s included in soft score. |
+| **N22** | **Diagnosis mode order is nondeterministic.** `return list(set(modes))` scrambles order. | Demo output can change order run-to-run. | Deduplicate while preserving order. |
+| **N23** | **Deviation point logic uses agent-turn count as a proxy for step progress.** One agent turn can complete multiple steps/tools; long calls can still skip middle steps. | Diagnose may point to the wrong failure turn. | Prefer `score_report.step_compliance`: first required step whose status is not `completed` becomes the deviation point. |
+| **N24** | **`conversation_length` counts messages, including system reminders, not dialogue turns.** | Report may say a call had more “turns” than the visible transcript suggests. | Use `max(m.turn)` or count agent/user exchange pairs. Exclude `Role.SYSTEM`. |
+| **N25** | **`use_llm_judge=False` produces bad step/branch defaults.** Required steps score `0` without LLM step compliance, while branch defaults `1.0`. | Turning off LLM judging for speed makes scores misleading. | Add deterministic step fallback before disabling LLM. Branch should be `None/undertested` unless deterministically checked. |
+| **N26** | **Tool faults are tied to exact turn numbers.** If the agent calls the tool one turn earlier/later, the intended fault may not trigger. | Demo scenario difficulty may disappear or appear unpredictably. | Trigger faults by call count or step ID, not absolute turn. |
+| **N27** | **Agent prompt includes too much ground-truth order context.** The agent can answer from system prompt instead of querying tools. | Tool-use evaluation is weakened: the system tells the agent the facts, then penalizes it for not querying. | Mark context as “initial, not authoritative,” and remove exact fields that must be verified by tools from the prompt where possible. |
+| **N28** | **Harness sanitization hides model failures from Evaluate/Diagnose.** Final text has `***`, but raw unsafe text may be lost except in logs. | Treat layer can cover up the failure it should diagnose. | Store `raw_text`, `sanitized_text`, and `sanitization_reason`. Score safety on raw; score customer-facing text on final. |
+| **N29** | **End-intent detection is too broad.** Harness treats `"祝您"` as ending. | Normal polite phrases can trigger step gating or emotion protection. | Require stronger end patterns: sentence-final `再见`, `通话结束`, or farewell plus `log_call_result`. |
+| **N30** | **Template leak filter can produce empty customer output.** It strips tables/summaries but does not block empty text. | Agent may say nothing in a live transcript. | After filtering, if text is empty or too short, block and regenerate with a specific prompt. |
+
+---
+
+# What I would actually fix in 4–6 hours
+
+## Hour 1: stop scoring fake successes
+
+Patch scoring so it cannot pass on self-reported outcomes alone.
+
+Minimum scoring changes:
+
+```python
+# Required tool usage: success only
+called_successfully = set()
+called_attempted = set()
+
+for msg in conversation.messages:
+    for tc in msg.tool_calls:
+        called_attempted.add(tc.tool_name)
+        if not tc.error:
+            called_successfully.add(tc.tool_name)
+
+for tool in required_tools:
+    passed = tool in called_successfully
+```
+
+Then make `call_result` validate DB/tool side effects, not only `log_call_result`. Even a simple version is enough:
+
+```python
+def _validate_outcome(expected: str, db_state: dict, conversation: Conversation) -> tuple[bool, str]:
+    call_logs = db_state.get("call_logs", [])
+    logged = call_logs[-1].get("result") if call_logs else "not_logged"
+
+    successful_tools = [
+        tc.tool_name
+        for msg in conversation.messages
+        for tc in msg.tool_calls
+        if not tc.error
+    ]
+
+    if expected == "refunded":
+        ok = "create_compensation" in successful_tools and logged == "refunded"
+        return ok, f"logged={logged}, successful_tools={successful_tools}"
+
+    if expected == "confirmed":
+        ok = logged == "confirmed"
+        return ok, f"logged={logged}"
+
+    return logged == expected, f"logged={logged}"
+```
+
+You can refine DB field names after checking `tools_outbound.py`.
+
+---
+
+## Hour 2: make Harness real
+
+Two essential fixes:
+
+### 1. Let the agent see Harness system messages
+
+```python
+# baseline_agent_outbound.py / _build_messages
+elif msg.role == Role.SYSTEM:
+    messages.append({
+        "role": "user",
+        "content": f"[系统提醒，仅供Agent参考，不要直接复述给客户]\n{msg.content}"
+    })
+```
+
+### 2. Do not let blocked tool calls mutate state
+
+Best clean design is pre-execution approval, but fastest demo patch is rollback:
+
+```python
+import copy
+
+# in orchestrator retry loop, before agent.respond()
+tool_snapshot = copy.deepcopy(self.tool_sim.__dict__)
+
+agent_text, tool_calls = self.agent.respond(self.conversation)
+
+agent_text, tool_calls, blocked = self.harness.process_agent_output(
+    agent_text, tool_calls, self.conversation
+)
+
+if blocked:
+    self.tool_sim.__dict__ = copy.deepcopy(tool_snapshot)
+    tool_calls = []
+    ...
+```
+
+This is not elegant, but it prevents the most embarrassing Treat-layer bug.
+
+---
+
+## Hour 3: fix branch and step visibility
+
+Add synthetic checks so step/branch failures appear in the normal failure list and Diagnose.
+
+```python
+rule_checks.append(CheckResult(
+    check_id="step_compliance_overall",
+    check_type="rule",
+    dimension="instruction_following",
+    description="必要步骤完成率",
+    passed=step_score >= 0.95,
+    score=step_score,
+    explanation=f"step_score={step_score:.2f}",
+))
+
+if branch_score is not None:
+    rule_checks.append(CheckResult(
+        check_id="branch_accuracy_overall",
+        check_type="rule",
+        dimension="branching",
+        description="分支判断准确率",
+        passed=branch_score >= 0.95,
+        score=branch_score,
+        explanation=f"branch_score={branch_score:.2f}",
+    ))
+```
+
+For empty expected branches:
+
+```python
+scenario_has_branches = any(s.branches for s in scenario.instruction_steps)
+
+if expected_branches and step_compliance:
+    ...
+elif scenario_has_branches:
+    branch_score = None  # undertested, not 1.0
+else:
+    branch_score = 1.0
+```
+
+You will need to adjust the report model if it requires float. If changing the model is annoying, use `branch_score = 0.0` plus an `undertested` flag in metadata, but do not display it as 100%.
+
+---
+
+## Hour 4: stabilize LLM behavior
+
+Change judge calls to temperature `0`:
+
+```python
+raw = chat_text(prompt, temperature=0, max_tokens=300)
+```
+
+Change simulator to lower temperature for demo:
+
+```python
+temperature=0.2
+```
+
+Add a robust bool parser:
+
+```python
+def parse_bool(value: Any, default: bool = False) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        v = value.strip().lower()
+        if v in ("true", "1", "yes", "是"):
+            return True
+        if v in ("false", "0", "no", "否"):
+            return False
+    return default
+```
+
+Use this for `should_end`, `undertested`, and binary rubric `triggered`.
+
+---
+
+## Hour 5: fix demo scenarios
+
+For the live demo, I would use **three scenarios only**:
+
+1. `delivery_confirm_basic.json` — clean baseline.
+2. `after_sales_complaint.json` — emotional complaint and refund branch.
+3. `delay_notify_difficult.json` or `stress_test_extreme.json` — only if branch expectations are fixed.
+
+Concrete scenario fixes:
+
+| Scenario | Fix before demo |
+|---|---|
+| `delivery_confirm_basic.json` | Ensure tool simulator logs exactly `confirmed`. |
+| `after_sales_complaint.json` | Remove the `create_compensation` timeout fault unless you add retry/fallback. Add `execute_refund` to expected path if refund branch is expected. |
+| `delay_notify_difficult.json` | Make expected branch match deterministic simulator behavior. Fault should not make expected result impossible. |
+| `stress_test_extreme.json` | Do not demo branch accuracy until `expected_branch_taken` is populated. Otherwise display branch as `未测试`. |
+
+---
+
+# Final prioritization
+
+## Must fix before demo
+
+1. **N1 — System reminders ignored by agent and mis-scored as agent speech.**
+2. **N2 — Harness blocks after tool side effects already happened.**
+3. **N3/N4 — Scorer trusts `log_call_result` and counts failed tools as success.**
+4. **A3/C1 — Branch score defaults to fake 100%.**
+5. **A5/N6/N5 — Non-deterministic or silently failed judging.**
+6. **E1/N8/N9 — Diagnosis ignores branch/step failures.**
+7. **C2/C3 — Scenario expected outcomes must be reachable.**
+
+## Should fix if time remains
+
+1. A2 — double penalties.
+2. B2/B3/B4 — obvious Harness weirdness.
+3. D2 — additional issue not reliably triggered.
+4. N10/N11/N12/N13 — branch exact-match and tool-memory issues.
+5. N16 — string boolean parsing.
+
+## Safe to defer
+
+1. E2 — mechanical response dead enum.
+2. D3 — persona parameter realism, unless you plan to pitch it.
+3. N22/N24 — deterministic ordering and turn-count polish.
+4. Most wording-level prompt polish.
+
+The core story for judges should be: **Evaluate catches instruction, branch, tool, and outcome failures; Diagnose explains the first meaningful deviation; Treat intervenes before unsafe/customer-visible damage occurs.** Right now, the code is close to that story, but the scoring and Harness side-effect bugs need to be fixed before the demo.

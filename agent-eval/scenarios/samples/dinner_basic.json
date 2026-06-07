@@ -1,0 +1,87 @@
+{
+  "id": "dinner_basic_01",
+  "name": "团建聚餐-基础版",
+  "domain": "dinner_booking",
+  "difficulty": "medium",
+  "description": "10人团建聚餐，预算有限，有人坚果过敏，用户会中途改时间",
+  "user_goal": "为10人团建订一个人均不超过70元的餐厅，需要包间，有人坚果过敏。原定周二改到周三同一时间。最终要完成预订。",
+  "initial_message": "帮我订个团建聚餐，大概10个人，下周二晚上。",
+  "constraints": [
+    {
+      "id": "c_budget",
+      "type": "budget",
+      "description": "人均不超过70元",
+      "hidden": false,
+      "check_rule": "restaurant.price_per_person <= 70",
+      "value": 70
+    },
+    {
+      "id": "c_headcount",
+      "type": "headcount",
+      "description": "10人用餐",
+      "hidden": false,
+      "value": 10
+    },
+    {
+      "id": "c_private_room",
+      "type": "preference",
+      "description": "需要包间",
+      "hidden": true,
+      "reveal_turn": 3,
+      "check_rule": "restaurant.has_private_room == 1"
+    },
+    {
+      "id": "c_allergy",
+      "type": "dietary",
+      "description": "有同事坚果过敏",
+      "hidden": true,
+      "reveal_turn": 4,
+      "check_rule": "restaurant.allergen_free_options contains 'nut_free'"
+    },
+    {
+      "id": "c_time_change",
+      "type": "time",
+      "description": "原定周二改到周三",
+      "hidden": true,
+      "reveal_turn": 6,
+      "value": "2026-05-20"
+    },
+    {
+      "id": "c_coupon",
+      "type": "coupon",
+      "description": "用户有一张TEAM50优惠券想用",
+      "hidden": true,
+      "reveal_turn": 8,
+      "value": "TEAM50"
+    }
+  ],
+  "tool_faults": [
+    {
+      "tool_name": "check_availability",
+      "trigger_turn": 5,
+      "fault_type": "timeout",
+      "description": "查询可用性时超时"
+    }
+  ],
+  "user_persona": {
+    "patience": 6,
+    "clarity": 4,
+    "emotional": 3,
+    "pickiness": 6,
+    "change_mind_probability": 0.3
+  },
+  "expected_outcome": {
+    "must_satisfy": ["c_budget", "c_headcount", "c_private_room", "c_allergy"],
+    "must_call_tools": ["search_restaurants", "check_availability", "make_reservation"],
+    "must_not_do": ["recommend_restaurant_over_budget", "ignore_allergy", "book_without_confirming_change"],
+    "final_state_checks": {
+      "reservations": {
+        "count_gte": 1,
+        "latest_status": "confirmed",
+        "latest_party_size": 10
+      }
+    }
+  },
+  "max_turns": 20,
+  "world_seed": {}
+}

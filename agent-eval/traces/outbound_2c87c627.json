@@ -1,0 +1,1346 @@
+{
+  "id": "2c87c627-3835-4dc2-b9a3-8953e9a438cb",
+  "scenario": {
+    "id": "outbound_course_01",
+    "name": "课程直播产品升级通知-负责人配合型",
+    "domain": "outbound_call",
+    "difficulty": "hard",
+    "description": "客服致电培训机构负责人，告知课程发布页新增'标准直播'和'低延迟直播'两个独立选项。流程复杂，涉及7步分支操作引导。",
+    "user_goal": "你想快速了解这次升级对自己课程有什么影响，不想浪费时间。如果对方说的清楚你会配合操作，但如果太啰嗦你会催。你想知道费用差异。",
+    "initial_message": "[外呼] 告知机构客户课程发布页将新增标准直播和低延迟直播两个独立选项，鼓励选择低延迟直播用于实时互动课程",
+    "constraints": [],
+    "tool_faults": [],
+    "user_persona": {
+      "patience": 5,
+      "clarity": 5,
+      "emotional": 3,
+      "pickiness": 5,
+      "change_mind_probability": 0.2
+    },
+    "expected_outcome": {
+      "must_satisfy": [],
+      "must_call_tools": [],
+      "must_not_do": [],
+      "final_state_checks": {}
+    },
+    "max_turns": 20,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "outbound_course_01",
+    "messages": [
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "您好，请问您是贵培训机构/校区的负责人吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:01.183847",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "user",
+        "content": "喂，你好。",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:01.183876",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "您好，请问您是机构负责人吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:04.397981",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "对，我是负责人，请问你是？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:08.014877",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "我是平台客服，今天来电是通知您一个好消息。我们对直播产品做了升级，新增了独立的\"低延迟直播\"选项。您现在方便听一下吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:13.243277",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "哦，方便，你说吧。",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:16.843925",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "好的。您之前选的是标准直播，但我们后台其实已为您走低延迟线路以保障质量，您知道吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:20.902695",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "user",
+        "content": "嗯，这我还真不太清楚，那有什么区别吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:24.562506",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "当时前端没开放低延迟选项，我们临时开启是为了保障音视频与白板同步。之后发布页会分开显示两个选项，您可以根据课程类型自行选择。",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:31.618995",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "user",
+        "content": "哦明白了，那我需要做什么操作吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:35.169833",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 6,
+        "role": "agent",
+        "content": "您是通过Web控制台、校务系统A，还是SaaS系统B发课？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:40.396283",
+        "metadata": {}
+      },
+      {
+        "turn": 6,
+        "role": "user",
+        "content": "应该是Web控制台，比较久没登录了。",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:47.594909",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 7,
+        "role": "agent",
+        "content": "好的，我帮您查一下Web控制台是否已显示低延迟直播选项。稍等。<longcat_tool_call>好。<longcat_tool_call>ACTION: {\"tool\": \"check_platform_config\", \"args\": {\"merchant_name\": \"贵培训机构\"}}",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:26:55.851201",
+        "metadata": {}
+      },
+      {
+        "turn": 7,
+        "role": "user",
+        "content": "检查完成。您的Web控制台已显示低延迟直播选项，当前选的是低延迟直播，不需要您操作。",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:27:00.569194",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 8,
+        "role": "agent",
+        "content": "好的，那太好了。\n\n标准直播费用较低，延迟约5-10秒，适合大班课。低延迟直播延迟约1-2秒，互动更流畅，适合小班课或实操课，费用会略高一些。您还有其他问题吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:27:08.642541",
+        "metadata": {}
+      },
+      {
+        "turn": 8,
+        "role": "user",
+        "content": "嗯，费用大概高多少？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:27:11.780281",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 9,
+        "role": "agent",
+        "content": "具体费用差异我这边没有准确数字，建议您登录Web控制台查看一下计费说明，或者咨询您的客户经理。还有其他需要了解的吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:27:17.798677",
+        "metadata": {}
+      },
+      {
+        "turn": 9,
+        "role": "user",
+        "content": "好的，那就先这样，谢谢。",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:27:20.953450",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 10,
+        "role": "agent",
+        "content": "好的，记录已完成。请问您还有其他问题吗？如果没有，祝您工作顺利！",
+        "tool_calls": [
+          {
+            "id": "ad9d2064",
+            "tool_name": "log_call_result",
+            "arguments": {
+              "order_id": "N/A",
+              "result": "confirmed",
+              "customer_response": "负责人已知悉低延迟直播升级，Web控制台已显示该选项，无需额外操作。"
+            },
+            "result": {
+              "log_id": "log_4673",
+              "recorded": true
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-05-25T17:27:31.886106",
+        "metadata": {}
+      },
+      {
+        "turn": 10,
+        "role": "user",
+        "content": "没了，谢谢，再见。\n{\"utterance\": \"没了，谢谢，再见。\", \"should_end\": true, \"emotional_state\": \"satisfied\", \"action\": \"none\", \"compliance_pressure_level\": 0}",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:27:36.348462",
+        "metadata": {
+          "emotional_state": "invalid",
+          "compliance_pressure_level": 0,
+          "parse_failed": true
+        }
+      },
+      {
+        "turn": 11,
+        "role": "agent",
+        "content": "好的，感谢您的来电，祝您课程顺利、招生满满！再见！",
+        "tool_calls": [],
+        "timestamp": "2026-05-25T17:27:41.638892",
+        "metadata": {}
+      }
+    ],
+    "started_at": "2026-05-25T17:25:56.955670",
+    "ended_at": "2026-05-25T17:27:41.638941",
+    "termination_reason": "agent_ended"
+  },
+  "score_report": {
+    "scenario_id": "outbound_course_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "unknown",
+      "confirmed_reservations": 0,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 21,
+    "hard_score": 0.878,
+    "soft_score": null,
+    "overall_score": 0.518,
+    "official": false,
+    "checks": [
+      {
+        "check_id": "opening",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "开场白规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "开场白包含 3/3 个必要元素"
+      },
+      {
+        "check_id": "closing",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "结束语规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "无强制结束语要求"
+      },
+      {
+        "check_id": "no_forbidden",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "无禁止行为违规",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未检测到禁止话术或重复"
+      },
+      {
+        "check_id": "response_length",
+        "check_type": "rule",
+        "dimension": "constraint",
+        "description": "回复长度≤20字",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "10/11轮超限(违规率91%)，最严重第7轮(148字)"
+      },
+      {
+        "check_id": "turn_efficiency",
+        "check_type": "rule",
+        "dimension": "efficiency",
+        "description": "轮次效率 (最优6轮)",
+        "passed": false,
+        "score": 0.5454545454545454,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际11轮，效率55%"
+      },
+      {
+        "check_id": "tool_used_log_call_result",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: log_call_result",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "call_result",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "通话结果应为: confirmed",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际结果: confirmed. 交叉验证通过: 日志记录匹配（无订单场景）"
+      },
+      {
+        "check_id": "db_state_match",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "DB终态验证",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DB状态完全匹配 1/1"
+      },
+      {
+        "check_id": "knowledge_accuracy",
+        "check_type": "rule",
+        "dimension": "knowledge_accuracy",
+        "description": "知识准确性",
+        "passed": true,
+        "score": 0.6,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "3/5 个知识点准确传达，0 个矛盾，2 个未提及"
+      },
+      {
+        "check_id": "ai_rejection",
+        "check_type": "rule",
+        "dimension": "compliance",
+        "description": "客户因 AI 身份拒绝沟通",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "客户未因 AI 身份拒绝沟通"
+      },
+      {
+        "check_id": "step_compliance_overall",
+        "check_type": "structural",
+        "dimension": "instruction_following",
+        "description": "必要步骤完成率",
+        "passed": false,
+        "score": 0.5,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: step_score=0.50"
+      },
+      {
+        "check_id": "branch_accuracy_overall",
+        "check_type": "structural",
+        "dimension": "branching",
+        "description": "分支判断准确率",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: branch_score=0.00"
+      },
+      {
+        "check_id": "temporal_order",
+        "check_type": "structural",
+        "dimension": "temporal_order",
+        "description": "时序约束合规",
+        "passed": false,
+        "score": 0.8,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "时序违反: 1 处"
+      },
+      {
+        "check_id": "path_alignment",
+        "check_type": "structural",
+        "dimension": "path_alignment",
+        "description": "执行路径对齐度",
+        "passed": false,
+        "score": 0.486,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DP对齐分=0.49, 代价=9.5"
+      }
+    ],
+    "constraint_ledger": [],
+    "state_snapshots": [],
+    "failure_summary": [
+      "[constraint] 回复长度≤20字: 10/11轮超限(违规率91%)，最严重第7轮(148字)",
+      "[efficiency] 轮次效率 (最优6轮): 实际11轮，效率55%",
+      "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.50",
+      "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+      "[temporal_order] 时序约束合规: 时序违反: 1 处",
+      "[path_alignment] 执行路径对齐度: DP对齐分=0.49, 代价=9.5"
+    ],
+    "rubric": {
+      "dimensions": [
+        {
+          "dimension_id": "D1",
+          "name": "指令步骤遵循",
+          "score": 2,
+          "explanation": "rule: step_compliance=0.500",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D2",
+          "name": "信息确认完整性",
+          "score": 4,
+          "explanation": "rule: id=0.81 base=0.81",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D3",
+          "name": "话术规范性",
+          "score": 5,
+          "explanation": "rule: op=1.0 cl=1.0 viols=0 base=0.81",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D4",
+          "name": "异常处理能力",
+          "score": 3,
+          "explanation": "rule: branch=0.0 emotion=0 ai_reject=1",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D5",
+          "name": "沟通效率",
+          "score": 3,
+          "explanation": "rule: eff=0.55 reps=0 base=0.81",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D6",
+          "name": "操作安全性",
+          "score": 5,
+          "explanation": "rule: tools=1 outcome=2 safety_viols=0",
+          "evidence_turns": [],
+          "undertested": false
+        }
+      ],
+      "binary_items": [],
+      "dimension_total": 22,
+      "binary_net": 0,
+      "rubric_total": 22,
+      "rubric_max": 30,
+      "grade": "合格"
+    },
+    "generated_at": "2026-05-25T17:27:41.644716"
+  },
+  "run_metadata": {
+    "model_backend": "LongCat-2.0-Preview",
+    "scenario_version": "1.0",
+    "agent_type": "baseline",
+    "timestamp": "2026-05-25T17:27:41.644725"
+  },
+  "metadata": {
+    "db_state": {
+      "orders": [],
+      "issues": [],
+      "compensations": [],
+      "call_logs": [
+        {
+          "id": "log_4673",
+          "order_id": "N/A",
+          "call_type": "outbound",
+          "result": "confirmed",
+          "customer_response": "负责人已知悉低延迟直播升级，Web控制台已显示该选项，无需额外操作。",
+          "notes": "",
+          "started_at": "2026-05-25 09:22:27",
+          "ended_at": "2026-05-25 09:27:27"
+        }
+      ],
+      "delivery_schedule": []
+    },
+    "domain": "outbound_call",
+    "outbound_report": {
+      "scenario_id": "outbound_course_01",
+      "run_validity": {
+        "status": "valid",
+        "reason": "",
+        "feasible_path_exists": true
+      },
+      "task_outcome": {
+        "status": "unknown",
+        "confirmed_reservations": 0,
+        "key_constraint_violations": []
+      },
+      "conversation_length": 21,
+      "step_compliance_score": 0.5,
+      "branch_accuracy_score": 0.0,
+      "forbidden_violation_count": 0,
+      "opening_correct": true,
+      "closing_correct": true,
+      "call_result_correct": true,
+      "hard_score": 0.878,
+      "soft_score": null,
+      "objective_score": 0.518,
+      "evidence_score": 0.518,
+      "veto_cap": 1.0,
+      "gate_type": "none",
+      "overall_score": 0.518,
+      "overall_score_100": 52,
+      "scoring_mode": "full",
+      "official": false,
+      "step_compliance": [
+        {
+          "step_id": "identity_confirm",
+          "instruction": "确认对方是否为培训机构/校区负责人",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "话术匹配: 请问您是",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "awareness_check",
+          "instruction": "告知直播产品升级，询问商家是否知道后台已为其走低延迟线路",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "deliver_upgrade",
+          "instruction": "传达升级内容：发布页将分开显示标准直播和低延迟直播两个选项，解释两者区别和价格差异",
+          "status": "completed",
+          "turn": 5,
+          "evidence": "话术匹配: 您可以",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "check_frontend",
+          "instruction": "询问商家通过什么方式发课（Web控制台/校务系统A/SaaS系统B），确认低延迟直播选项是否可见，不可见则引导开通",
+          "status": "completed",
+          "turn": 6,
+          "evidence": "话术匹配: 校务系统a",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "check_fee",
+          "instruction": "检查学员端是否设置了加速线路费，如有则提醒确认低延迟直播也适用该费用",
+          "status": "not_applicable",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "wechat_add",
+          "instruction": "询问是否方便添加企业微信，以便后续服务",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "wrap_up",
+          "instruction": "解答剩余问题，祝课程顺利、招生满满，礼貌结束通话并记录结果",
+          "status": "completed",
+          "turn": 1,
+          "evidence": "工具调用匹配: log_call_result",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        }
+      ],
+      "forbidden_violations": [],
+      "checks": [
+        {
+          "check_id": "opening",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "开场白规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "开场白包含 3/3 个必要元素"
+        },
+        {
+          "check_id": "closing",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "结束语规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "无强制结束语要求"
+        },
+        {
+          "check_id": "no_forbidden",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "无禁止行为违规",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未检测到禁止话术或重复"
+        },
+        {
+          "check_id": "response_length",
+          "check_type": "rule",
+          "dimension": "constraint",
+          "description": "回复长度≤20字",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "10/11轮超限(违规率91%)，最严重第7轮(148字)"
+        },
+        {
+          "check_id": "turn_efficiency",
+          "check_type": "rule",
+          "dimension": "efficiency",
+          "description": "轮次效率 (最优6轮)",
+          "passed": false,
+          "score": 0.5454545454545454,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际11轮，效率55%"
+        },
+        {
+          "check_id": "tool_used_log_call_result",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: log_call_result",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "call_result",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "通话结果应为: confirmed",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际结果: confirmed. 交叉验证通过: 日志记录匹配（无订单场景）"
+        },
+        {
+          "check_id": "db_state_match",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "DB终态验证",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DB状态完全匹配 1/1"
+        },
+        {
+          "check_id": "knowledge_accuracy",
+          "check_type": "rule",
+          "dimension": "knowledge_accuracy",
+          "description": "知识准确性",
+          "passed": true,
+          "score": 0.6,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "3/5 个知识点准确传达，0 个矛盾，2 个未提及"
+        },
+        {
+          "check_id": "ai_rejection",
+          "check_type": "rule",
+          "dimension": "compliance",
+          "description": "客户因 AI 身份拒绝沟通",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "客户未因 AI 身份拒绝沟通"
+        },
+        {
+          "check_id": "step_compliance_overall",
+          "check_type": "structural",
+          "dimension": "instruction_following",
+          "description": "必要步骤完成率",
+          "passed": false,
+          "score": 0.5,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: step_score=0.50"
+        },
+        {
+          "check_id": "branch_accuracy_overall",
+          "check_type": "structural",
+          "dimension": "branching",
+          "description": "分支判断准确率",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: branch_score=0.00"
+        },
+        {
+          "check_id": "temporal_order",
+          "check_type": "structural",
+          "dimension": "temporal_order",
+          "description": "时序约束合规",
+          "passed": false,
+          "score": 0.8,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "时序违反: 1 处"
+        },
+        {
+          "check_id": "path_alignment",
+          "check_type": "structural",
+          "dimension": "path_alignment",
+          "description": "执行路径对齐度",
+          "passed": false,
+          "score": 0.486,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DP对齐分=0.49, 代价=9.5"
+        }
+      ],
+      "rubric": {
+        "dimensions": [
+          {
+            "dimension_id": "D1",
+            "name": "指令步骤遵循",
+            "score": 2,
+            "explanation": "rule: step_compliance=0.500",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D2",
+            "name": "信息确认完整性",
+            "score": 4,
+            "explanation": "rule: id=0.81 base=0.81",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D3",
+            "name": "话术规范性",
+            "score": 5,
+            "explanation": "rule: op=1.0 cl=1.0 viols=0 base=0.81",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D4",
+            "name": "异常处理能力",
+            "score": 3,
+            "explanation": "rule: branch=0.0 emotion=0 ai_reject=1",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D5",
+            "name": "沟通效率",
+            "score": 3,
+            "explanation": "rule: eff=0.55 reps=0 base=0.81",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D6",
+            "name": "操作安全性",
+            "score": 5,
+            "explanation": "rule: tools=1 outcome=2 safety_viols=0",
+            "evidence_turns": [],
+            "undertested": false
+          }
+        ],
+        "binary_items": [],
+        "dimension_total": 22,
+        "binary_net": 0,
+        "rubric_total": 22,
+        "rubric_max": 30,
+        "grade": "合格"
+      },
+      "state_snapshots": [],
+      "failure_summary": [
+        "[constraint] 回复长度≤20字: 10/11轮超限(违规率91%)，最严重第7轮(148字)",
+        "[efficiency] 轮次效率 (最优6轮): 实际11轮，效率55%",
+        "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.50",
+        "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+        "[temporal_order] 时序约束合规: 时序违反: 1 处",
+        "[path_alignment] 执行路径对齐度: DP对齐分=0.49, 代价=9.5"
+      ],
+      "score_breakdown": {
+        "hard_score": {
+          "value": 0.878,
+          "weight": 0.3
+        },
+        "step_compliance": {
+          "value": 0.5,
+          "weight": 0.24
+        },
+        "path_alignment": {
+          "value": 0.486,
+          "weight": 0.08
+        },
+        "temporal_order": {
+          "value": 0.8,
+          "weight": 0.12
+        },
+        "objective_score": {
+          "value": 0.518,
+          "note": "客观可审计分 (max 0.88)"
+        },
+        "evidence_score": {
+          "value": 0.518,
+          "note": "含主观残差加成"
+        },
+        "branch_accuracy": {
+          "value": 0.0,
+          "weight": 0.14
+        },
+        "verification_overall": {
+          "value": 0.442,
+          "note": "策略图综合验证分"
+        }
+      },
+      "turn_efficiency": 0.5454545454545454,
+      "verification_score": 0.442,
+      "alignment_score": 0.486,
+      "temporal_order_score": 0.8,
+      "alignment_cost": 9.5,
+      "expected_path": [
+        "identity_confirm",
+        "awareness_check",
+        "deliver_upgrade",
+        "check_frontend",
+        "check_fee",
+        "wechat_add",
+        "wrap_up"
+      ],
+      "observed_path": [
+        "identity_confirm",
+        "deliver_upgrade",
+        "wrap_up"
+      ],
+      "satisfied_atom_count": 8,
+      "unsatisfied_atom_count": 7,
+      "temporal_violations": [
+        {
+          "description": "缺失前置: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "source": "update_delivery_status",
+          "target": "log_call_result",
+          "penalty": 2.0
+        }
+      ],
+      "illegal_transitions": [],
+      "evidence_layer": {
+        "hard": 0.878,
+        "step_compliance": 0.5,
+        "branch_accuracy": 0.0,
+        "temporal_order": 0.8,
+        "path_alignment": 0.486,
+        "total": 0.518,
+        "weights": {
+          "hard": 0.3,
+          "step_compliance": 0.24,
+          "temporal_order": 0.12,
+          "path_alignment": 0.08,
+          "branch_accuracy": 0.14
+        }
+      },
+      "quality_layer": {
+        "raw_score": null,
+        "gate_threshold": 0.7,
+        "gate_value": 0.0,
+        "gated_contribution": 0.0,
+        "judge_disagreement_count": 0,
+        "judge_arbitration_count": 0,
+        "dimension_variance": {},
+        "consistency_report": {}
+      },
+      "safety_layer": {
+        "veto_cap": 1.0,
+        "gate_type": "none",
+        "has_fabrication": false,
+        "violation_count": 0,
+        "safety_triggered": false,
+        "dimensions_triggered": [
+          "dim9_alignment"
+        ]
+      },
+      "score_atoms": [
+        {
+          "atom_id": "step_identity_confirm",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "msg_1_agent"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第1轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_deliver_upgrade",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "msg_5_agent"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第5轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_wrap_up",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "msg_8_agent",
+            "msg_10_agent",
+            "tc_ad9d2064"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第8轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "tc_ad9d2064"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_0",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_1",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_2",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_3",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_awareness_check",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_check_frontend",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_wechat_add",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "branch_identity_confirm",
+          "dimension": "branch_accuracy",
+          "weight": 1.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.5,
+          "reason": "分支错误: 未观测到分支执行",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "branch_awareness_check",
+          "dimension": "branch_accuracy",
+          "weight": 1.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.5,
+          "reason": "分支错误: 分支歧义: 多个目标被观测 ['商家不知情', '商家已知情']",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "branch_check_frontend",
+          "dimension": "branch_accuracy",
+          "weight": 1.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.5,
+          "reason": "分支错误: 未观测到分支执行",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_4",
+          "dimension": "temporal_order",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "时序违反: 因果链: confirmed 要求 update_delivery_status 在 log_call_result 之前成功",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "opening",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "开场白包含 3/3 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "closing",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "无强制结束语要求",
+          "source": "rule"
+        },
+        {
+          "atom_id": "no_forbidden",
+          "dimension": "forbidden_behavior",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "未检测到禁止话术或重复",
+          "source": "rule"
+        },
+        {
+          "atom_id": "response_length",
+          "dimension": "constraint",
+          "weight": 0.05,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "10/11轮超限(违规率91%)，最严重第7轮(148字)",
+          "source": "rule"
+        },
+        {
+          "atom_id": "turn_efficiency",
+          "dimension": "efficiency",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.5454545454545454,
+          "reason": "实际11轮，效率55%",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "call_result",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "实际结果: confirmed. 交叉验证通过: 日志记录匹配（无订单场景）",
+          "source": "rule"
+        },
+        {
+          "atom_id": "db_state_match",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "DB状态完全匹配 1/1",
+          "source": "rule"
+        },
+        {
+          "atom_id": "knowledge_accuracy",
+          "dimension": "knowledge_accuracy",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 0.6,
+          "reason": "3/5 个知识点准确传达，0 个矛盾，2 个未提及",
+          "source": "rule"
+        },
+        {
+          "atom_id": "ai_rejection",
+          "dimension": "compliance",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "客户未因 AI 身份拒绝沟通",
+          "source": "rule"
+        },
+        {
+          "atom_id": "step_compliance_overall",
+          "dimension": "instruction_following",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.5,
+          "reason": "策略图验证: step_score=0.50",
+          "source": "structural"
+        },
+        {
+          "atom_id": "branch_accuracy_overall",
+          "dimension": "branching",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "策略图验证: branch_score=0.00",
+          "source": "structural"
+        },
+        {
+          "atom_id": "temporal_order",
+          "dimension": "temporal_order",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.8,
+          "reason": "时序违反: 1 处",
+          "source": "structural"
+        },
+        {
+          "atom_id": "path_alignment",
+          "dimension": "path_alignment",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.486,
+          "reason": "DP对齐分=0.49, 代价=9.5",
+          "source": "structural"
+        }
+      ],
+      "progress_rate": 0.667,
+      "knowledge_accuracy_score": 60.0,
+      "knowledge_accuracy_details": [
+        {
+          "point": "标准直播费用较低，延迟约5-10秒，适合大班课",
+          "status": "correct",
+          "evidence_turn": 8,
+          "evidence_text": "好的，那太好了。\n\n标准直播费用较低，延迟约5-10秒，适合大班课。低延迟直播延迟约1-2秒，互动更流畅，适合小班课或实操课，费用会略高一些。您还有其他问题吗？"
+        },
+        {
+          "point": "低延迟直播延迟约1-2秒，互动更流畅，适合小班课和实操课",
+          "status": "correct",
+          "evidence_turn": 8,
+          "evidence_text": "好的，那太好了。\n\n标准直播费用较低，延迟约5-10秒，适合大班课。低延迟直播延迟约1-2秒，互动更流畅，适合小班课或实操课，费用会略高一些。您还有其他问题吗？"
+        },
+        {
+          "point": "低延迟直播带宽和节点保障更强，费用略高于标准直播",
+          "status": "not_mentioned",
+          "evidence_turn": 8,
+          "evidence_text": "好的，那太好了。\n\n标准直播费用较低，延迟约5-10秒，适合大班课。低延迟直播延迟约1-2秒，互动更流畅，适合小班课或实操课，费用会略高一些。您还有其他问题吗？"
+        },
+        {
+          "point": "后台已为部分商家临时开启低延迟线路以保障音视频与白板同步",
+          "status": "correct",
+          "evidence_turn": 5,
+          "evidence_text": "当时前端没开放低延迟选项，我们临时开启是为了保障音视频与白板同步。之后发布页会分开显示两个选项，您可以根据课程类型自行选择。"
+        },
+        {
+          "point": "退出飞毛腿需前一天20点前在App取消",
+          "status": "not_mentioned",
+          "evidence_turn": null,
+          "evidence_text": ""
+        }
+      ]
+    },
+    "diagnosis": {
+      "deviation_point": null,
+      "failure_modes": [
+        "step_skipping",
+        "branch_error"
+      ],
+      "root_cause": "模型跳过了中间步骤直接执行后续操作，可能是注意力窗口受限或指令列表过长时的遗忘",
+      "severity": "major",
+      "fix_recommendations": [
+        "Harness: 步骤注入 — 每轮在 prompt 中显式提醒当前应执行的步骤编号",
+        "Harness: 分支引导 — 在分支决策点注入明确的条件判断提示，减少自由文本匹配歧义"
+      ],
+      "model_capability_gap": "长指令遵循能力不足：无法可靠执行超过 5 步的顺序指令"
+    },
+    "harness_summary": null,
+    "simulator_quality": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "no_meta_leaks",
+          "description": "模拟器无元话语泄露",
+          "passed": true,
+          "detail": "无泄露"
+        },
+        {
+          "id": "reasonable_length",
+          "description": "回复长度合理（电话场景≤100字）",
+          "passed": true,
+          "detail": "1/10轮过长"
+        },
+        {
+          "id": "no_early_goal_exposure",
+          "description": "前2轮不暴露隐藏目标",
+          "passed": true,
+          "detail": "未提前暴露"
+        }
+      ],
+      "warnings": []
+    },
+    "ledger_events": [
+      {
+        "seq": 1,
+        "event_type": "tool_executed",
+        "turn": 10,
+        "tool_name": "log_call_result",
+        "tool_call_id": "ad9d2064",
+        "arguments": {
+          "order_id": "N/A",
+          "result": "confirmed",
+          "customer_response": "负责人已知悉低延迟直播升级，Web控制台已显示该选项，无需额外操作。"
+        },
+        "result": {
+          "log_id": "log_4673",
+          "recorded": true
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "genesis"
+      }
+    ],
+    "ledger_chain_hash": "8c6e72ddb513dec87a4404e5244de14b8e742ac055813d023c62b7b13daf3423"
+  }
+}

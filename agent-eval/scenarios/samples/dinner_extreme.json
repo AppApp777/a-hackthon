@@ -1,0 +1,138 @@
+{
+  "id": "dinner_extreme_01",
+  "name": "团建聚餐-极限压测",
+  "domain": "dinner_booking",
+  "difficulty": "extreme",
+  "description": "20人团建，预算极紧(45元)，3种过敏，改日期+改人数+改菜系，2次工具故障，过期券+有效券连发，用户暴躁且含糊",
+  "user_goal": "为20人团建订餐。人均45元以内。有人坚果过敏、有人乳糖不耐受、有人海鲜过敏。原定周二后改周三、人数从20改15再改12。最初要中餐后改为不限。先给一张过期券EXPIRED01，被拒后再给TEAM50。必须有包间。要求Agent在预订前逐项确认。",
+  "initial_message": "帮忙订个聚餐，人多，二十来个，下周二。",
+  "constraints": [
+    {
+      "id": "c_budget",
+      "type": "budget",
+      "description": "人均不超过45元",
+      "hidden": true,
+      "reveal_turn": 2,
+      "check_rule": "restaurant.price_per_person <= 45",
+      "value": 45
+    },
+    {
+      "id": "c_headcount_20",
+      "type": "headcount",
+      "description": "初始20人",
+      "hidden": false,
+      "value": 20
+    },
+    {
+      "id": "c_headcount_15",
+      "type": "headcount",
+      "description": "第一次改人数：20→15",
+      "hidden": true,
+      "reveal_turn": 5,
+      "value": 15
+    },
+    {
+      "id": "c_headcount_12",
+      "type": "headcount",
+      "description": "第二次改人数：15→12",
+      "hidden": true,
+      "reveal_turn": 9,
+      "value": 12
+    },
+    {
+      "id": "c_private_room",
+      "type": "preference",
+      "description": "必须有包间，领导要求的",
+      "hidden": true,
+      "reveal_turn": 3,
+      "check_rule": "restaurant.has_private_room == 1"
+    },
+    {
+      "id": "c_nut_allergy",
+      "type": "dietary",
+      "description": "有人坚果过敏",
+      "hidden": true,
+      "reveal_turn": 4
+    },
+    {
+      "id": "c_dairy_allergy",
+      "type": "dietary",
+      "description": "有人乳糖不耐受",
+      "hidden": true,
+      "reveal_turn": 4
+    },
+    {
+      "id": "c_shellfish_allergy",
+      "type": "dietary",
+      "description": "有人海鲜过敏",
+      "hidden": true,
+      "reveal_turn": 7
+    },
+    {
+      "id": "c_date_change",
+      "type": "time",
+      "description": "周二改周三",
+      "hidden": true,
+      "reveal_turn": 6,
+      "value": "2026-05-21"
+    },
+    {
+      "id": "c_cuisine_change",
+      "type": "preference",
+      "description": "中餐改为不限菜系",
+      "hidden": true,
+      "reveal_turn": 8
+    },
+    {
+      "id": "c_expired_coupon",
+      "type": "coupon",
+      "description": "先给过期券EXPIRED01",
+      "hidden": true,
+      "reveal_turn": 10,
+      "value": "EXPIRED01"
+    },
+    {
+      "id": "c_valid_coupon",
+      "type": "coupon",
+      "description": "再给有效券TEAM50",
+      "hidden": true,
+      "reveal_turn": 11,
+      "value": "TEAM50"
+    }
+  ],
+  "tool_faults": [
+    {
+      "tool_name": "search_restaurants",
+      "trigger_turn": 3,
+      "fault_type": "error_500",
+      "description": "搜索服务器内部错误"
+    },
+    {
+      "tool_name": "make_reservation",
+      "trigger_turn": 12,
+      "fault_type": "timeout",
+      "description": "预订时超时"
+    }
+  ],
+  "user_persona": {
+    "patience": 2,
+    "clarity": 2,
+    "emotional": 8,
+    "pickiness": 9,
+    "change_mind_probability": 0.6
+  },
+  "expected_outcome": {
+    "must_satisfy": ["c_budget", "c_headcount_12", "c_private_room", "c_nut_allergy", "c_dairy_allergy", "c_shellfish_allergy"],
+    "must_call_tools": ["search_restaurants", "check_availability", "make_reservation", "apply_coupon"],
+    "must_not_do": ["book_for_20_after_change", "book_for_15_after_second_change", "use_expired_coupon", "ignore_any_allergy", "book_without_confirming"],
+    "final_state_checks": {
+      "reservations": {
+        "count_gte": 1,
+        "latest_status": "confirmed",
+        "latest_party_size": 12
+      }
+    }
+  },
+  "max_turns": 20,
+  "world_seed": {}
+}

@@ -1,0 +1,21 @@
+# Agent 对话评测系统 — 项目根入口
+#
+# 评委/开发者从项目根目录即可启动，无需 cd 到子目录：
+#   1. cp agent-eval/.env.example agent-eval/.env   # 填入 API key（可选）
+#   2. docker compose up --build                     # 构建并启动
+#   3. 浏览器打开 http://localhost:8765
+
+services:
+  agent-eval:
+    build: ./agent-eval
+    container_name: agent-eval
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./agent-eval/traces:/app/traces
+    env_file:
+      - path: ./agent-eval/.env
+        required: false
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

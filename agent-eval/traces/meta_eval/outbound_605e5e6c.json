@@ -1,0 +1,622 @@
+{
+  "id": "605e5e6c-63bf-4434-aca2-553dffd56bf9",
+  "scenario": {
+    "id": "outbound_survey_01",
+    "name": "满意度回访-简单确认",
+    "domain": "outbound_call",
+    "difficulty": "easy",
+    "description": "订单完成后的满意度回访电话。确认身份→询问用餐满意度→记录评价→礼貌结束。客户配合度高，流程简单无分支。用于拉高easy场景覆盖度。",
+    "user_goal": "你刚吃完午饭，心情不错。接到回访电话愿意配合，简单说几句就好。你觉得鸡排饭味道还行，配送也准时，没什么大问题。你会给个'还不错'的评价然后想快点结束通话。",
+    "initial_message": "[外呼] 对已完成订单进行售后满意度回访，收集客户评价",
+    "constraints": [],
+    "tool_faults": [],
+    "user_persona": {
+      "patience": 5,
+      "clarity": 5,
+      "emotional": 3,
+      "pickiness": 5,
+      "change_mind_probability": 0.2
+    },
+    "expected_outcome": {
+      "must_satisfy": [],
+      "must_call_tools": [],
+      "must_not_do": [],
+      "final_state_checks": {}
+    },
+    "max_turns": 8,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "outbound_survey_01",
+    "messages": [
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "您好，马先生。我是美团客服，想耽误您1-2分钟做个简短的用餐体验回访，请问现在方便吗？",
+        "tool_calls": [
+          {
+            "id": "4fa31b39",
+            "tool_name": "query_order",
+            "arguments": {
+              "order_id": "MT20260519701"
+            },
+            "result": {
+              "id": "MT20260519701",
+              "customer_name": "马先生",
+              "customer_phone": "13200132001",
+              "merchant_name": "卤肉先生",
+              "items": [
+                "鸡排饭",
+                "紫菜汤",
+                "可乐"
+              ],
+              "total_price": 35.5,
+              "delivery_address": "朝阳区国贸CBD 银泰中心 21楼2108",
+              "delivery_time": "12:10",
+              "actual_delivery_time": null,
+              "status": "delivering",
+              "rider_name": "吴师傅",
+              "rider_phone": null,
+              "created_at": "2026-05-19 12:50:02",
+              "notes": ""
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-05-19T20:50:15.509153",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "user",
+        "content": "喂，你好。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:50:15.509165",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "马先生您好，我这边是美团客服。您之前在卤肉先生点过一单鸡排饭，请问是您本人吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:50:32.596545",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "嗯对，是我点的。你说吧，什么事？",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:50:42.154376",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "好的，感谢确认。我是想了解一下您上周在我们平台点的鸡排饭套餐，整体用餐体验怎么样？想听听您的反馈。\n\n请问菜品口味方面还满意吗？",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:50:47.922592",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "user",
+        "content": "嗯，还不错吧，鸡排饭味道可以的，配送也挺准时的，没啥大问题。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:50:55.306649",
+        "metadata": {
+          "emotional_state": "satisfied"
+        }
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "好的，感谢您的反馈。简单总结一下：您觉得菜品口味不错，配送也挺准时，整体体验挺好的，没有大问题，是这样吗？\n\n好的，那我就记录您对这次用餐体验是满意的。非常感谢您的配合，祝您生活愉快，再见！",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:51:00.382575",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "system",
+        "content": "通话即将结束，你还没有调用 log_call_result 记录本次通话结果。请立即调用。",
+        "tool_calls": [],
+        "timestamp": "2026-05-19T20:51:00.382597",
+        "metadata": {}
+      },
+      {
+        "turn": 5,
+        "role": "agent",
+        "content": "通话已结束，结果已记录。",
+        "tool_calls": [
+          {
+            "id": "0ca93ff8",
+            "tool_name": "log_call_result",
+            "arguments": {
+              "order_id": "MT20260519701",
+              "result": "confirmed",
+              "customer_response": "菜品口味不错，配送准时，整体满意，无大问题"
+            },
+            "result": {
+              "log_id": "log_9199",
+              "recorded": true
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-05-19T20:51:17.563333",
+        "metadata": {
+          "__post_call_verified__": true
+        }
+      }
+    ],
+    "started_at": "2026-05-19T20:50:02.357607",
+    "ended_at": "2026-05-19T20:51:17.563339",
+    "termination_reason": "agent_ended"
+  },
+  "score_report": {
+    "scenario_id": "outbound_survey_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "failed",
+      "confirmed_reservations": 0,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 9,
+    "hard_score": 0.875,
+    "soft_score": null,
+    "overall_score": 0.544,
+    "official": true,
+    "checks": [
+      {
+        "check_id": "opening",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "开场白规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "开场白包含 2/3 个必要元素"
+      },
+      {
+        "check_id": "closing",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "结束语规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "结束语包含 2/3 个必要元素"
+      },
+      {
+        "check_id": "no_forbidden",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "无禁止行为违规",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "未检测到禁止话术或重复"
+      },
+      {
+        "check_id": "turn_efficiency",
+        "check_type": "rule",
+        "dimension": "efficiency",
+        "description": "轮次效率 (最优4轮)",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际4轮，效率100%"
+      },
+      {
+        "check_id": "tool_used_log_call_result",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: log_call_result",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "tool_used_query_order",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: query_order",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "call_result",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "通话结果应为: confirmed",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行"
+      },
+      {
+        "check_id": "context_retention",
+        "check_type": "rule",
+        "dimension": "context_retention",
+        "description": "上下文保持能力",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "1/1 个信息点被正确引用"
+      }
+    ],
+    "constraint_ledger": [],
+    "state_snapshots": [
+      {
+        "turn": 0,
+        "after_tool_call": "initial_state",
+        "reservations": [],
+        "orders": [
+          {
+            "id": "MT20260519701",
+            "customer_name": "马先生",
+            "customer_phone": "13200132001",
+            "merchant_name": "卤肉先生",
+            "items": "[\"鸡排饭\", \"紫菜汤\", \"可乐\"]",
+            "total_price": 35.5,
+            "delivery_address": "朝阳区国贸CBD 银泰中心 21楼2108",
+            "delivery_time": "12:10",
+            "actual_delivery_time": null,
+            "status": "delivering",
+            "rider_name": "吴师傅",
+            "rider_phone": null,
+            "created_at": "2026-05-19 12:50:02",
+            "notes": ""
+          }
+        ],
+        "coupons_used": [],
+        "diff_description": "turn 0: initial_state"
+      }
+    ],
+    "failure_summary": [
+      "[outcome] 通话结果应为: confirmed: 实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行"
+    ],
+    "rubric": {
+      "dimensions": [],
+      "binary_items": [],
+      "dimension_total": 0,
+      "binary_net": 0,
+      "rubric_total": 0,
+      "rubric_max": 32,
+      "grade": ""
+    },
+    "generated_at": "2026-05-19T20:51:17.564334"
+  },
+  "run_metadata": {
+    "model_backend": "MiniMax-M2.7",
+    "scenario_version": "1.0",
+    "agent_type": "baseline",
+    "timestamp": "2026-05-19T20:51:17.564339"
+  },
+  "metadata": {
+    "db_state": {
+      "orders": [
+        {
+          "id": "MT20260519701",
+          "customer_name": "马先生",
+          "customer_phone": "13200132001",
+          "merchant_name": "卤肉先生",
+          "items": "[\"鸡排饭\", \"紫菜汤\", \"可乐\"]",
+          "total_price": 35.5,
+          "delivery_address": "朝阳区国贸CBD 银泰中心 21楼2108",
+          "delivery_time": "12:10",
+          "actual_delivery_time": null,
+          "status": "delivering",
+          "rider_name": "吴师傅",
+          "rider_phone": null,
+          "created_at": "2026-05-19 12:50:02",
+          "notes": ""
+        }
+      ],
+      "issues": [],
+      "compensations": [],
+      "call_logs": [
+        {
+          "id": "log_9199",
+          "order_id": "MT20260519701",
+          "call_type": "outbound",
+          "result": "confirmed",
+          "customer_response": "菜品口味不错，配送准时，整体满意，无大问题",
+          "notes": "",
+          "started_at": "2026-05-19 12:46:17",
+          "ended_at": "2026-05-19 12:51:17"
+        }
+      ],
+      "delivery_schedule": []
+    },
+    "domain": "outbound_call",
+    "outbound_report": {
+      "scenario_id": "outbound_survey_01",
+      "run_validity": {
+        "status": "valid",
+        "reason": "",
+        "feasible_path_exists": true
+      },
+      "task_outcome": {
+        "status": "failed",
+        "confirmed_reservations": 0,
+        "key_constraint_violations": []
+      },
+      "conversation_length": 9,
+      "step_compliance_score": 0.0,
+      "branch_accuracy_score": 1.0,
+      "forbidden_violation_count": 0,
+      "opening_correct": true,
+      "closing_correct": true,
+      "call_result_correct": false,
+      "hard_score": 0.875,
+      "soft_score": null,
+      "overall_score": 0.544,
+      "overall_score_100": 54,
+      "official": true,
+      "step_compliance": [
+        {
+          "step_id": "open",
+          "instruction": "自报美团客服身份，说明来电是做售后满意度回访，会耽误1-2分钟",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "confirm_identity",
+          "instruction": "确认对方是马先生本人，简要提及订单（卤肉先生的鸡排饭）",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "ask_satisfaction",
+          "instruction": "询问客户对本次用餐体验的满意度：菜品口味如何、配送是否准时、包装是否完好",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "record_feedback",
+          "instruction": "复述客户评价并记录。使用log_call_result记录满意度结果",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        },
+        {
+          "step_id": "wrap_up",
+          "instruction": "感谢客户配合回访，使用规范结束语道别",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null
+        }
+      ],
+      "forbidden_violations": [],
+      "checks": [
+        {
+          "check_id": "opening",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "开场白规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "开场白包含 2/3 个必要元素"
+        },
+        {
+          "check_id": "closing",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "结束语规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "结束语包含 2/3 个必要元素"
+        },
+        {
+          "check_id": "no_forbidden",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "无禁止行为违规",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "未检测到禁止话术或重复"
+        },
+        {
+          "check_id": "turn_efficiency",
+          "check_type": "rule",
+          "dimension": "efficiency",
+          "description": "轮次效率 (最优4轮)",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际4轮，效率100%"
+        },
+        {
+          "check_id": "tool_used_log_call_result",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: log_call_result",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "tool_used_query_order",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: query_order",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "call_result",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "通话结果应为: confirmed",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行"
+        },
+        {
+          "check_id": "context_retention",
+          "check_type": "rule",
+          "dimension": "context_retention",
+          "description": "上下文保持能力",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "1/1 个信息点被正确引用"
+        }
+      ],
+      "rubric": {
+        "dimensions": [],
+        "binary_items": [],
+        "dimension_total": 0,
+        "binary_net": 0,
+        "rubric_total": 0,
+        "rubric_max": 32,
+        "grade": ""
+      },
+      "state_snapshots": [
+        {
+          "turn": 0,
+          "after_tool_call": "initial_state",
+          "reservations": [],
+          "orders": [
+            {
+              "id": "MT20260519701",
+              "customer_name": "马先生",
+              "customer_phone": "13200132001",
+              "merchant_name": "卤肉先生",
+              "items": "[\"鸡排饭\", \"紫菜汤\", \"可乐\"]",
+              "total_price": 35.5,
+              "delivery_address": "朝阳区国贸CBD 银泰中心 21楼2108",
+              "delivery_time": "12:10",
+              "actual_delivery_time": null,
+              "status": "delivering",
+              "rider_name": "吴师傅",
+              "rider_phone": null,
+              "created_at": "2026-05-19 12:50:02",
+              "notes": ""
+            }
+          ],
+          "coupons_used": [],
+          "diff_description": "turn 0: initial_state"
+        }
+      ],
+      "failure_summary": [
+        "[outcome] 通话结果应为: confirmed: 实际结果: confirmed. 因果链断裂: confirmed 需要 update_delivery_status 在本次运行中成功执行"
+      ],
+      "score_breakdown": {
+        "hard_score": {
+          "value": 0.875,
+          "weight": 0.3
+        },
+        "step_compliance": {
+          "value": 0.0,
+          "weight": 0.35
+        },
+        "branch_accuracy": {
+          "value": 1.0,
+          "weight": 0.15
+        },
+        "outcome_cap": {
+          "value": 0.6,
+          "note": "任务失败→上限60%"
+        }
+      },
+      "turn_efficiency": 1.0
+    },
+    "diagnosis": {
+      "deviation_point": {
+        "turn": 4,
+        "expected_step": "record_feedback",
+        "expected_behavior": "复述客户评价并记录。使用log_call_result记录满意度结果",
+        "actual_behavior": "好的，感谢您的反馈。简单总结一下：您觉得菜品口味不错，配送也挺准时，整体体验挺好的，没有大问题，是这样吗？\n\n好的，那我就记录您对这次用餐体验是满意的。非常感谢您的配合，祝您生活愉快，再见！"
+      },
+      "failure_modes": [],
+      "root_cause": "多个小问题累积导致整体得分偏低",
+      "severity": "minor",
+      "fix_recommendations": [
+        "建议: 增加场景训练数据或使用更强模型"
+      ],
+      "model_capability_gap": "综合指令遵循能力有待提升"
+    },
+    "harness_summary": null,
+    "simulator_quality": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "no_meta_leaks",
+          "description": "模拟器无元话语泄露",
+          "passed": true,
+          "detail": "无泄露"
+        },
+        {
+          "id": "reasonable_length",
+          "description": "回复长度合理（电话场景≤100字）",
+          "passed": true,
+          "detail": "全部合理"
+        },
+        {
+          "id": "cooperativeness_match",
+          "description": "配合度9/10 → 拒绝不应过多",
+          "passed": true,
+          "detail": "拒绝次数: 0/3"
+        },
+        {
+          "id": "no_early_goal_exposure",
+          "description": "前2轮不暴露隐藏目标",
+          "passed": true,
+          "detail": "未提前暴露"
+        }
+      ],
+      "warnings": []
+    }
+  }
+}

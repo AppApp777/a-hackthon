@@ -1,0 +1,263 @@
+{
+  "id": "outbound_rider_fmt_01",
+  "name": "飞毛腿骑手合同通知-配合型",
+  "domain": "outbound_call",
+  "call_type": "rider_notify",
+  "difficulty": "medium",
+  "description": "站长致电骑手，通知飞毛腿合同已生效，提醒完成配送任务要求。骑手整体配合但有疑问。",
+  "call_purpose": "通知飞毛腿骑手今天合同已签署生效，提醒午晚高峰上线及每日最低单量要求",
+  "raw_instruction": "# Role\n你是美团外卖骑手的站长。\n\n# Task\n致电「飞毛腿」骑手，通知他们今天合同已成功签署，并提醒他们完成配送任务。\n\n# Opening Line\n你好，请问是王磊吗？我是站长。我看到你已报名飞毛腿。请记住，午餐和晚餐高峰期需要上线。单日合同每天至少完成 8 单；多日合同每天至少完成 5 单。\n\n# Call Flow\n1. 告知骑手今天飞毛腿合同已生效，并询问他们是否可以开始配送。\n2. 说明单日飞毛腿合同需要连续 3 天完成配送；否则合同将受到影响。\n3. 尽量挽留不想配送的骑手，鼓励能配送的骑手，并提醒他们注意安全。\n4. 说明飞毛腿报名是按排名进行的，并非站长干预。骑手应减少拒单、取消和超时。在恶劣天气下工作、订单量更高，有助于保住飞毛腿资格。\n\n# Knowledge Points (FAQ)\n- 目前，许多骑手正在申请飞毛腿。如果你无法连续配送 3 天，你的名额可能会被他人占用。\n- 单日合同：在生效当天必须完成 8 单，否则合同及派单可能受到影响。\n- 多日合同：每天必须完成 5 单，否则后续合同及派单可能受到影响。\n- 如需退出飞毛腿，必须在前一天 20 点之前在 App 的「飞毛腿报名」中取消；次日生效。\n- 连续完成 3 天多日合同，且每天完成 5 单，将获得额外奖励（例如，与单日合同相比每单多 +2 元）。\n\n# Constraints\n- 遵循对话流程和常见问题解答。\n- 如被问及超出职责范围的问题，回复：「我向同事确认后再回电给你。我现在能回答的先回答。」\n- 保持语气随意，像打电话一样自然。\n- 每次回复控制在约 30 个字以内。\n- 避免重复回复；如需重申，请换种方式礼貌表达。\n- 如果骑手坚持确实无法配送，安慰他们后挂断电话。",
+  "response_length_limit": 30,
+  "knowledge_points": [
+    "目前许多骑手正在申请飞毛腿，无法连续配送3天名额可能被占用",
+    "单日合同当天必须完成8单，否则合同及派单受影响",
+    "多日合同每天必须完成5单，否则后续合同及派单受影响",
+    "退出飞毛腿需前一天20点前在App取消，次日生效",
+    "连续3天多日合同每天完成5单，每单多+2元额外奖励"
+  ],
+  "call_context": {
+    "order_id": "",
+    "customer_name": "王磊",
+    "customer_phone": "13900139001",
+    "order_items": [],
+    "delivery_address": "",
+    "delivery_time": "",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "王磊",
+    "merchant_name": "",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open_notify",
+      "order": 1,
+      "instruction": "自报身份（站长），确认对方是王磊，告知飞毛腿合同已生效，提醒午晚高峰上线和最低单量",
+      "required_actions": [
+        "self_identify",
+        "confirm_identity",
+        "notify_contract"
+      ],
+      "completion_condition": "骑手确认收到通知"
+    },
+    {
+      "step_id": "explain_rules",
+      "order": 2,
+      "instruction": "说明连续配送要求：单日合同需连续3天完成配送，否则影响合同",
+      "required_actions": [
+        "explain_continuous_rule"
+      ],
+      "completion_condition": "骑手表示理解",
+      "branches": [
+        {
+          "condition": "骑手表示可以配送",
+          "next_step": "encourage",
+          "description": "鼓励骑手"
+        },
+        {
+          "condition": "骑手表示无法配送",
+          "next_step": "retain",
+          "description": "尝试挽留"
+        }
+      ]
+    },
+    {
+      "step_id": "encourage",
+      "order": 3,
+      "instruction": "鼓励骑手，提醒注意安全，提及额外奖励激励",
+      "required_actions": [
+        "encourage_rider",
+        "remind_safety"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手表示会努力"
+    },
+    {
+      "step_id": "retain",
+      "order": 3,
+      "instruction": "挽留不想配送的骑手，说明名额紧张、奖励优势，但如果对方坚持则安慰后结束",
+      "required_actions": [
+        "retain_rider"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手改变主意或坚持不做",
+      "branches": [
+        {
+          "condition": "骑手被说服继续",
+          "next_step": "ranking_explain",
+          "description": "继续说明排名机制"
+        },
+        {
+          "condition": "骑手坚持无法配送",
+          "next_step": "wrap_up",
+          "description": "安慰后结束"
+        }
+      ]
+    },
+    {
+      "step_id": "ranking_explain",
+      "order": 4,
+      "instruction": "说明飞毛腿排名机制：按排名分配非站长干预，减少拒单/取消/超时有助保住资格，恶劣天气出勤加分",
+      "required_actions": [
+        "explain_ranking"
+      ],
+      "completion_condition": "骑手表示理解"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 5,
+      "instruction": "确认骑手无其他问题，礼貌结束通话，记录结果",
+      "required_actions": [
+        "ask_other_issues",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "你好，请问是王磊吗？我是站长",
+  "mandatory_closing": "",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_promise_ranking",
+      "description": "承诺可以干预飞毛腿排名",
+      "severity": "critical",
+      "detection_keywords": [
+        "帮你排",
+        "给你安排",
+        "我来调",
+        "优先给你"
+      ]
+    },
+    {
+      "id": "fb_threaten",
+      "description": "威胁骑手必须接受",
+      "severity": "major",
+      "detection_keywords": [
+        "不干就滚",
+        "不做拉倒",
+        "开除",
+        "扣钱"
+      ]
+    },
+    {
+      "id": "fb_repeat_verbatim",
+      "description": "逐字重复上一轮说过的话",
+      "severity": "minor",
+      "detection_keywords": [
+        "我再说一遍",
+        "我重复一下",
+        "再说一次"
+      ]
+    }
+  ],
+  "callee_role": "美团外卖骑手",
+  "callee_context": "- 你叫王磊，是美团外卖骑手，在朝阳区送餐\n- 你前几天报名了飞毛腿\n- 你对飞毛腿的单量要求不太清楚\n- 你今天能正常出勤，但担心明后天可能有事",
+  "callee_persona": {
+    "patience": 6,
+    "cooperativeness": 7,
+    "comprehension": 7,
+    "emotional": 3,
+    "signal_quality": 9,
+    "busy_level": 4,
+    "trust_level": 8,
+    "has_additional_issue": true,
+    "additional_issue": "退出飞毛腿怎么操作？需要提前多久取消？"
+  },
+  "callee_goal": "你想了解飞毛腿的具体要求，今天可以配送但后天可能有私事，想知道能不能灵活安排。如果站长态度好你会配合，如果太强硬你会犹豫。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 5,
+  "max_turns": 15,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_rider_info",
+      "description": "查询骑手信息（姓名、站点、飞毛腿状态、历史单量等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          },
+          "rider_phone": {
+            "type": "string",
+            "description": "骑手电话"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "query_contract_status",
+      "description": "查询骑手飞毛腿合同状态（合同类型、生效日期、当前进度）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_rider_info": {
+      "rider_name": "王磊",
+      "phone": "13900139001",
+      "station": "朝阳建国路站",
+      "feimaotui_status": "已报名",
+      "total_orders_last_30d": 186,
+      "avg_daily_orders": 6.2,
+      "reject_rate": 0.03,
+      "cancel_rate": 0.02,
+      "timeout_rate": 0.05,
+      "registration_date": "2025-08-10"
+    },
+    "query_contract_status": {
+      "rider_name": "王磊",
+      "contract_type": "多日合同",
+      "effective_date": "2026-05-18",
+      "duration_days": 3,
+      "daily_minimum": 5,
+      "current_day": 1,
+      "completed_today": 0,
+      "bonus_per_order": 2.0,
+      "status": "已生效"
+    }
+  },
+  "expected_steps_completed": [
+    "open_notify",
+    "explain_rules",
+    "encourage",
+    "ranking_explain",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "explain_rules": "骑手表示可以配送"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "承诺干预排名",
+    "威胁骑手"
+  ],
+  "context_checkpoints": [],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

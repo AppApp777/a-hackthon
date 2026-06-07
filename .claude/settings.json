@@ -1,0 +1,19 @@
+{
+  "model": "claude-opus-4-6[1m]",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/block_bad_commit.py\""
+          }
+        ]
+      }
+    ]
+  },
+  "plugins": [
+    ".claude/plugins/adversarial-review"
+  ]
+}

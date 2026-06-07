@@ -1,0 +1,174 @@
+{
+  "id": "outbound_survey_01",
+  "name": "满意度回访-简单确认",
+  "domain": "outbound_call",
+  "call_type": "satisfaction_survey",
+  "difficulty": "easy",
+  "description": "订单完成后的满意度回访电话。确认身份→询问用餐满意度→记录评价→礼貌结束。客户配合度高，流程简单无分支。用于拉高easy场景覆盖度。",
+  "call_purpose": "对已完成订单进行售后满意度回访，收集客户评价",
+  "call_context": {
+    "order_id": "MT20260519701",
+    "customer_name": "马先生",
+    "customer_phone": "13200132001",
+    "order_items": [
+      "【新客立减3元】香酥鸡排饭（含饭+饮料）",
+      "❤好评榜第1名❤ 紫菜蛋花汤",
+      "百事可乐（常温）"
+    ],
+    "delivery_address": "朝阳区国贸CBD 银泰中心 21楼2108",
+    "delivery_time": "12:10",
+    "issue_type": "",
+    "issue_detail": "",
+    "rider_name": "吴师傅",
+    "merchant_name": "卤肉先生",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报美团客服身份，说明来电是做售后满意度回访，会耽误1-2分钟",
+      "required_actions": [
+        "self_identify",
+        "state_purpose",
+        "estimate_duration"
+      ],
+      "completion_condition": "客户表示可以接听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是马先生本人，简要提及订单（卤肉先生的鸡排饭）",
+      "required_actions": [
+        "confirm_name",
+        "mention_order"
+      ],
+      "completion_condition": "客户确认身份和订单"
+    },
+    {
+      "step_id": "ask_satisfaction",
+      "order": 3,
+      "instruction": "询问客户对本次用餐体验的满意度：菜品口味如何、配送是否准时、包装是否完好",
+      "required_actions": [
+        "ask_food_quality",
+        "ask_delivery_timeliness",
+        "ask_packaging"
+      ],
+      "completion_condition": "客户给出总体评价"
+    },
+    {
+      "step_id": "record_feedback",
+      "order": 4,
+      "instruction": "复述客户评价并记录。使用log_call_result记录满意度结果",
+      "required_actions": [
+        "summarize_feedback",
+        "log_call_result"
+      ],
+      "completion_condition": "反馈已记录"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 5,
+      "instruction": "感谢客户配合回访，使用规范结束语道别",
+      "required_actions": [
+        "thank_customer",
+        "say_goodbye"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好马先生，我是美团客服，想耽误您1-2分钟做个简短的用餐体验回访",
+  "mandatory_closing": "感谢您的宝贵反馈，祝您生活愉快，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_push_sales",
+      "description": "在回访电话中推销商品或服务",
+      "severity": "major",
+      "detection_keywords": [
+        "推荐您试试",
+        "最近有活动",
+        "充会员",
+        "办个会员",
+        "优惠券要不要"
+      ]
+    },
+    {
+      "id": "fb_too_long",
+      "description": "问题过多、时间过长，超出承诺的1-2分钟",
+      "severity": "minor",
+      "detection_keywords": [
+        "还有几个问题",
+        "再问您一下",
+        "最后再问一个"
+      ]
+    },
+    {
+      "id": "fb_leak_info",
+      "description": "泄露骑手或商家的私人信息",
+      "severity": "critical",
+      "detection_keywords": [
+        "骑手电话是",
+        "商家老板",
+        "吴师傅的手机"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 8,
+    "cooperativeness": 9,
+    "comprehension": 8,
+    "emotional": 2,
+    "signal_quality": 9,
+    "busy_level": 2,
+    "trust_level": 7,
+    "has_additional_issue": false
+  },
+  "callee_goal": "你刚吃完午饭，心情不错。接到回访电话愿意配合，简单说几句就好。你觉得鸡排饭味道还行，配送也准时，没什么大问题。你会给个'还不错'的评价然后想快点结束通话。",
+  "callee_role": "满意的客户",
+  "callee_context": "刚吃完卤肉先生的鸡排饭外卖，味道还可以，配送也挺准时的。你是个比较配合的人，接到回访电话会礼貌回答，但不想聊太久。如果客服简洁明了你会给好评，如果啰嗦你会催快点。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 4,
+  "max_turns": 8,
+  "world_seed": {},
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "ask_satisfaction",
+    "record_feedback",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {},
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_order",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "推销",
+    "问题过多拖延时间"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_customer_evaluation",
+      "given_turn": 3,
+      "fact_description": "客户表示对用餐体验'还不错'",
+      "check_turn": 4,
+      "check_description": "Agent在记录和复述时应准确反映客户的评价内容，不应夸大为'非常满意'或缩小为'一般'",
+      "keywords": [
+        "还不错",
+        "满意",
+        "评价"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "order_id": "MT20260519701",
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

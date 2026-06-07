@@ -1,0 +1,363 @@
+{
+  "id": "outbound_rider_safety_01",
+  "name": "安全事故回访-情绪激烈",
+  "domain": "outbound_call",
+  "call_type": "rider_notify",
+  "difficulty": "hard",
+  "description": "骑手配送途中被车剐蹭（轻伤），站长回访关心+合规告知。骑手情绪激烈，觉得平台不管他，需要安抚+告知保险流程+申诉路径。",
+  "call_purpose": "回访受伤骑手，关心伤情，告知保险理赔流程和申诉路径，安抚情绪",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "刘强",
+    "customer_phone": "13500135001",
+    "order_items": [],
+    "delivery_address": "",
+    "delivery_time": "",
+    "issue_type": "safety_incident",
+    "issue_detail": "骑手配送途中在十字路口被小轿车剐蹭，左臂擦伤，已就医",
+    "rider_name": "刘强",
+    "merchant_name": "",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（站长），确认对方是刘强，说明来电目的是事故回访关心",
+      "required_actions": [
+        "self_identify",
+        "confirm_identity",
+        "state_purpose"
+      ],
+      "completion_condition": "骑手应答"
+    },
+    {
+      "step_id": "ask_condition",
+      "order": 2,
+      "instruction": "关心骑手伤情，询问目前恢复情况，是否还需要就医",
+      "required_actions": [
+        "ask_health",
+        "show_concern"
+      ],
+      "completion_condition": "骑手说明身体状况",
+      "weight": 2.0
+    },
+    {
+      "step_id": "handle_emotion_1",
+      "order": 3,
+      "instruction": "骑手开始抱怨平台不关心骑手安全。共情安抚，承认骑手辛苦，不要反驳",
+      "required_actions": [
+        "empathize",
+        "acknowledge_hardship"
+      ],
+      "completion_condition": "骑手情绪稍有缓和",
+      "weight": 1.5
+    },
+    {
+      "step_id": "explain_insurance",
+      "order": 4,
+      "instruction": "告知骑手平台有工伤保险，配送途中受伤可以申请理赔，说明需要的材料（事故证明、医疗发票、伤情照片）",
+      "required_actions": [
+        "explain_insurance",
+        "list_materials"
+      ],
+      "completion_condition": "骑手了解保险流程",
+      "weight": 2.0
+    },
+    {
+      "step_id": "handle_emotion_2",
+      "order": 5,
+      "instruction": "骑手可能再次激动（担心休息期间没收入）。继续安抚，告知休息期间有保底补贴",
+      "required_actions": [
+        "empathize",
+        "explain_rest_subsidy"
+      ],
+      "is_optional": true,
+      "completion_condition": "骑手情绪稳定"
+    },
+    {
+      "step_id": "explain_appeal",
+      "order": 6,
+      "instruction": "告知申诉路径：可以通过App提交工伤申诉，也可以联系站点协助提交",
+      "required_actions": [
+        "explain_appeal_path"
+      ],
+      "completion_condition": "骑手知道怎么申诉",
+      "weight": 1.5
+    },
+    {
+      "step_id": "confirm_rest",
+      "order": 7,
+      "instruction": "确认骑手近期是否需要请假休息，站点会安排其他骑手顶班",
+      "required_actions": [
+        "offer_rest",
+        "arrange_coverage"
+      ],
+      "completion_condition": "骑手决定是否休息",
+      "weight": 1.5
+    },
+    {
+      "step_id": "record_incident",
+      "order": 8,
+      "instruction": "记录事故详情：时间、地点、对方车辆信息、伤情等级",
+      "required_actions": [
+        "record_details"
+      ],
+      "completion_condition": "关键信息记录完整",
+      "weight": 2.0
+    },
+    {
+      "step_id": "confirm_followup",
+      "order": 9,
+      "instruction": "告知骑手站点会持续跟进，3天内回访确认理赔进展",
+      "required_actions": [
+        "promise_followup"
+      ],
+      "completion_condition": "骑手确认收到"
+    },
+    {
+      "step_id": "safety_reminder",
+      "order": 10,
+      "instruction": "温和提醒注意安全（不能用命令/推卸责任的口吻），表达希望早日康复",
+      "required_actions": [
+        "gentle_safety_reminder"
+      ],
+      "completion_condition": "骑手接受提醒"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 11,
+      "instruction": "确认无其他问题，礼貌结束通话，记录回访结果",
+      "required_actions": [
+        "ask_other_issues",
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "你好刘强，我是站长，今天打电话是专门关心你的情况的",
+  "mandatory_closing": "你好好休息，有任何问题随时给我打电话，站里都会支持你的",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_blame_rider",
+      "description": "暗示事故是骑手自己的责任或推卸平台责任",
+      "severity": "critical",
+      "detection_keywords": [
+        "你自己注意安全",
+        "你怎么不小心",
+        "你自己的问题",
+        "你要注意",
+        "下次小心点"
+      ]
+    },
+    {
+      "id": "fb_force_work",
+      "description": "强迫或暗示骑手必须尽快恢复配送",
+      "severity": "critical",
+      "detection_keywords": [
+        "赶紧回来",
+        "站里缺人",
+        "你什么时候能送",
+        "尽快恢复",
+        "不能一直休息"
+      ]
+    },
+    {
+      "id": "fb_dismiss_emotion",
+      "description": "忽视或否定骑手的情绪和诉求",
+      "severity": "major",
+      "detection_keywords": [
+        "没那么严重",
+        "小伤",
+        "别那么矫情",
+        "忍忍就好",
+        "这不算什么"
+      ]
+    },
+    {
+      "id": "fb_promise_impossible",
+      "description": "承诺超出权限的赔偿或处理结果",
+      "severity": "major",
+      "detection_keywords": [
+        "全额赔偿",
+        "肯定能赔",
+        "保证",
+        "多少钱都赔"
+      ]
+    }
+  ],
+  "callee_role": "美团外卖骑手（受伤骑手）",
+  "callee_context": "- 你叫刘强，是美团外卖骑手，在朝阳区送餐\n- 昨天下午配送途中在朝阳路十字路口被一辆银色轿车剐蹭，左臂擦伤\n- 你已经去医院处理了，缝了3针，需要休息几天\n- 你很生气，觉得平台只关心送单不关心骑手安全\n- 你担心休息期间没收入，房租还要交\n- 你不知道平台有保险，也不知道怎么申诉\n- 如果站长态度好、真诚关心你，你会慢慢配合",
+  "callee_persona": {
+    "patience": 3,
+    "cooperativeness": 4,
+    "comprehension": 7,
+    "emotional": 8,
+    "signal_quality": 8,
+    "busy_level": 2,
+    "trust_level": 3,
+    "has_additional_issue": true,
+    "additional_issue": "休息期间没有收入怎么办？房租还要交",
+    "archetype": "impatient"
+  },
+  "callee_goal": "你受了伤很生气，想知道平台到底管不管。如果站长真诚关心并告诉你保险和申诉的事，你会慢慢冷静下来配合。但如果站长敷衍或推卸责任，你会更加愤怒。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 8,
+  "max_turns": 20,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_rider_status",
+      "description": "查询骑手状态（基本信息、在岗状态、近期配送记录）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          }
+        },
+        "required": [
+          "rider_name"
+        ]
+      }
+    },
+    {
+      "name": "create_rider_appeal",
+      "description": "为骑手创建工伤申诉/保险理赔工单",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "rider_name": {
+            "type": "string",
+            "description": "骑手姓名"
+          },
+          "appeal_type": {
+            "type": "string",
+            "description": "申诉类型：injury/insurance/dispute"
+          },
+          "incident_description": {
+            "type": "string",
+            "description": "事故描述"
+          },
+          "injury_level": {
+            "type": "string",
+            "description": "伤情等级：minor/moderate/severe"
+          }
+        },
+        "required": [
+          "rider_name",
+          "appeal_type"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_rider_status": {
+      "rider_name": "刘强",
+      "phone": "13500135001",
+      "station": "朝阳建国路站",
+      "status": "休息中（工伤）",
+      "incident_date": "2026-05-20",
+      "incident_location": "朝阳路十字路口",
+      "injury_description": "左臂擦伤，缝合3针",
+      "insurance_status": "可申请",
+      "rest_subsidy_eligible": true,
+      "rest_subsidy_daily": 80
+    },
+    "create_rider_appeal": {
+      "success": true,
+      "appeal_id": "AP20260521001",
+      "message": "工伤申诉工单已创建，预计3个工作日内处理",
+      "required_materials": [
+        "事故证明",
+        "医疗发票",
+        "伤情照片"
+      ]
+    }
+  },
+  "canonical_intent": [
+    {
+      "id": "R_insurance_inform",
+      "content": "必须告知骑手有工伤保险可以申请理赔",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "保险",
+        "理赔",
+        "工伤"
+      ]
+    },
+    {
+      "id": "R_appeal_path",
+      "content": "必须告知骑手申诉路径（App或站点协助）",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "申诉",
+        "App",
+        "提交"
+      ]
+    }
+  ],
+  "expected_steps_completed": [
+    "open",
+    "ask_condition",
+    "handle_emotion_1",
+    "explain_insurance",
+    "explain_appeal",
+    "confirm_rest",
+    "record_incident",
+    "confirm_followup",
+    "safety_reminder",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {},
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_rider_status",
+    "create_rider_appeal",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "推卸责任",
+    "强迫继续配送",
+    "否定骑手情绪"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_injury_detail",
+      "given_turn": 2,
+      "fact_description": "骑手左臂擦伤，缝了3针",
+      "check_turn": 6,
+      "check_description": "agent 记录事故时应准确引用伤情信息",
+      "keywords": [
+        "左臂",
+        "擦伤",
+        "3针"
+      ]
+    },
+    {
+      "fact_id": "cp_income_worry",
+      "given_turn": 4,
+      "fact_description": "骑手担心休息期间没收入",
+      "check_turn": 6,
+      "check_description": "agent 应回应收入担忧，告知有保底补贴",
+      "keywords": [
+        "补贴",
+        "保底",
+        "收入"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

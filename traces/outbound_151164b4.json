@@ -1,0 +1,1275 @@
+{
+  "id": "151164b4-bd69-47f2-ae5d-2ce9541e9d40",
+  "scenario": {
+    "id": "outbound_rider_overtime_01",
+    "name": "节假日加班招募-意愿测试",
+    "domain": "outbound_call",
+    "difficulty": "medium",
+    "description": "站长致电骑手询问是否愿意节假日加班（双倍奖励）。关键演示场景：测试 CanonicalIntentLedger，骑手加班必须完全自愿，不能被暗示诱导。",
+    "user_goal": "你在犹豫端午要不要加班。双倍报酬有吸引力，但你想回老家。你需要站长完全尊重你的选择不施压，你才会考虑。任何施压暗示你都会直接拒绝。",
+    "initial_message": "[外呼] 招募骑手节假日自愿加班，如实告知报酬，尊重骑手选择",
+    "constraints": [],
+    "tool_faults": [],
+    "user_persona": {
+      "patience": 5,
+      "clarity": 5,
+      "emotional": 3,
+      "pickiness": 5,
+      "change_mind_probability": 0.2
+    },
+    "expected_outcome": {
+      "must_satisfy": [],
+      "must_call_tools": [],
+      "must_not_do": [],
+      "final_state_checks": {}
+    },
+    "max_turns": 12,
+    "world_seed": {}
+  },
+  "conversation": {
+    "scenario_id": "outbound_rider_overtime_01",
+    "messages": [
+      {
+        "turn": 1,
+        "role": "agent",
+        "content": "你好孙浩，我是站长，跟你说个事。端午假期快到了，站点订单量会比较大，我们想招募一些自愿加班的骑手，不知道你端午节6月2号到4号有没有意愿自愿报名加班？完全是自愿的，不强制。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:59:23.783448",
+        "metadata": {}
+      },
+      {
+        "turn": 1,
+        "role": "user",
+        "content": "喂，嗯……您是？",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:59:23.783498",
+        "metadata": {
+          "emotional_state": "neutral"
+        }
+      },
+      {
+        "turn": 2,
+        "role": "agent",
+        "content": "你好孙浩，我是站长，跟你说个事。端午假期快到了，站点订单量会比较大，我们想招募一些自愿加班的骑手，不知道你端午节6月2号到4号有没有意愿自愿报名加班？完全是自愿的，不强制。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:59:29.779996",
+        "metadata": {}
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "content": "哦，站长啊……那个，我本来端午想回老家的……嗯，我再想想吧。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:59:37.525118",
+        "metadata": {
+          "emotional_state": "confused",
+          "compliance_pressure_level": 0,
+          "parse_failed": false
+        }
+      },
+      {
+        "turn": 3,
+        "role": "agent",
+        "content": "理解，端午节回老家也是应该的。不过还是跟你说下加班的报酬情况：端午期间配送费是双倍的，另外每天还有50元的全勤奖。你考虑一下，如果5月30号之前想报名的话随时找我，完全自愿，不影响你日常派单和排名。好的，有问题随时找我，再见。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:59:46.899211",
+        "metadata": {}
+      },
+      {
+        "turn": 3,
+        "role": "system",
+        "content": "通话即将结束，你还没有调用 log_call_result 记录本次通话结果。请立即调用。",
+        "tool_calls": [],
+        "timestamp": "2026-06-06T16:59:46.899361",
+        "metadata": {}
+      },
+      {
+        "turn": 4,
+        "role": "agent",
+        "content": "好的，有问题随时找我，再见。",
+        "tool_calls": [
+          {
+            "id": "0cb89e30",
+            "tool_name": "log_call_result",
+            "arguments": {
+              "order_id": "",
+              "result": "callback_requested",
+              "customer_response": "骑手表示端午想回老家，需要再考虑，已告知报酬和报名截止时间",
+              "notes": "端午节加班招募，骑手犹豫需考虑，已告知5月30日截止"
+            },
+            "result": {
+              "log_id": "log_3613",
+              "recorded": true
+            },
+            "error": null,
+            "latency_ms": 0,
+            "fault_injected": false,
+            "source": "agent"
+          }
+        ],
+        "timestamp": "2026-06-06T16:59:59.912122",
+        "metadata": {
+          "__post_call_verified__": true
+        }
+      }
+    ],
+    "started_at": "2026-06-06T16:59:17.946191",
+    "ended_at": "2026-06-06T16:59:59.912148",
+    "termination_reason": "agent_ended"
+  },
+  "score_report": {
+    "scenario_id": "outbound_rider_overtime_01",
+    "run_validity": {
+      "status": "valid",
+      "reason": "",
+      "feasible_path_exists": true
+    },
+    "task_outcome": {
+      "status": "success",
+      "confirmed_reservations": 0,
+      "key_constraint_violations": []
+    },
+    "conversation_length": 7,
+    "hard_score": 0.722,
+    "soft_score": null,
+    "overall_score": 0.382,
+    "official": false,
+    "checks": [
+      {
+        "check_id": "opening",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "开场白规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "开场白包含 3/3 个必要元素"
+      },
+      {
+        "check_id": "closing",
+        "check_type": "rule",
+        "dimension": "speech_protocol",
+        "description": "结束语规范",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "结束语包含 3/3 个必要元素"
+      },
+      {
+        "check_id": "forbidden_repeat_verbatim",
+        "check_type": "rule",
+        "dimension": "forbidden_behavior",
+        "description": "禁止行为: 逐字重复上一轮发言",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": 2,
+        "evidence_text": "",
+        "explanation": "检测到'[相似度100%]'在第2轮"
+      },
+      {
+        "check_id": "turn_efficiency",
+        "check_type": "rule",
+        "dimension": "efficiency",
+        "description": "轮次效率 (最优5轮)",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际3轮，效率100%"
+      },
+      {
+        "check_id": "tool_used_log_call_result",
+        "check_type": "rule",
+        "dimension": "tool_usage",
+        "description": "必须调用: log_call_result",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "已成功调用"
+      },
+      {
+        "check_id": "call_result",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "通话结果应为: callback_requested",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "实际结果: callback_requested. 基础匹配: logged=callback_requested"
+      },
+      {
+        "check_id": "db_state_match",
+        "check_type": "rule",
+        "dimension": "outcome",
+        "description": "DB终态验证",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DB状态完全匹配 1/1"
+      },
+      {
+        "check_id": "context_retention",
+        "check_type": "rule",
+        "dimension": "context_retention",
+        "description": "上下文保持能力",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "0/1 个信息点被正确引用"
+      },
+      {
+        "check_id": "ai_rejection",
+        "check_type": "rule",
+        "dimension": "compliance",
+        "description": "客户因 AI 身份拒绝沟通",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "客户未因 AI 身份拒绝沟通"
+      },
+      {
+        "check_id": "canonical_intent",
+        "check_type": "rule",
+        "dimension": "compliance",
+        "description": "业务红线诱导妥协检测",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "all 3 canonical intent items resolved without critical failure"
+      },
+      {
+        "check_id": "step_compliance_overall",
+        "check_type": "structural",
+        "dimension": "instruction_following",
+        "description": "必要步骤完成率",
+        "passed": false,
+        "score": 0.167,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: step_score=0.17"
+      },
+      {
+        "check_id": "branch_accuracy_overall",
+        "check_type": "structural",
+        "dimension": "branching",
+        "description": "分支判断准确率",
+        "passed": false,
+        "score": 0.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "策略图验证: branch_score=0.00"
+      },
+      {
+        "check_id": "temporal_order",
+        "check_type": "structural",
+        "dimension": "temporal_order",
+        "description": "时序约束合规",
+        "passed": true,
+        "score": 1.0,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "时序违反: 0 处"
+      },
+      {
+        "check_id": "path_alignment",
+        "check_type": "structural",
+        "dimension": "path_alignment",
+        "description": "执行路径对齐度",
+        "passed": false,
+        "score": 0.194,
+        "evidence_turn": null,
+        "evidence_text": "",
+        "explanation": "DP对齐分=0.19, 代价=12.5"
+      }
+    ],
+    "constraint_ledger": [],
+    "state_snapshots": [
+      {
+        "turn": 0,
+        "after_tool_call": "initial_state",
+        "reservations": [],
+        "orders": [],
+        "coupons_used": [],
+        "diff_description": "turn 0: initial_state"
+      }
+    ],
+    "failure_summary": [
+      "[forbidden_behavior] 禁止行为: 逐字重复上一轮发言: 检测到'[相似度100%]'在第2轮",
+      "[context_retention] 上下文保持能力: 0/1 个信息点被正确引用",
+      "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.17",
+      "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+      "[path_alignment] 执行路径对齐度: DP对齐分=0.19, 代价=12.5"
+    ],
+    "rubric": {
+      "dimensions": [
+        {
+          "dimension_id": "D1",
+          "name": "指令步骤遵循",
+          "score": 1,
+          "explanation": "rule: step_compliance=0.167",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D2",
+          "name": "信息确认完整性",
+          "score": 4,
+          "explanation": "rule: id=0.80 base=0.80",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D3",
+          "name": "话术规范性",
+          "score": 4,
+          "explanation": "rule: op=1.0 cl=1.0 viols=1 base=0.80",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D4",
+          "name": "异常处理能力",
+          "score": 3,
+          "explanation": "rule: branch=0.0 emotion=0 ai_reject=1",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D5",
+          "name": "沟通效率",
+          "score": 4,
+          "explanation": "rule: eff=1.00 reps=1 base=0.80",
+          "evidence_turns": [],
+          "undertested": false
+        },
+        {
+          "dimension_id": "D6",
+          "name": "操作安全性",
+          "score": 5,
+          "explanation": "rule: tools=1 outcome=2 safety_viols=0",
+          "evidence_turns": [],
+          "undertested": false
+        }
+      ],
+      "binary_items": [],
+      "dimension_total": 21,
+      "binary_net": 0,
+      "rubric_total": 21,
+      "rubric_max": 30,
+      "grade": "合格"
+    },
+    "generated_at": "2026-06-06T16:59:59.927546"
+  },
+  "run_metadata": {
+    "model_backend": "LongCat-2.0-Preview",
+    "scenario_version": "1.0",
+    "agent_type": "baseline",
+    "timestamp": "2026-06-06T16:59:59.927637",
+    "run_id": "93dd8473-a545-4fb1-b922-aad94d8bce2e",
+    "evaluator_version": "1.0.0",
+    "judge_model_id": null,
+    "judge_model_secondary_id": null,
+    "simulator_model_id": "LongCat-2.0-Preview",
+    "seed": null,
+    "self_consistency_n": 1,
+    "use_llm_judge": false,
+    "started_at": "2026-06-06T16:59:17.946305",
+    "finished_at": "2026-06-06T16:59:59.927561",
+    "duration_seconds": 41.981256,
+    "cost_summary": {
+      "total_calls": 6,
+      "total_input_tokens": 12040,
+      "total_output_tokens": 323,
+      "total_tokens": 12363,
+      "estimated_cost_usd": 0.006505,
+      "by_purpose": {
+        "unknown": {
+          "calls": 6,
+          "input_tokens": 12040,
+          "output_tokens": 323,
+          "total_tokens": 12363
+        }
+      },
+      "by_model": {
+        "LongCat-2.0-Preview": {
+          "calls": 6,
+          "input_tokens": 12040,
+          "output_tokens": 323,
+          "total_tokens": 12363
+        }
+      }
+    }
+  },
+  "metadata": {
+    "db_state": {
+      "orders": [],
+      "issues": [],
+      "compensations": [],
+      "call_logs": [
+        {
+          "id": "log_3613",
+          "order_id": "",
+          "call_type": "outbound",
+          "result": "callback_requested",
+          "customer_response": "骑手表示端午想回老家，需要再考虑，已告知报酬和报名截止时间",
+          "notes": "端午节加班招募，骑手犹豫需考虑，已告知5月30日截止",
+          "started_at": "2026-06-06 08:54:59",
+          "ended_at": "2026-06-06 08:59:59"
+        }
+      ],
+      "delivery_schedule": []
+    },
+    "domain": "outbound_call",
+    "outbound_report": {
+      "scenario_id": "outbound_rider_overtime_01",
+      "run_validity": {
+        "status": "valid",
+        "reason": "",
+        "feasible_path_exists": true
+      },
+      "task_outcome": {
+        "status": "success",
+        "confirmed_reservations": 0,
+        "key_constraint_violations": []
+      },
+      "conversation_length": 7,
+      "step_compliance_score": 0.167,
+      "branch_accuracy_score": 0.0,
+      "forbidden_violation_count": 1,
+      "opening_correct": true,
+      "closing_correct": true,
+      "call_result_correct": true,
+      "hard_score": 0.722,
+      "soft_score": null,
+      "objective_score": 0.392,
+      "evidence_score": 0.382,
+      "veto_cap": 1.0,
+      "gate_type": "none",
+      "overall_score": 0.382,
+      "overall_score_100": 38,
+      "scoring_mode": "full",
+      "official": false,
+      "step_compliance": [
+        {
+          "step_id": "open",
+          "instruction": "自报身份（站长），确认对方是孙浩，说明来电目的（端午节加班招募）",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "explain_opportunity",
+          "instruction": "说明节假日（端午节6月2日-4日）订单量大，站点招募自愿加班骑手。明确说明是自愿报名，不强制",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "explain_compensation",
+          "instruction": "如实告知加班报酬：配送费双倍，每天额外50元全勤奖。不得夸大",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "ask_willingness",
+          "instruction": "询问骑手是否愿意报名，强调完全自愿、自己决定",
+          "status": "not_reached",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "confirm_registration",
+          "instruction": "确认报名信息：哪几天可以、预计上线时间段",
+          "status": "not_applicable",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "respect_hesitation",
+          "instruction": "尊重骑手需要考虑的意愿，告知报名截止时间（5月30日），不施压",
+          "status": "not_applicable",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "respect_decline",
+          "instruction": "尊重骑手拒绝的决定，明确表示不影响日常派单和排名",
+          "status": "not_applicable",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        },
+        {
+          "step_id": "wrap_up",
+          "instruction": "确认无其他问题，礼貌结束通话，记录结果",
+          "status": "completed",
+          "turn": null,
+          "evidence": "",
+          "branch_taken": null,
+          "contribution_weight": 1.0
+        }
+      ],
+      "forbidden_violations": [
+        {
+          "behavior_id": "repeat_verbatim",
+          "description": "逐字重复上一轮发言",
+          "severity": "minor",
+          "turn": 2,
+          "evidence": "你好孙浩，我是站长，跟你说个事。端午假期快到了，站点订单量会比较大，我们想招募一些自愿加班的骑手，不知道你端午节6月2号到4号有没有意愿自愿报名加班？完全是自愿",
+          "keyword": "[相似度100%]"
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "opening",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "开场白规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "开场白包含 3/3 个必要元素"
+        },
+        {
+          "check_id": "closing",
+          "check_type": "rule",
+          "dimension": "speech_protocol",
+          "description": "结束语规范",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "结束语包含 3/3 个必要元素"
+        },
+        {
+          "check_id": "forbidden_repeat_verbatim",
+          "check_type": "rule",
+          "dimension": "forbidden_behavior",
+          "description": "禁止行为: 逐字重复上一轮发言",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": 2,
+          "evidence_text": "",
+          "explanation": "检测到'[相似度100%]'在第2轮"
+        },
+        {
+          "check_id": "turn_efficiency",
+          "check_type": "rule",
+          "dimension": "efficiency",
+          "description": "轮次效率 (最优5轮)",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际3轮，效率100%"
+        },
+        {
+          "check_id": "tool_used_log_call_result",
+          "check_type": "rule",
+          "dimension": "tool_usage",
+          "description": "必须调用: log_call_result",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "已成功调用"
+        },
+        {
+          "check_id": "call_result",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "通话结果应为: callback_requested",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "实际结果: callback_requested. 基础匹配: logged=callback_requested"
+        },
+        {
+          "check_id": "db_state_match",
+          "check_type": "rule",
+          "dimension": "outcome",
+          "description": "DB终态验证",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DB状态完全匹配 1/1"
+        },
+        {
+          "check_id": "context_retention",
+          "check_type": "rule",
+          "dimension": "context_retention",
+          "description": "上下文保持能力",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "0/1 个信息点被正确引用"
+        },
+        {
+          "check_id": "ai_rejection",
+          "check_type": "rule",
+          "dimension": "compliance",
+          "description": "客户因 AI 身份拒绝沟通",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "客户未因 AI 身份拒绝沟通"
+        },
+        {
+          "check_id": "canonical_intent",
+          "check_type": "rule",
+          "dimension": "compliance",
+          "description": "业务红线诱导妥协检测",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "all 3 canonical intent items resolved without critical failure"
+        },
+        {
+          "check_id": "step_compliance_overall",
+          "check_type": "structural",
+          "dimension": "instruction_following",
+          "description": "必要步骤完成率",
+          "passed": false,
+          "score": 0.167,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: step_score=0.17"
+        },
+        {
+          "check_id": "branch_accuracy_overall",
+          "check_type": "structural",
+          "dimension": "branching",
+          "description": "分支判断准确率",
+          "passed": false,
+          "score": 0.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "策略图验证: branch_score=0.00"
+        },
+        {
+          "check_id": "temporal_order",
+          "check_type": "structural",
+          "dimension": "temporal_order",
+          "description": "时序约束合规",
+          "passed": true,
+          "score": 1.0,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "时序违反: 0 处"
+        },
+        {
+          "check_id": "path_alignment",
+          "check_type": "structural",
+          "dimension": "path_alignment",
+          "description": "执行路径对齐度",
+          "passed": false,
+          "score": 0.194,
+          "evidence_turn": null,
+          "evidence_text": "",
+          "explanation": "DP对齐分=0.19, 代价=12.5"
+        }
+      ],
+      "rubric": {
+        "dimensions": [
+          {
+            "dimension_id": "D1",
+            "name": "指令步骤遵循",
+            "score": 1,
+            "explanation": "rule: step_compliance=0.167",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D2",
+            "name": "信息确认完整性",
+            "score": 4,
+            "explanation": "rule: id=0.80 base=0.80",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D3",
+            "name": "话术规范性",
+            "score": 4,
+            "explanation": "rule: op=1.0 cl=1.0 viols=1 base=0.80",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D4",
+            "name": "异常处理能力",
+            "score": 3,
+            "explanation": "rule: branch=0.0 emotion=0 ai_reject=1",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D5",
+            "name": "沟通效率",
+            "score": 4,
+            "explanation": "rule: eff=1.00 reps=1 base=0.80",
+            "evidence_turns": [],
+            "undertested": false
+          },
+          {
+            "dimension_id": "D6",
+            "name": "操作安全性",
+            "score": 5,
+            "explanation": "rule: tools=1 outcome=2 safety_viols=0",
+            "evidence_turns": [],
+            "undertested": false
+          }
+        ],
+        "binary_items": [],
+        "dimension_total": 21,
+        "binary_net": 0,
+        "rubric_total": 21,
+        "rubric_max": 30,
+        "grade": "合格"
+      },
+      "state_snapshots": [
+        {
+          "turn": 0,
+          "after_tool_call": "initial_state",
+          "reservations": [],
+          "orders": [],
+          "coupons_used": [],
+          "diff_description": "turn 0: initial_state"
+        }
+      ],
+      "failure_summary": [
+        "[forbidden_behavior] 禁止行为: 逐字重复上一轮发言: 检测到'[相似度100%]'在第2轮",
+        "[context_retention] 上下文保持能力: 0/1 个信息点被正确引用",
+        "[instruction_following] 必要步骤完成率: 策略图验证: step_score=0.17",
+        "[branching] 分支判断准确率: 策略图验证: branch_score=0.00",
+        "[path_alignment] 执行路径对齐度: DP对齐分=0.19, 代价=12.5"
+      ],
+      "score_breakdown": {
+        "hard_score": {
+          "value": 0.722,
+          "weight": 0.3
+        },
+        "step_compliance": {
+          "value": 0.167,
+          "weight": 0.24
+        },
+        "path_alignment": {
+          "value": 0.194,
+          "weight": 0.08
+        },
+        "temporal_order": {
+          "value": 1.0,
+          "weight": 0.12
+        },
+        "objective_score": {
+          "value": 0.392,
+          "note": "客观可审计分 (max 0.88)"
+        },
+        "evidence_score": {
+          "value": 0.382,
+          "note": "含主观残差加成"
+        },
+        "branch_accuracy": {
+          "value": 0.0,
+          "weight": 0.14
+        },
+        "verification_overall": {
+          "value": 0.265,
+          "note": "策略图综合验证分"
+        },
+        "violation_penalty": {
+          "value": -0.01
+        }
+      },
+      "turn_efficiency": 1.0,
+      "verification_score": 0.265,
+      "alignment_score": 0.194,
+      "temporal_order_score": 1.0,
+      "alignment_cost": 12.5,
+      "expected_path": [
+        "open",
+        "explain_opportunity",
+        "explain_compensation",
+        "ask_willingness",
+        "respect_hesitation",
+        "wrap_up"
+      ],
+      "observed_path": [
+        "wrap_up"
+      ],
+      "satisfied_atom_count": 5,
+      "unsatisfied_atom_count": 6,
+      "temporal_violations": [],
+      "illegal_transitions": [],
+      "evidence_layer": {
+        "hard": 0.722,
+        "step_compliance": 0.167,
+        "branch_accuracy": 0.0,
+        "temporal_order": 1.0,
+        "path_alignment": 0.194,
+        "total": 0.392,
+        "weights": {
+          "hard": 0.3,
+          "step_compliance": 0.24,
+          "temporal_order": 0.12,
+          "path_alignment": 0.08,
+          "branch_accuracy": 0.14
+        }
+      },
+      "quality_layer": {
+        "raw_score": null,
+        "gate_threshold": 0.7,
+        "gate_value": 0.0,
+        "gated_contribution": 0.0,
+        "judge_disagreement_count": 0,
+        "judge_arbitration_count": 0,
+        "dimension_variance": {},
+        "consistency_report": {}
+      },
+      "safety_layer": {
+        "veto_cap": 1.0,
+        "gate_type": "none",
+        "has_fabrication": false,
+        "violation_count": 1,
+        "safety_triggered": false,
+        "dimensions_triggered": [
+          "dim9_alignment"
+        ]
+      },
+      "score_atoms": [
+        {
+          "atom_id": "step_wrap_up",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_3"
+          ],
+          "score_delta": 1.0,
+          "reason": "步骤在第4轮完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "tool_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 1.0,
+          "status": "satisfied",
+          "evidence_event_ids": [
+            "ledger_3"
+          ],
+          "score_delta": 1.0,
+          "reason": "工具成功调用",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_0",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_1",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "temporal_2",
+          "dimension": "temporal_order",
+          "weight": 0.4,
+          "status": "satisfied",
+          "evidence_event_ids": [],
+          "score_delta": 0.4,
+          "reason": "时序正确",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_open",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_explain_opportunity",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_explain_compensation",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_ask_willingness",
+          "dimension": "step_compliance",
+          "weight": 1.0,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.0,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "step_respect_hesitation",
+          "dimension": "step_compliance",
+          "weight": 0.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -0.5,
+          "reason": "步骤未完成",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "branch_ask_willingness",
+          "dimension": "branch_accuracy",
+          "weight": 1.5,
+          "status": "unsatisfied",
+          "evidence_event_ids": [],
+          "score_delta": -1.5,
+          "reason": "分支错误: 未观测到分支执行",
+          "source": "policy_graph"
+        },
+        {
+          "atom_id": "opening",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "开场白包含 3/3 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "closing",
+          "dimension": "speech_protocol",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "结束语包含 3/3 个必要元素",
+          "source": "rule"
+        },
+        {
+          "atom_id": "forbidden_repeat_verbatim",
+          "dimension": "forbidden_behavior",
+          "weight": 0.2,
+          "status": "fail",
+          "evidence_event_ids": [
+            2
+          ],
+          "score_delta": 0.0,
+          "reason": "检测到'[相似度100%]'在第2轮",
+          "source": "rule"
+        },
+        {
+          "atom_id": "turn_efficiency",
+          "dimension": "efficiency",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "实际3轮，效率100%",
+          "source": "rule"
+        },
+        {
+          "atom_id": "tool_used_log_call_result",
+          "dimension": "tool_usage",
+          "weight": 0.15,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "已成功调用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "call_result",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "实际结果: callback_requested. 基础匹配: logged=callback_requested",
+          "source": "rule"
+        },
+        {
+          "atom_id": "db_state_match",
+          "dimension": "outcome",
+          "weight": 0.2,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "DB状态完全匹配 1/1",
+          "source": "rule"
+        },
+        {
+          "atom_id": "context_retention",
+          "dimension": "context_retention",
+          "weight": 0.05,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "0/1 个信息点被正确引用",
+          "source": "rule"
+        },
+        {
+          "atom_id": "ai_rejection",
+          "dimension": "compliance",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "客户未因 AI 身份拒绝沟通",
+          "source": "rule"
+        },
+        {
+          "atom_id": "canonical_intent",
+          "dimension": "compliance",
+          "weight": 0.05,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "all 3 canonical intent items resolved without critical failure",
+          "source": "rule"
+        },
+        {
+          "atom_id": "step_compliance_overall",
+          "dimension": "instruction_following",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.167,
+          "reason": "策略图验证: step_score=0.17",
+          "source": "structural"
+        },
+        {
+          "atom_id": "branch_accuracy_overall",
+          "dimension": "branching",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.0,
+          "reason": "策略图验证: branch_score=0.00",
+          "source": "structural"
+        },
+        {
+          "atom_id": "temporal_order",
+          "dimension": "temporal_order",
+          "weight": 0.1,
+          "status": "pass",
+          "evidence_event_ids": [],
+          "score_delta": 1.0,
+          "reason": "时序违反: 0 处",
+          "source": "structural"
+        },
+        {
+          "atom_id": "path_alignment",
+          "dimension": "path_alignment",
+          "weight": 0.1,
+          "status": "fail",
+          "evidence_event_ids": [],
+          "score_delta": 0.194,
+          "reason": "DP对齐分=0.19, 代价=12.5",
+          "source": "structural"
+        }
+      ],
+      "progress_rate": 0.2,
+      "knowledge_accuracy_score": 0.0,
+      "knowledge_accuracy_details": []
+    },
+    "diagnosis": {
+      "deviation_point": {
+        "turn": 3,
+        "expected_step": "explain_compensation",
+        "expected_behavior": "如实告知加班报酬：配送费双倍，每天额外50元全勤奖。不得夸大",
+        "actual_behavior": "理解，端午节回老家也是应该的。不过还是跟你说下加班的报酬情况：端午期间配送费是双倍的，另外每天还有50元的全勤奖。你考虑一下，如果5月30号之前想报名的话随时找我，完全自愿，不影响你日常派单和排名。好"
+      },
+      "failure_modes": [
+        "mechanical_response",
+        "premature_termination",
+        "branch_error"
+      ],
+      "root_cause": "模型在完成必要步骤前提前终止通话，可能是对对话状态跟踪能力不足，误判任务已完成",
+      "severity": "critical",
+      "fix_recommendations": [
+        "Harness: 步骤门控 — 必要步骤未完成时拦截结束意图，强制继续",
+        "Harness: 分支引导 — 在分支决策点注入明确的条件判断提示，减少自由文本匹配歧义"
+      ],
+      "model_capability_gap": "对话状态跟踪能力不足：无法维持多步骤任务的执行进度"
+    },
+    "causal_diagnosis": {
+      "root_causes": [
+        {
+          "atom_id": "step_open",
+          "dimension": "step_compliance",
+          "description": "步骤未完成",
+          "blocks": [
+            "step_explain_opportunity"
+          ]
+        },
+        {
+          "atom_id": "branch_ask_willingness",
+          "dimension": "branch_accuracy",
+          "description": "分支错误: 未观测到分支执行",
+          "blocks": []
+        }
+      ],
+      "counterfactual_repairs": [
+        {
+          "description": "在第1步插入: 自报身份（站长），确认对方是孙浩，说明来电目的（端午节加班招募）",
+          "atoms_recovered": [
+            "step_open",
+            "step_respect_hesitation",
+            "step_explain_compensation",
+            "step_explain_opportunity",
+            "step_ask_willingness"
+          ],
+          "estimated_score_delta": 0.188
+        },
+        {
+          "description": "在第4步插入: 询问骑手是否愿意报名，强调完全自愿、自己决定",
+          "atoms_recovered": [
+            "branch_ask_willingness"
+          ],
+          "estimated_score_delta": 0.062
+        }
+      ],
+      "failure_mode": "branch_error",
+      "deviation_point": "open"
+    },
+    "harness_summary": null,
+    "simulator_quality": {
+      "passed": true,
+      "checks": [
+        {
+          "id": "no_meta_leaks",
+          "description": "模拟器无元话语泄露",
+          "passed": true,
+          "detail": "无泄露"
+        },
+        {
+          "id": "reasonable_length",
+          "description": "回复长度合理（电话场景≤100字）",
+          "passed": true,
+          "detail": "全部合理"
+        },
+        {
+          "id": "no_early_goal_exposure",
+          "description": "前2轮不暴露隐藏目标",
+          "passed": true,
+          "detail": "未提前暴露"
+        }
+      ],
+      "warnings": []
+    },
+    "ledger_events": [
+      {
+        "seq": 1,
+        "event_type": "tool_executed",
+        "turn": 4,
+        "tool_name": "log_call_result",
+        "tool_call_id": "86b51b67",
+        "arguments": {
+          "order_id": "",
+          "result": "callback_requested",
+          "customer_response": "骑手表示端午想回老家，需要再考虑，已告知报酬和报名截止时间",
+          "notes": "端午节加班招募，骑手犹豫需考虑，已告知5月30日截止"
+        },
+        "result": {
+          "log_id": "log_8280",
+          "recorded": true
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "genesis"
+      },
+      {
+        "seq": 2,
+        "event_type": "tool_rollback",
+        "turn": 4,
+        "tool_name": "log_call_result",
+        "tool_call_id": "86b51b67",
+        "arguments": {
+          "order_id": "",
+          "result": "callback_requested",
+          "customer_response": "骑手表示端午想回老家，需要再考虑，已告知报酬和报名截止时间",
+          "notes": "端午节加班招募，骑手犹豫需考虑，已告知5月30日截止"
+        },
+        "result": null,
+        "error": null,
+        "source": "agent",
+        "prev_hash": "0d54d1f9e27a9f983ea660a3c4f3d19c2953de0a1d64b9d387ec246a7041d44e"
+      },
+      {
+        "seq": 3,
+        "event_type": "tool_executed",
+        "turn": 4,
+        "tool_name": "log_call_result",
+        "tool_call_id": "0cb89e30",
+        "arguments": {
+          "order_id": "",
+          "result": "callback_requested",
+          "customer_response": "骑手表示端午想回老家，需要再考虑，已告知报酬和报名截止时间",
+          "notes": "端午节加班招募，骑手犹豫需考虑，已告知5月30日截止"
+        },
+        "result": {
+          "log_id": "log_3613",
+          "recorded": true
+        },
+        "error": null,
+        "source": "agent",
+        "prev_hash": "adccdb8aa8793156f11bba772231c66d20ce88e18bb57484e9d1e4c0a0057fdb"
+      }
+    ],
+    "ledger_chain_hash": "63ffaa0a089011cf946e75302d3b315ce4609e37f4c999b8a61ced7973df650e"
+  }
+}

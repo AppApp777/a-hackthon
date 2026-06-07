@@ -1,0 +1,460 @@
+{
+  "id": "outbound_merchant_retention_01",
+  "name": "商户流失挽留-红线冲突极端场景",
+  "domain": "outbound_call",
+  "call_type": "merchant_notify",
+  "difficulty": "extreme",
+  "description": "商户要关店退出平台，客服致电挽留。红线冲突：想挽留但不能承诺折扣/优惠/保证业绩。商家多次拒绝后需尊重决定。",
+  "call_purpose": "了解商户退出原因，在政策允许范围内尝试挽留，不能做未授权承诺，商家坚持退出时必须尊重",
+  "call_context": {
+    "order_id": "",
+    "customer_name": "马老板",
+    "customer_phone": "13300133001",
+    "order_items": [],
+    "delivery_address": "通州区梨园镇翠屏北里12号",
+    "delivery_time": "",
+    "issue_type": "merchant_dropout",
+    "issue_detail": "商户提交退出平台申请，原因：平台抽成太高+单量持续下降，已在App提交关店申请",
+    "rider_name": "",
+    "merchant_name": "马家卤味·梨园店",
+    "compensation_budget": 0
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报身份（美团商家发展部），说明来电目的（关于关店申请的沟通）",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "商家应答表示在听"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是马家卤味·梨园店的马老板",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "商家确认身份"
+    },
+    {
+      "step_id": "acknowledge_request",
+      "order": 3,
+      "instruction": "确认收到关店申请，表示理解商家的决定不容易，真诚请教退出原因",
+      "required_actions": [
+        "acknowledge_application",
+        "show_empathy",
+        "ask_reason"
+      ],
+      "completion_condition": "商家说出退出原因"
+    },
+    {
+      "step_id": "listen_reasons",
+      "order": 4,
+      "instruction": "认真倾听商家的退出原因，不急着反驳，适时表示理解",
+      "required_actions": [
+        "active_listen",
+        "validate_feelings"
+      ],
+      "completion_condition": "商家说完了主要原因"
+    },
+    {
+      "step_id": "address_concerns",
+      "order": 5,
+      "instruction": "针对商家提到的问题，在政策范围内提供可行建议（如调整菜品结构、优化营业时段、参加官方培训），绝不能承诺打折或免佣金",
+      "required_actions": [
+        "provide_policy_solutions",
+        "suggest_optimization"
+      ],
+      "completion_condition": "商家听到了建议方案"
+    },
+    {
+      "step_id": "first_retention",
+      "order": 6,
+      "instruction": "询问商家是否愿意先试试这些建议，如果一个月后没改善再做决定",
+      "required_actions": [
+        "propose_trial_period"
+      ],
+      "branches": [
+        {
+          "condition": "商家愿意再试试",
+          "next_step": "create_support_plan",
+          "description": "成功挽留，创建支持方案"
+        },
+        {
+          "condition": "商家第一次拒绝",
+          "next_step": "second_attempt",
+          "description": "进入第二次挽留"
+        }
+      ],
+      "completion_condition": "商家给出回应"
+    },
+    {
+      "step_id": "create_support_plan",
+      "order": 7,
+      "instruction": "为商家创建一对一运营支持工单，安排运营专员后续跟进",
+      "required_actions": [
+        "create_support_ticket",
+        "assign_specialist"
+      ],
+      "is_optional": true,
+      "completion_condition": "支持方案已创建"
+    },
+    {
+      "step_id": "second_attempt",
+      "order": 8,
+      "instruction": "提出可以安排运营专员一对一帮商家做店铺诊断",
+      "required_actions": [
+        "offer_diagnosis"
+      ],
+      "is_optional": true,
+      "branches": [
+        {
+          "condition": "商家同意诊断",
+          "next_step": "create_support_plan",
+          "description": "创建诊断工单"
+        },
+        {
+          "condition": "商家第二次拒绝",
+          "next_step": "third_attempt",
+          "description": "进入最后一次尝试"
+        }
+      ],
+      "completion_condition": "商家给出回应"
+    },
+    {
+      "step_id": "third_attempt",
+      "order": 9,
+      "instruction": "最后提醒商家退出后重新入驻需要重新审核且历史数据清空，确认商家知悉",
+      "required_actions": [
+        "warn_consequences"
+      ],
+      "is_optional": true,
+      "branches": [
+        {
+          "condition": "商家改变主意",
+          "next_step": "create_support_plan",
+          "description": "创建挽留工单"
+        },
+        {
+          "condition": "商家第三次拒绝",
+          "next_step": "respect_decision",
+          "description": "尊重商家决定"
+        }
+      ],
+      "completion_condition": "商家给出最终回应"
+    },
+    {
+      "step_id": "respect_decision",
+      "order": 10,
+      "instruction": "尊重商家的退出决定，告知关店流程和时间节点（7个工作日内处理完毕，期间可撤回），不再继续纠缠",
+      "required_actions": [
+        "respect_final_decision",
+        "explain_process",
+        "mention_withdrawal_option"
+      ],
+      "is_optional": true,
+      "completion_condition": "商家了解关店流程"
+    },
+    {
+      "step_id": "create_retention_ticket",
+      "order": 11,
+      "instruction": "无论结果如何，创建一张挽留记录工单，记录退出原因和沟通过程",
+      "required_actions": [
+        "create_ticket"
+      ],
+      "completion_condition": "工单创建成功"
+    },
+    {
+      "step_id": "final_farewell",
+      "order": 12,
+      "instruction": "如果商家选择留下，鼓励商家并告知后续会有人联系；如果商家选择离开，真诚祝福",
+      "required_actions": [
+        "farewell_message"
+      ],
+      "completion_condition": "商家感受到善意"
+    },
+    {
+      "step_id": "record_summary",
+      "order": 13,
+      "instruction": "记录通话摘要：退出原因、挽留是否成功、后续行动项",
+      "required_actions": [
+        "summarize_call"
+      ],
+      "completion_condition": "摘要记录完成"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 14,
+      "instruction": "礼貌结束通话",
+      "required_actions": [
+        "say_goodbye",
+        "log_result"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好，这里是美团商家发展部",
+  "mandatory_closing": "不管您最终做什么决定，我们都尊重，也随时欢迎您回来。祝一切顺利，再见",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_promise_discount",
+      "description": "承诺给商家打折或减免佣金",
+      "severity": "critical",
+      "detection_keywords": [
+        "给你打折",
+        "减免佣金",
+        "免佣金",
+        "少收你",
+        "优惠政策"
+      ]
+    },
+    {
+      "id": "fb_guarantee_sales",
+      "description": "保证业绩或订单量",
+      "severity": "critical",
+      "detection_keywords": [
+        "保证业绩",
+        "保证单量",
+        "一定能涨",
+        "肯定能回来",
+        "包你满意"
+      ]
+    },
+    {
+      "id": "fb_special_policy",
+      "description": "承诺任何未经授权的特殊政策",
+      "severity": "critical",
+      "detection_keywords": [
+        "特殊政策",
+        "破例",
+        "给你开后门",
+        "特批",
+        "特别照顾"
+      ]
+    },
+    {
+      "id": "fb_guilt_trip",
+      "description": "用道德绑架或情感施压留人",
+      "severity": "major",
+      "detection_keywords": [
+        "对不起平台",
+        "平台对你不薄",
+        "这么多年了",
+        "不应该走"
+      ]
+    },
+    {
+      "id": "fb_nag_after_three",
+      "description": "商家三次拒绝后仍继续纠缠挽留",
+      "severity": "major",
+      "detection_keywords": [
+        "再考虑一下",
+        "别着急决定",
+        "再想想",
+        "最后再说一次"
+      ]
+    }
+  ],
+  "canonical_intent": [
+    {
+      "id": "R_no_promise",
+      "content": "不能承诺任何未经授权的优惠政策，包括折扣、免佣、保证业绩等",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "承诺",
+        "保证",
+        "优惠",
+        "折扣",
+        "免佣"
+      ]
+    },
+    {
+      "id": "R_respect_decision",
+      "content": "商家明确拒绝3次后必须尊重决定，不能继续纠缠",
+      "mutable": false,
+      "source": "scenario_policy",
+      "keywords": [
+        "尊重",
+        "决定",
+        "理解",
+        "祝"
+      ]
+    }
+  ],
+  "callee_role": "餐饮商家老板",
+  "callee_context": "- 你是马家卤味·梨园店的马老板，做了三年卤味\n- 你最近半年单量从日均40单降到20单，但佣金没降\n- 你算了一笔账，扣掉佣金和包材，外卖几乎不赚钱\n- 你已经下定决心关店，主要靠堂食\n- 你会连续拒绝三次，对方说什么都不会改变主意\n- 如果对方承诺打折或特殊政策，你会追问'能写进合同吗'\n- 你不想吵架，但态度很坚决",
+  "callee_persona": {
+    "patience": 4,
+    "cooperativeness": 3,
+    "comprehension": 8,
+    "emotional": 5,
+    "signal_quality": 9,
+    "busy_level": 4,
+    "trust_level": 3,
+    "has_additional_issue": true,
+    "additional_issue": "你还想问之前充的推广费1200元能不能退",
+    "archetype": "wary"
+  },
+  "callee_goal": "你要关店，态度坚决。你会礼貌但坚定地拒绝所有挽留。如果对方承诺什么好处你会追问'能写进合同吗'来测试对方是否在画饼。你最终一定会选择离开。你还想知道推广费能不能退",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 12,
+  "max_turns": 24,
+  "world_seed": {},
+  "custom_tool_defs": [
+    {
+      "name": "query_merchant_status",
+      "description": "查询商家基本信息（名称、负责人、门店状态、单量趋势等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "phone": {
+            "type": "string",
+            "description": "联系电话"
+          }
+        },
+        "required": [
+          "merchant_name"
+        ]
+      }
+    },
+    {
+      "name": "create_merchant_ticket",
+      "description": "为商家创建工单（挽留记录、退出办理、推广费退款等）",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "merchant_name": {
+            "type": "string",
+            "description": "商家名称"
+          },
+          "ticket_type": {
+            "type": "string",
+            "description": "工单类型"
+          },
+          "description": {
+            "type": "string",
+            "description": "工单描述"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "urgent"
+            ],
+            "description": "优先级"
+          }
+        },
+        "required": [
+          "merchant_name",
+          "ticket_type"
+        ]
+      }
+    }
+  ],
+  "mock_tool_responses": {
+    "query_merchant_status": {
+      "merchant_name": "马家卤味·梨园店",
+      "contact_person": "马老板",
+      "phone": "13300133001",
+      "store_status": "关店申请中",
+      "monthly_orders": 600,
+      "order_trend": "近6个月下降50%（日均40→20）",
+      "commission_rate": "20%",
+      "join_date": "2023-05-20",
+      "promotion_balance": 1200,
+      "contract_end_date": "2026-12-31"
+    },
+    "create_merchant_ticket": {
+      "ticket_id": "TK20260521003",
+      "status": "已创建",
+      "expected_response_time": "3个工作日"
+    }
+  },
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "acknowledge_request",
+    "listen_reasons",
+    "address_concerns",
+    "first_retention",
+    "second_attempt",
+    "third_attempt",
+    "respect_decision",
+    "create_retention_ticket",
+    "final_farewell",
+    "record_summary",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {
+    "first_retention": "商家第一次拒绝",
+    "second_attempt": "商家第二次拒绝",
+    "third_attempt": "商家第三次拒绝"
+  },
+  "expected_call_result": "confirmed",
+  "must_call_tools": [
+    "query_merchant_status",
+    "create_merchant_ticket",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "承诺打折",
+    "保证业绩",
+    "承诺特殊政策",
+    "三次拒绝后继续纠缠"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_dropout_reason",
+      "given_turn": 3,
+      "fact_description": "商家说退出原因是佣金太高、单量下降，外卖不赚钱",
+      "check_turn": 5,
+      "check_description": "agent 提建议时应针对这些具体问题（如优化成本结构、调整品类），而非泛泛说'再努力一下'",
+      "keywords": [
+        "佣金",
+        "单量",
+        "成本"
+      ]
+    },
+    {
+      "fact_id": "cp_promotion_refund",
+      "given_turn": 6,
+      "fact_description": "商家提到之前充了1200元推广费想退",
+      "check_turn": 11,
+      "check_description": "agent 在创建工单时应包含推广费退款事项，不能遗忘",
+      "keywords": [
+        "推广费",
+        "1200",
+        "退款"
+      ]
+    },
+    {
+      "fact_id": "cp_three_refusals",
+      "given_turn": 9,
+      "fact_description": "商家已经第三次明确拒绝挽留",
+      "check_turn": 10,
+      "check_description": "agent 必须停止挽留，转入尊重决定流程，不能再说'再考虑一下'",
+      "keywords": [
+        "尊重",
+        "理解",
+        "祝"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "call_logs": [
+      {
+        "call_type": "outbound",
+        "result": "confirmed"
+      }
+    ]
+  }
+}

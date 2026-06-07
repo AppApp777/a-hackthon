@@ -1,0 +1,275 @@
+{
+  "id": "outbound_flip_flop_01",
+  "name": "用户改口-退款换货反复",
+  "domain": "outbound_call",
+  "call_type": "after_sales",
+  "difficulty": "medium",
+  "description": "客户先说要退款，聊了两轮后改主意说不退了要换货，再过两轮又改回退款。Agent必须跟踪客户最新意图并按最新意图执行，不能按旧意图操作。难点在于Agent可能锁定第一次意图不更新。",
+  "call_purpose": "处理客户的售后诉求，准确跟踪客户变化的意图并按最终意图执行",
+  "call_context": {
+    "order_id": "MT20260519401",
+    "customer_name": "刘女士",
+    "customer_phone": "13500135001",
+    "order_items": [
+      "有机蒜蓉西兰花（轻食低卡）",
+      "【素食主义·匠心手作】香煎嫩豆腐",
+      "（加购+1元得）紫菜蛋花汤",
+      "杂粮米饭x2（糙米+藜麦）"
+    ],
+    "delivery_address": "海淀区五道口优盛大厦 3楼305",
+    "delivery_time": "12:15",
+    "issue_type": "wrong_item",
+    "issue_detail": "客户点的蒜蓉西兰花送成了清炒西兰花，口味完全不对",
+    "rider_name": "陈师傅",
+    "merchant_name": "素食小厨",
+    "compensation_budget": 25
+  },
+  "instruction_steps": [
+    {
+      "step_id": "open",
+      "order": 1,
+      "instruction": "自报美团客服身份，说明来电是跟进送错菜品问题",
+      "required_actions": [
+        "self_identify",
+        "state_purpose"
+      ],
+      "completion_condition": "客户应答"
+    },
+    {
+      "step_id": "confirm_identity",
+      "order": 2,
+      "instruction": "确认对方是刘女士本人",
+      "required_actions": [
+        "confirm_name"
+      ],
+      "completion_condition": "客户确认身份"
+    },
+    {
+      "step_id": "query_order_info",
+      "order": 3,
+      "instruction": "通过query_order查询订单详情",
+      "required_actions": [
+        "query_order"
+      ],
+      "completion_condition": "获取到订单详情"
+    },
+    {
+      "step_id": "confirm_issue",
+      "order": 4,
+      "instruction": "复述问题让客户确认：点的蒜蓉西兰花送成了清炒西兰花",
+      "required_actions": [
+        "restate_issue"
+      ],
+      "completion_condition": "客户确认送错情况"
+    },
+    {
+      "step_id": "check_eligibility",
+      "order": 5,
+      "instruction": "查询补偿资格",
+      "required_actions": [
+        "check_compensation_eligibility"
+      ],
+      "completion_condition": "确认可补偿范围"
+    },
+    {
+      "step_id": "first_intent_refund",
+      "order": 6,
+      "instruction": "客户第一次表达意图（退款）。记录客户想要退款，开始准备退款方案",
+      "required_actions": [
+        "acknowledge_intent"
+      ],
+      "completion_condition": "确认客户当前想退款"
+    },
+    {
+      "step_id": "intent_change_to_exchange",
+      "order": 7,
+      "instruction": "客户改口说不退了要换货。Agent必须明确确认新意图，更新处理方向为换货，不要按退款继续执行",
+      "required_actions": [
+        "reconfirm_new_intent"
+      ],
+      "completion_condition": "确认客户改为换货"
+    },
+    {
+      "step_id": "intent_change_back_refund",
+      "order": 8,
+      "instruction": "客户再次改口说还是退款吧。Agent必须再次确认最终意图，耐心不急躁",
+      "required_actions": [
+        "reconfirm_final_intent"
+      ],
+      "forbidden_words": [
+        "你到底要什么",
+        "能不能想好了再说",
+        "你一直变",
+        "你之前说的是"
+      ],
+      "completion_condition": "确认客户最终选择退款"
+    },
+    {
+      "step_id": "execute_final_intent",
+      "order": 9,
+      "instruction": "按客户最终意图（退款）执行补偿。执行前明确复述：'好的刘女士，那我帮您办理退款'",
+      "required_actions": [
+        "create_compensation"
+      ],
+      "completion_condition": "退款已创建"
+    },
+    {
+      "step_id": "confirm_result",
+      "order": 10,
+      "instruction": "告知客户退款结果和到账时间，确认客户满意",
+      "required_actions": [
+        "confirm_with_customer"
+      ],
+      "completion_condition": "客户确认"
+    },
+    {
+      "step_id": "ask_other",
+      "order": 11,
+      "instruction": "确认是否还有其他问题",
+      "required_actions": [
+        "ask_other_issues"
+      ],
+      "completion_condition": "客户说没了"
+    },
+    {
+      "step_id": "log_result",
+      "order": 12,
+      "instruction": "记录通话结果，备注客户意图变化过程",
+      "required_actions": [
+        "log_call_result"
+      ],
+      "completion_condition": "记录完成"
+    },
+    {
+      "step_id": "wrap_up",
+      "order": 13,
+      "instruction": "使用规范结束语道别",
+      "required_actions": [
+        "say_goodbye"
+      ],
+      "completion_condition": "通话结束"
+    }
+  ],
+  "mandatory_opening": "您好刘女士，我是美团客服，关于您订单送错菜品的问题给您来电",
+  "mandatory_closing": "退款已为您办理，感谢您的耐心，祝您生活愉快",
+  "forbidden_behaviors": [
+    {
+      "id": "fb_execute_old_intent",
+      "description": "按客户已改变的旧意图执行操作（如客户最后说退款但Agent执行了换货）",
+      "severity": "critical",
+      "detection_keywords": [
+        "帮您安排换货",
+        "补送一份给您",
+        "重新配送"
+      ]
+    },
+    {
+      "id": "fb_impatient_with_change",
+      "description": "对客户改口表现不耐烦或指责",
+      "severity": "major",
+      "detection_keywords": [
+        "你到底要什么",
+        "能不能想好了",
+        "你一直在变",
+        "刚才不是说",
+        "你之前说"
+      ]
+    },
+    {
+      "id": "fb_skip_reconfirm",
+      "description": "客户改口后不重新确认就直接执行",
+      "severity": "major",
+      "detection_keywords": [
+        "好的马上办",
+        "直接帮您处理"
+      ]
+    }
+  ],
+  "callee_persona": {
+    "patience": 6,
+    "cooperativeness": 7,
+    "comprehension": 7,
+    "emotional": 4,
+    "signal_quality": 9,
+    "busy_level": 3,
+    "trust_level": 6,
+    "has_additional_issue": false
+  },
+  "callee_goal": "你点的蒜蓉西兰花送成了清炒西兰花。你的行为模式：1) 一开始说想退款 2) 聊两轮后你犹豫了，觉得其实换一份也行，就改口说'算了不退了，能不能重新送一份对的？' 3) 再过两轮你又觉得太麻烦了，说'还是退款吧，我不想等了'。你不是故意刁难，就是真的在犹豫。如果客服对你的改口表现出不耐烦，你会不高兴。",
+  "callee_role": "犹豫不决的客户",
+  "callee_context": "午饭点了蒜蓉西兰花但收到的是清炒西兰花，虽然都是西兰花但做法和味道完全不同。你在退款和换货之间犹豫，因为退款快但没饭吃，换货有饭吃但要等。你是那种容易改主意的人，不是故意刁难客服。",
+  "initial_state": "answered",
+  "tool_faults": [],
+  "optimal_turns": 8,
+  "max_turns": 15,
+  "world_seed": {},
+  "expected_steps_completed": [
+    "open",
+    "confirm_identity",
+    "query_order_info",
+    "confirm_issue",
+    "check_eligibility",
+    "first_intent_refund",
+    "intent_change_to_exchange",
+    "intent_change_back_refund",
+    "execute_final_intent",
+    "confirm_result",
+    "log_result",
+    "wrap_up"
+  ],
+  "expected_branch_taken": {},
+  "expected_call_result": "refunded",
+  "must_call_tools": [
+    "query_order",
+    "check_compensation_eligibility",
+    "create_compensation",
+    "log_call_result"
+  ],
+  "must_not_do": [
+    "按旧意图执行",
+    "对改口不耐烦",
+    "不确认就执行"
+  ],
+  "context_checkpoints": [
+    {
+      "fact_id": "cp_intent_tracking",
+      "given_turn": 5,
+      "fact_description": "客户第一次改口从退款改为换货",
+      "check_turn": 7,
+      "check_description": "当客户第二次改口回退款时，Agent应确认'您之前提到想换货，现在确认改回退款对吗'，体现对意图变化的跟踪",
+      "keywords": [
+        "退款",
+        "确认",
+        "最终"
+      ]
+    },
+    {
+      "fact_id": "cp_wrong_item_detail",
+      "given_turn": 2,
+      "fact_description": "送错的具体情况：蒜蓉西兰花送成了清炒西兰花",
+      "check_turn": 9,
+      "check_description": "Agent在执行最终退款时应准确引用送错的菜品名，不应说错或泛称",
+      "keywords": [
+        "蒜蓉西兰花",
+        "清炒西兰花",
+        "送错"
+      ]
+    }
+  ],
+  "expected_db_state": {
+    "compensations": [
+      {
+        "order_id": "MT20260519401",
+        "type": "refund",
+        "status": "approved"
+      }
+    ],
+    "call_logs": [
+      {
+        "order_id": "MT20260519401",
+        "call_type": "outbound",
+        "result": "refunded"
+      }
+    ]
+  }
+}
